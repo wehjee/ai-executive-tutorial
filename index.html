@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise AI — Humana Leadership Series</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        /* ═══════════════════════════════════════════
+           HERO
+        ═══════════════════════════════════════════ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 140px 48px 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero__ambient {
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, var(--accent-warm-dim) 0%, transparent 70%);
+            pointer-events: none;
+            animation: ambientPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes ambientPulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .hero__eyebrow {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-warm);
+            margin-bottom: 32px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s var(--ease-out-expo) 0.2s forwards;
+        }
+
+        .hero__title {
+            font-family: var(--font-display);
+            font-size: clamp(48px, 7vw, 96px);
+            line-height: 1.05;
+            font-weight: 400;
+            max-width: 900px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s var(--ease-out-expo) 0.4s forwards;
+        }
+
+        .hero__title em {
+            font-style: italic;
+            color: var(--accent-warm);
+        }
+
+        .hero__subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 540px;
+            margin-top: 32px;
+            font-weight: 300;
+            line-height: 1.8;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s var(--ease-out-expo) 0.7s forwards;
+        }
+
+        .hero__meta {
+            display: flex;
+            gap: 40px;
+            margin-top: 56px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s var(--ease-out-expo) 0.9s forwards;
+        }
+
+        .hero__meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .hero__meta-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .hero__meta-value {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ═══════════════════════════════════════════
+           MODULE CARD GRID
+        ═══════════════════════════════════════════ */
+        .modules {
+            padding: 0 48px 120px;
+        }
+
+        .modules__grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .module-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s var(--ease-out-expo);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 12px 12px 0 0;
+            transition: height 0.4s var(--ease-out-expo);
+        }
+
+        .module-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-active);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .module-card:hover::before {
+            height: 4px;
+        }
+
+        .module-card--warm::before { background: var(--accent-warm); }
+        .module-card--teal::before { background: var(--accent-teal); }
+        .module-card--lavender::before { background: var(--accent-lavender); }
+        .module-card--gold::before { background: var(--accent-gold); }
+
+        .module-card__number {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .module-card--warm .module-card__number { color: var(--accent-warm); }
+        .module-card--teal .module-card__number { color: var(--accent-teal); }
+        .module-card--lavender .module-card__number { color: var(--accent-lavender); }
+        .module-card--gold .module-card__number { color: var(--accent-gold); }
+
+        .module-card__title {
+            font-family: var(--font-display);
+            font-size: 26px;
+            line-height: 1.25;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .module-card__desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .module-card__footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .module-card__time {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .module-card__cta {
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .module-card__cta-arrow {
+            transition: transform 0.3s var(--ease-out-expo);
+        }
+
+        .module-card:hover .module-card__cta-arrow {
+            transform: translateX(4px);
+        }
+
+        /* Completed state */
+        .module-card--completed {
+            border-color: var(--accent-teal);
+        }
+
+        .module-card--completed .module-card__number::after {
+            content: ' \2713  Completed';
+            color: var(--accent-teal);
+            font-weight: 500;
+        }
+
+        /* ═══════════════════════════════════════════
+           CLOSING
+        ═══════════════════════════════════════════ */
+        .closing {
+            padding: 120px 48px;
+            text-align: center;
+            border-top: 1px solid var(--border-subtle);
+            position: relative;
+        }
+
+        .closing__ambient {
+            position: absolute;
+            bottom: -30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-teal-dim) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .closing__quote {
+            font-family: var(--font-display);
+            font-size: clamp(28px, 4vw, 44px);
+            max-width: 680px;
+            margin: 0 auto 20px;
+            line-height: 1.25;
+            position: relative;
+            font-style: italic;
+            color: var(--text-primary);
+        }
+
+        .closing__quote em {
+            font-style: italic;
+            color: var(--accent-warm);
+        }
+
+        .closing__attr {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+            position: relative;
+        }
+
+        /* ═══════════════════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .hero {
+                padding: 120px 24px 80px;
+            }
+
+            .hero__meta {
+                flex-wrap: wrap;
+                gap: 24px;
+            }
+
+            .modules {
+                padding: 0 24px 80px;
+            }
+
+            .modules__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .closing {
+                padding: 80px 24px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero {
+                padding: 100px 16px 60px;
+            }
+
+            .modules {
+                padding: 0 16px 60px;
+            }
+
+            .module-card {
+                padding: 28px;
+            }
+
+            .closing {
+                padding: 60px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════
+         NAVIGATION
+    ═══════════════════════════════════════════ -->
+    <nav class="nav">
+        <a href="index.html" class="nav__brand">
+            <div class="nav__logo">✨</div>
+            <span class="nav__title">Enterprise AI  — Humana Leadership Series</span>
+        </a>
+        <div class="nav__links">
+            <a href="photo-prompting.html" class="nav__link">Photo Prompting</a>
+            <a href="document-intel.html" class="nav__link">Documents</a>
+            <a href="vibe-coding.html" class="nav__link">Vibe Coding</a>
+            <a href="ai-agents.html" class="nav__link">AI Agents</a>
+        </div>
+        <button class="nav__hamburger" id="nav-hamburger" type="button" aria-label="Open menu">
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+        </button>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════
+         HERO
+    ═══════════════════════════════════════════ -->
+    <section class="hero">
+        <div class="hero__ambient"></div>
+        <div class="hero__eyebrow">Humana Leadership Series — 2026</div>
+        <h1 class="hero__title">Forty-Five Minutes<br>to <em>Fluency.</em></h1>
+        <p class="hero__subtitle">A hands-on executive briefing. Four capabilities every healthcare leader needs to understand — not in theory, but in practice.</p>
+        <div class="hero__meta">
+            <div class="hero__meta-item">
+                <span class="hero__meta-label">Duration</span>
+                <span class="hero__meta-value">45 Minutes</span>
+            </div>
+            <div class="hero__meta-item">
+                <span class="hero__meta-label">Format</span>
+                <span class="hero__meta-value">Interactive Workshop</span>
+            </div>
+            <div class="hero__meta-item">
+                <span class="hero__meta-label">Prerequisite</span>
+                <span class="hero__meta-value">None</span>
+            </div>
+            <div class="hero__meta-item">
+                <span class="hero__meta-label">Modules</span>
+                <span class="hero__meta-value">4 Hands-On Sessions</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         MODULE GRID
+    ═══════════════════════════════════════════ -->
+    <section class="modules">
+        <div class="modules__grid">
+
+            <a href="photo-prompting.html" class="module-card module-card--warm reveal" data-module="photo-prompting">
+                <div class="module-card__number">Module 01</div>
+                <div class="module-card__title">The Art of Photo Prompting</div>
+                <p class="module-card__desc">Generate photorealistic images and marketing visuals from text descriptions alone.</p>
+                <div class="module-card__footer">
+                    <span class="module-card__time">~10 min</span>
+                    <span class="module-card__cta">Start Module <span class="module-card__cta-arrow">&rarr;</span></span>
+                </div>
+            </a>
+
+            <a href="document-intel.html" class="module-card module-card--teal reveal reveal--delay-1" data-module="document-intel">
+                <div class="module-card__number">Module 02</div>
+                <div class="module-card__title">From Documents to Decisions</div>
+                <p class="module-card__desc">Transform reports, spreadsheets, and data into executive-ready presentations in minutes.</p>
+                <div class="module-card__footer">
+                    <span class="module-card__time">~12 min</span>
+                    <span class="module-card__cta">Start Module <span class="module-card__cta-arrow">&rarr;</span></span>
+                </div>
+            </a>
+
+            <a href="vibe-coding.html" class="module-card module-card--lavender reveal reveal--delay-2" data-module="vibe-coding">
+                <div class="module-card__number">Module 03</div>
+                <div class="module-card__title">Building Software Without Code</div>
+                <p class="module-card__desc">Describe what you need in plain English and watch AI build working software.</p>
+                <div class="module-card__footer">
+                    <span class="module-card__time">~12 min</span>
+                    <span class="module-card__cta">Start Module <span class="module-card__cta-arrow">&rarr;</span></span>
+                </div>
+            </a>
+
+            <a href="ai-agents.html" class="module-card module-card--gold reveal reveal--delay-3" data-module="ai-agents">
+                <div class="module-card__number">Module 04</div>
+                <div class="module-card__title">Building Systems That Work for You</div>
+                <p class="module-card__desc">Design AI agents that reason, decide, and act on your behalf with defined guardrails.</p>
+                <div class="module-card__footer">
+                    <span class="module-card__time">~11 min</span>
+                    <span class="module-card__cta">Start Module <span class="module-card__cta-arrow">&rarr;</span></span>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         CLOSING
+    ═══════════════════════════════════════════ -->
+    <section class="closing">
+        <div class="closing__ambient"></div>
+        <p class="closing__quote reveal">"The future belongs to leaders who <em>build</em> — not those who wait for permission to start."</p>
+        <span class="closing__attr reveal reveal--delay-1">Enterprise AI</span>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════════ -->
+    <footer class="footer">
+        <span class="footer__text">Enterprise AI — Humana Leadership Series</span>
+        <span class="footer__text">Confidential</span>
+    </footer>
+
+    <!-- ═══════════════════════════════════════════
+         JAVASCRIPT
+    ═══════════════════════════════════════════ -->
+    <script>
+        // ─── Scroll Reveal ───
+        const revealEls = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal--visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+        revealEls.forEach(el => revealObserver.observe(el));
+
+        // ─── Completion Status from localStorage ───
+        (function() {
+            try {
+                const completed = JSON.parse(localStorage.getItem('ai-tutorial-completed') || '[]');
+                if (Array.isArray(completed)) {
+                    document.querySelectorAll('.module-card').forEach(card => {
+                        const moduleName = card.getAttribute('data-module');
+                        if (completed.includes(moduleName)) {
+                            card.classList.add('module-card--completed');
+                        }
+                    });
+                }
+            } catch (e) {
+                // Silently handle malformed localStorage data
+            }
+        })();
+
+        // ─── Mobile Nav Toggle ───
+        (function() {
+            var hamburger = document.getElementById('nav-hamburger');
+            var navLinks = document.querySelector('.nav__links');
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', function() {
+                    hamburger.classList.toggle('nav__hamburger--open');
+                    navLinks.classList.toggle('nav__links--open');
+                });
+                navLinks.querySelectorAll('.nav__link').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        hamburger.classList.remove('nav__hamburger--open');
+                        navLinks.classList.remove('nav__links--open');
+                    });
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

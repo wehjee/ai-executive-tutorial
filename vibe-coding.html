@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Coding — Enterprise AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        /* ===============================================
+           VIBE CODING — PAGE-SPECIFIC STYLES
+        =============================================== */
+
+        /* ── Scenario Buttons ── */
+        .sandbox__scenarios {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .scenario-btn {
+            padding: 8px 18px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+        }
+
+        .scenario-btn:hover {
+            color: var(--text-secondary);
+            border-color: var(--border-active);
+            background: var(--bg-secondary);
+        }
+
+        .scenario-btn--active {
+            background: var(--text-primary);
+            color: #FFFFFF;
+            border-color: var(--text-primary);
+        }
+
+        .scenario-btn--active:hover {
+            background: #333;
+            border-color: #333;
+            color: #FFFFFF;
+        }
+
+        /* ── Step Indicator ── */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .step-indicator__dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .step-indicator__dot {
+            width: 28px;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-subtle);
+            transition: all 0.4s var(--ease-out-expo);
+        }
+
+        .step-indicator__dot--active {
+            background: var(--accent-lavender);
+            width: 36px;
+        }
+
+        .step-indicator__dot--done {
+            background: var(--accent-teal);
+        }
+
+        .step-indicator__label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+        }
+
+        /* ── Sandbox Textarea Override ── */
+        .sandbox .field__textarea {
+            min-height: 200px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.7;
+            resize: vertical;
+        }
+
+        /* ── Sandbox Action Buttons ── */
+        .sandbox__actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn--build {
+            background: var(--accent-lavender);
+            color: #FFFFFF;
+            border-color: var(--accent-lavender);
+        }
+
+        .btn--build:hover {
+            background: #6A5A96;
+            border-color: #6A5A96;
+        }
+
+        .btn--build:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .btn--iterate {
+            background: transparent;
+            color: var(--accent-lavender);
+            border-color: var(--accent-lavender);
+        }
+
+        .btn--iterate:hover {
+            background: var(--accent-lavender);
+            color: #FFFFFF;
+        }
+
+        .btn--iterate:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ── Preview Area ── */
+        .preview {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            min-height: 380px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview__empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 380px;
+            color: var(--text-muted);
+            gap: 12px;
+        }
+
+        .preview__empty-icon {
+            font-size: 36px;
+            opacity: 0.3;
+        }
+
+        .preview__empty-text {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 0.1em;
+        }
+
+        .preview__content {
+            padding: 24px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all 0.6s var(--ease-out-expo);
+        }
+
+        .preview__content--visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── Loading Shimmer ── */
+        .preview__loading {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .preview__loading--active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .shimmer-bar {
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--border-subtle) 25%, var(--bg-secondary) 50%, var(--border-subtle) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+
+        .shimmer-bar--wide { width: 80%; }
+        .shimmer-bar--medium { width: 60%; }
+        .shimmer-bar--narrow { width: 40%; }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .preview__loading-text {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-top: 8px;
+        }
+
+        /* ── Preview Mockup: Shared ── */
+        .mockup-title {
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .mockup-subtitle {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        /* ── Staffing Dashboard Bars ── */
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bar-row__label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            width: 80px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .bar-row__track {
+            flex: 1;
+            height: 22px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-row__fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s var(--ease-out-expo);
+        }
+
+        .bar-row__fill--gray { background: #B0ADA6; }
+        .bar-row__fill--green { background: #4CAF7D; }
+        .bar-row__fill--yellow { background: #D4A843; }
+        .bar-row__fill--red { background: #C25B5B; }
+
+        .bar-row__value {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            width: 40px;
+            flex-shrink: 0;
+        }
+
+        /* ── Staffing: Date Picker & Download ── */
+        .mockup-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .mockup-date-input {
+            padding: 6px 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 5px;
+            font-family: var(--font-body);
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            pointer-events: none;
+        }
+
+        .mockup-btn {
+            padding: 6px 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 5px;
+            background: var(--bg-card);
+            font-family: var(--font-body);
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: default;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mockup-btn--primary {
+            background: var(--accent-lavender);
+            color: #FFFFFF;
+            border-color: var(--accent-lavender);
+        }
+
+        /* ── Wait Time Table ── */
+        .mockup-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .mockup-table th {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-align: left;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            font-weight: 500;
+        }
+
+        .mockup-table td {
+            padding: 10px 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-subtle);
+            font-weight: 400;
+        }
+
+        .mockup-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-badge--green {
+            background: rgba(76, 175, 125, 0.12);
+            color: #3A8F5A;
+        }
+
+        .status-badge--yellow {
+            background: rgba(212, 168, 67, 0.12);
+            color: #9A7A1F;
+        }
+
+        .status-badge--red {
+            background: rgba(194, 91, 91, 0.12);
+            color: #B04040;
+        }
+
+        /* ── Wait Time Mini Chart ── */
+        .mini-chart {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .mini-chart__bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 80px;
+            padding-top: 8px;
+        }
+
+        .mini-chart__col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .mini-chart__bar {
+            width: 100%;
+            border-radius: 3px 3px 0 0;
+            transition: height 0.5s var(--ease-out-expo);
+        }
+
+        .mini-chart__label {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        /* ── Report Generator Form ── */
+        .mockup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .mockup-form__group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mockup-form__label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .mockup-form__input,
+        .mockup-form__select {
+            padding: 7px 10px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 5px;
+            font-family: var(--font-body);
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            pointer-events: none;
+        }
+
+        .mockup-form__row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mockup-form__row > * {
+            flex: 1;
+        }
+
+        /* ── Report Output Preview ── */
+        .mockup-report {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+        }
+
+        .mockup-report__title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .mockup-report__line {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .mockup-export-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        /* ── Callout Accent Override ── */
+        .callout--lavender {
+            border-left-color: var(--accent-lavender);
+        }
+
+        /* ── Responsive: Sandbox ── */
+        @media (max-width: 900px) {
+            .sandbox__header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+
+            .bar-row__label {
+                width: 60px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sandbox__scenarios {
+                gap: 6px;
+            }
+
+            .scenario-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .mockup-form__row {
+                flex-direction: column;
+            }
+
+            .mockup-export-btns {
+                flex-direction: column;
+            }
+
+            .mockup-toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===============================================
+         NAVIGATION
+    =============================================== -->
+    <nav class="nav">
+        <a href="index.html" class="nav__brand">
+            <div class="nav__logo">✨</div>
+            <span class="nav__title">Enterprise AI  — Humana Leadership Series</span>
+        </a>
+        <div class="nav__links">
+            <a href="photo-prompting.html" class="nav__link" data-module="photo-prompting">Photo Prompting</a>
+            <a href="document-intel.html" class="nav__link" data-module="document-intel">Documents</a>
+            <a href="vibe-coding.html" class="nav__link nav__link--active" data-module="vibe-coding">Vibe Coding</a>
+            <a href="ai-agents.html" class="nav__link" data-module="ai-agents">AI Agents</a>
+        </div>
+        <button class="nav__hamburger" id="nav-hamburger" type="button" aria-label="Open menu">
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+        </button>
+    </nav>
+
+    <!-- ===============================================
+         PAGE
+    =============================================== -->
+    <div class="page">
+
+        <!-- ── Header ── -->
+        <header class="page__header">
+            <div class="page__number">03</div>
+            <div class="page__eyebrow page__eyebrow--vibe">Module 03 — Vibe Coding</div>
+            <h1 class="page__title">Building Software Without Code</h1>
+            <p class="page__intro">The barrier between "idea" and "working software" has collapsed. Today, you can describe what you want in plain English and watch AI build it. This is vibe coding — and it changes who gets to be a builder.</p>
+        </header>
+
+        <!-- ── Content ── -->
+        <section class="page__content">
+
+            <!-- 1. What is Vibe Coding? -->
+            <div class="content-grid">
+                <div class="card card--full card--no-hover reveal">
+                    <div class="card__badge card__badge--key">Key Concept</div>
+                    <h2 class="card__title">What is Vibe Coding?</h2>
+                    <p class="card__text">
+                        <strong>Vibe coding</strong> is the practice of building software by describing what you want in natural language — and letting AI generate the code. You don't need to understand programming syntax, frameworks, or databases. You need to understand <strong>the problem you're solving</strong> and be able to describe the experience you want clearly.
+                    </p>
+                    <p class="card__text" style="margin-top: 14px;">
+                        Think of it as the difference between being an architect and a bricklayer. You design the building — AI lays the bricks. The skill shifts from <strong>writing code</strong> to <strong>thinking clearly about what software should do</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2. Side-by-side: Possibilities & Expectations -->
+            <div class="content-grid">
+                <div class="card reveal">
+                    <div class="card__badge card__badge--step">Real Possibilities</div>
+                    <h3 class="card__title">What You Can Build</h3>
+                    <ul class="checklist">
+                        <li class="checklist__item">
+                            <span class="checklist__icon">&check;</span>
+                            Internal dashboards that visualize your department's data
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">&check;</span>
+                            Workflow tools that automate repetitive manual tasks
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">&check;</span>
+                            Report generators that pull from existing data sources
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">&check;</span>
+                            Scheduling and staffing calculators
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">&check;</span>
+                            Patient feedback trackers and survey tools
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">&check;</span>
+                            Training material generators and quizzes
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card reveal reveal--delay-1">
+                    <div class="card__badge card__badge--warn">Realistic Expectations</div>
+                    <h3 class="card__title">What It's NOT</h3>
+                    <ul class="checklist">
+                        <li class="checklist__item">
+                            <span class="checklist__icon" style="color: var(--accent-rose);">&times;</span>
+                            A replacement for enterprise software engineering
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon" style="color: var(--accent-rose);">&times;</span>
+                            Suitable for HIPAA-regulated patient data systems (without proper review)
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon" style="color: var(--accent-rose);">&times;</span>
+                            A way to bypass your IT department's security policies
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon" style="color: var(--accent-rose);">&times;</span>
+                            Perfect on the first try — iteration is always required
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon" style="color: var(--accent-rose);">&times;</span>
+                            Capable of building complex integrations without technical guidance
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 3. How to Vibe Code Effectively -->
+            <div class="content-grid">
+                <div class="card card--full card--no-hover reveal">
+                    <div class="card__badge card__badge--key">Framework</div>
+                    <h2 class="card__title">How to Vibe Code Effectively</h2>
+                    <ol class="steps">
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Start with the Problem, Not the Solution</h4>
+                                <p>Before you describe what to build, articulate the problem you're solving. "My charge nurses spend 45 minutes per shift manually checking staffing ratios" is a much better starting point than "Build me a staffing app."</p>
+                            </div>
+                        </li>
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Describe the User Experience</h4>
+                                <p>Think about who will use this tool and what they need to see. Describe the screen layout, the data displayed, and the actions a user should be able to take. Be specific: "A bar chart showing each department's staffing percentage, color-coded green/yellow/red."</p>
+                            </div>
+                        </li>
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Start Small, Then Iterate</h4>
+                                <p>Don't try to describe the entire application in one prompt. Start with the core screen. Get that working. Then add features one at a time. Each iteration should be a clear, focused addition.</p>
+                            </div>
+                        </li>
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Test Like a User, Not a Developer</h4>
+                                <p>When reviewing what AI builds, don't look at the code. Click through it like a nurse, administrator, or physician would. Does it make sense? Can you accomplish the task in under 30 seconds? If not, describe what's confusing and iterate.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 4. Staffing Dashboard Prompt Example -->
+            <div class="content-grid">
+                <div class="card card--full card--no-hover reveal">
+                    <div class="card__badge card__badge--key">Example Prompt</div>
+                    <h2 class="card__title">Staffing Dashboard — A Real Prompt</h2>
+                    <p class="card__text" style="margin-bottom: 20px;">
+                        Here's what a well-structured vibe coding prompt looks like. Notice how it describes the <strong>problem</strong>, the <strong>user</strong>, the <strong>layout</strong>, and the <strong>data</strong> — all without mentioning a single programming language.
+                    </p>
+                    <div class="prompt-example">
+                        <div class="prompt-example__label">
+                            <span>Vibe Coding Prompt</span>
+                        </div>
+                        <div class="prompt-example__text">
+                            <span class="highlight--lavender">Build me a staffing dashboard</span> for a hospital nursing supervisor.<br><br>
+                            The dashboard should show <span class="highlight">6 departments</span> (ICU, Emergency, Medical-Surgical, Labor & Delivery, Pediatrics, Oncology) with <span class="highlight">horizontal bar charts</span> showing current staffing percentage.<br><br>
+                            <span class="highlight--teal">Color-code the bars</span>: green if above 95%, yellow if 80-95%, red if below 80%.<br><br>
+                            Add a <span class="highlight">date picker</span> at the top so supervisors can view historical data. Include a <span class="highlight--lavender">"Download PDF"</span> button in the top-right corner for shift reports.<br><br>
+                            The design should be <span class="highlight--teal">clean and scannable</span> — a supervisor should be able to assess the entire floor's staffing status in under 5 seconds.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Callout Quote -->
+            <div class="callout callout--lavender reveal">
+                <p class="callout__text">"The best software is built by people who understand the problem deeply — not necessarily people who understand code."</p>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 HANDS-ON SANDBOX
+            ═══════════════════════════════════════════ -->
+            <div class="sandbox reveal" id="sandbox">
+                <div class="sandbox__header">
+                    <div class="sandbox__title">Describe &rarr; Build Simulator</div>
+                    <div class="sandbox__scenarios">
+                        <button class="scenario-btn scenario-btn--active" data-scenario="staffing">Staffing Dashboard</button>
+                        <button class="scenario-btn" data-scenario="waittime">Wait Time Tracker</button>
+                        <button class="scenario-btn" data-scenario="report">Report Generator</button>
+                    </div>
+                </div>
+                <div class="sandbox__split">
+
+                    <!-- Left Pane: Prompt -->
+                    <div class="sandbox__pane sandbox__pane--left">
+                        <span class="sandbox__pane-label">Describe What You Want</span>
+                        <div class="step-indicator">
+                            <div class="step-indicator__dots">
+                                <div class="step-indicator__dot step-indicator__dot--active" data-step-dot="1"></div>
+                                <div class="step-indicator__dot" data-step-dot="2"></div>
+                                <div class="step-indicator__dot" data-step-dot="3"></div>
+                            </div>
+                            <span class="step-indicator__label" id="stepLabel">Prompt 1 of 3</span>
+                        </div>
+                        <div class="field">
+                            <textarea class="field__textarea" id="promptArea" placeholder="Describe the software you want to build..."></textarea>
+                        </div>
+                        <div class="sandbox__actions">
+                            <button class="btn btn--build" id="buildBtn">Build It &rarr;</button>
+                            <button class="btn btn--iterate" id="iterateBtn" disabled>Next Iteration &rarr;</button>
+                        </div>
+                    </div>
+
+                    <!-- Right Pane: Preview -->
+                    <div class="sandbox__pane">
+                        <span class="sandbox__pane-label">Live Preview</span>
+                        <div class="preview" id="previewArea">
+                            <!-- Loading overlay -->
+                            <div class="preview__loading" id="previewLoading">
+                                <div class="shimmer-bar shimmer-bar--wide"></div>
+                                <div class="shimmer-bar shimmer-bar--medium"></div>
+                                <div class="shimmer-bar shimmer-bar--narrow"></div>
+                                <div class="shimmer-bar shimmer-bar--medium"></div>
+                                <div class="preview__loading-text">Generating UI...</div>
+                            </div>
+                            <!-- Empty state -->
+                            <div class="preview__empty" id="previewEmpty">
+                                <div class="preview__empty-icon">&#9671;</div>
+                                <div class="preview__empty-text">Click "Build It" to generate</div>
+                            </div>
+                            <!-- Preview content -->
+                            <div class="preview__content" id="previewContent"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 EXECUTIVE TAKEAWAY
+            ═══════════════════════════════════════════ -->
+            <div class="takeaway takeaway--vibe reveal">
+                <div class="takeaway__label">Executive Takeaway</div>
+                <h3 class="takeaway__title">You no longer need to file an IT ticket to solve a workflow problem.</h3>
+                <p class="takeaway__text">
+                    Vibe coding puts the power of software creation directly in the hands of the people closest to the problem. As a healthcare leader, you can prototype solutions in minutes, test ideas before committing budget, and communicate your vision to IT in a language they can immediately execute. The gap between "I wish we had a tool for this" and "Here's a working prototype" is now measured in minutes, not months.
+                </p>
+            </div>
+
+        </section>
+
+        <!-- ── Page Navigation ── -->
+        <nav class="page-nav">
+            <a href="document-intel.html" class="page-nav__link">
+                <span class="page-nav__label">Previous</span>
+                <span class="page-nav__title">&larr; Document Intelligence</span>
+            </a>
+            <a href="ai-agents.html" class="page-nav__link page-nav__link--next">
+                <span class="page-nav__label">Up Next</span>
+                <span class="page-nav__title">Next: AI Agents &rarr;</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+        <span class="footer__text">Enterprise AI — Humana Leadership Series</span>
+        <span class="footer__text">Confidential</span>
+    </footer>
+
+    <!-- ===============================================
+         JAVASCRIPT
+    =============================================== -->
+    <script>
+    (function() {
+        'use strict';
+
+        /* ─────────────────────────────────────
+           SCENARIO DATA
+        ───────────────────────────────────── */
+        const scenarios = {
+            staffing: {
+                prompts: [
+                    'Build me a staffing dashboard for a hospital nursing supervisor. Show 6 departments (ICU, Emergency, Medical-Surgical, Labor & Delivery, Pediatrics, Oncology) with horizontal bar charts showing current staffing percentage.',
+                    'Now color-code the bars based on staffing levels: green if above 95%, yellow if 80-95%, red if below 80%. Make it easy to spot problems at a glance.',
+                    'Add a date picker at the top so supervisors can view historical data. Include a "Download PDF" button in the top-right corner for shift reports.'
+                ],
+                previews: [
+                    function() {
+                        const depts = [
+                            { name: 'ICU', pct: 98 },
+                            { name: 'Emergency', pct: 87 },
+                            { name: 'Med-Surg', pct: 72 },
+                            { name: 'L&D', pct: 100 },
+                            { name: 'Pediatrics', pct: 91 },
+                            { name: 'Oncology', pct: 84 }
+                        ];
+                        let html = '<div class="mockup-title">Department Staffing Overview</div>';
+                        html += '<div class="bar-chart">';
+                        depts.forEach(d => {
+                            html += `<div class="bar-row">
+                                <span class="bar-row__label">${d.name}</span>
+                                <div class="bar-row__track">
+                                    <div class="bar-row__fill bar-row__fill--gray" style="width: ${d.pct}%"></div>
+                                </div>
+                                <span class="bar-row__value">${d.pct}%</span>
+                            </div>`;
+                        });
+                        html += '</div>';
+                        return html;
+                    },
+                    function() {
+                        const depts = [
+                            { name: 'ICU', pct: 98 },
+                            { name: 'Emergency', pct: 87 },
+                            { name: 'Med-Surg', pct: 72 },
+                            { name: 'L&D', pct: 100 },
+                            { name: 'Pediatrics', pct: 91 },
+                            { name: 'Oncology', pct: 84 }
+                        ];
+                        function barColor(p) {
+                            if (p > 95) return 'green';
+                            if (p >= 80) return 'yellow';
+                            return 'red';
+                        }
+                        let html = '<div class="mockup-title">Department Staffing Overview</div>';
+                        html += '<div class="bar-chart">';
+                        depts.forEach(d => {
+                            html += `<div class="bar-row">
+                                <span class="bar-row__label">${d.name}</span>
+                                <div class="bar-row__track">
+                                    <div class="bar-row__fill bar-row__fill--${barColor(d.pct)}" style="width: ${d.pct}%"></div>
+                                </div>
+                                <span class="bar-row__value">${d.pct}%</span>
+                            </div>`;
+                        });
+                        html += '</div>';
+                        return html;
+                    },
+                    function() {
+                        const depts = [
+                            { name: 'ICU', pct: 98 },
+                            { name: 'Emergency', pct: 87 },
+                            { name: 'Med-Surg', pct: 72 },
+                            { name: 'L&D', pct: 100 },
+                            { name: 'Pediatrics', pct: 91 },
+                            { name: 'Oncology', pct: 84 }
+                        ];
+                        function barColor(p) {
+                            if (p > 95) return 'green';
+                            if (p >= 80) return 'yellow';
+                            return 'red';
+                        }
+                        let html = '<div class="mockup-toolbar">';
+                        html += '<div><span class="mockup-subtitle" style="margin-bottom: 0;">Staffing Dashboard</span></div>';
+                        html += '<div style="display:flex;gap:8px;align-items:center;">';
+                        html += '<input type="date" class="mockup-date-input" value="2026-01-15">';
+                        html += '<span class="mockup-btn mockup-btn--primary">&#8681; Download PDF</span>';
+                        html += '</div></div>';
+                        html += '<div class="mockup-title" style="margin-bottom:12px;">Department Staffing Overview</div>';
+                        html += '<div class="bar-chart">';
+                        depts.forEach(d => {
+                            html += `<div class="bar-row">
+                                <span class="bar-row__label">${d.name}</span>
+                                <div class="bar-row__track">
+                                    <div class="bar-row__fill bar-row__fill--${barColor(d.pct)}" style="width: ${d.pct}%"></div>
+                                </div>
+                                <span class="bar-row__value">${d.pct}%</span>
+                            </div>`;
+                        });
+                        html += '</div>';
+                        return html;
+                    }
+                ]
+            },
+
+            waittime: {
+                prompts: [
+                    'Build a wait time tracker that shows current wait times for each department. Display it as a simple table with columns: Department, Current Wait, and Status.',
+                    'Add color-coded status badges: green for under 15 min, yellow for 15-30 min, red for over 30 min. Make the table feel like it updates in real time.',
+                    'Add a bar chart below the table showing average wait times for the past 6 hours so supervisors can see trends at a glance.'
+                ],
+                previews: [
+                    function() {
+                        const rows = [
+                            { dept: 'Emergency', wait: '42 min', status: 'Busy' },
+                            { dept: 'Radiology', wait: '18 min', status: 'Moderate' },
+                            { dept: 'Lab Services', wait: '8 min', status: 'Clear' },
+                            { dept: 'Pharmacy', wait: '23 min', status: 'Moderate' },
+                            { dept: 'Outpatient', wait: '12 min', status: 'Clear' }
+                        ];
+                        let html = '<div class="mockup-title">Current Wait Times</div>';
+                        html += '<table class="mockup-table"><thead><tr><th>Department</th><th>Current Wait</th><th>Status</th></tr></thead><tbody>';
+                        rows.forEach(r => {
+                            html += `<tr><td>${r.dept}</td><td>${r.wait}</td><td>${r.status}</td></tr>`;
+                        });
+                        html += '</tbody></table>';
+                        return html;
+                    },
+                    function() {
+                        const rows = [
+                            { dept: 'Emergency', wait: '42 min', color: 'red' },
+                            { dept: 'Radiology', wait: '18 min', color: 'yellow' },
+                            { dept: 'Lab Services', wait: '8 min', color: 'green' },
+                            { dept: 'Pharmacy', wait: '23 min', color: 'yellow' },
+                            { dept: 'Outpatient', wait: '12 min', color: 'green' }
+                        ];
+                        const labels = { green: 'On Track', yellow: 'Moderate', red: 'Delayed' };
+                        let html = '<div class="mockup-title" style="display:flex;align-items:center;justify-content:space-between;">Current Wait Times <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-teal);font-weight:500;letter-spacing:0.08em;">&#9679; LIVE</span></div>';
+                        html += '<table class="mockup-table"><thead><tr><th>Department</th><th>Current Wait</th><th>Status</th></tr></thead><tbody>';
+                        rows.forEach(r => {
+                            html += `<tr><td>${r.dept}</td><td>${r.wait}</td><td><span class="status-badge status-badge--${r.color}">${labels[r.color]}</span></td></tr>`;
+                        });
+                        html += '</tbody></table>';
+                        return html;
+                    },
+                    function() {
+                        const rows = [
+                            { dept: 'Emergency', wait: '42 min', color: 'red' },
+                            { dept: 'Radiology', wait: '18 min', color: 'yellow' },
+                            { dept: 'Lab Services', wait: '8 min', color: 'green' },
+                            { dept: 'Pharmacy', wait: '23 min', color: 'yellow' },
+                            { dept: 'Outpatient', wait: '12 min', color: 'green' }
+                        ];
+                        const labels = { green: 'On Track', yellow: 'Moderate', red: 'Delayed' };
+                        let html = '<div class="mockup-title" style="display:flex;align-items:center;justify-content:space-between;">Current Wait Times <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-teal);font-weight:500;letter-spacing:0.08em;">&#9679; LIVE</span></div>';
+                        html += '<table class="mockup-table"><thead><tr><th>Department</th><th>Current Wait</th><th>Status</th></tr></thead><tbody>';
+                        rows.forEach(r => {
+                            html += `<tr><td>${r.dept}</td><td>${r.wait}</td><td><span class="status-badge status-badge--${r.color}">${labels[r.color]}</span></td></tr>`;
+                        });
+                        html += '</tbody></table>';
+                        // Mini chart
+                        const hours = ['10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM'];
+                        const values = [14, 22, 38, 31, 26, 19];
+                        const max = 45;
+                        html += '<div class="mini-chart"><div class="mockup-subtitle">Average Wait (Past 6 Hours)</div><div class="mini-chart__bars">';
+                        hours.forEach((h, i) => {
+                            const pct = (values[i] / max) * 100;
+                            let color = '#4CAF7D';
+                            if (values[i] >= 30) color = '#C25B5B';
+                            else if (values[i] >= 15) color = '#D4A843';
+                            html += `<div class="mini-chart__col"><div class="mini-chart__bar" style="height:${pct}%;background:${color};"></div><span class="mini-chart__label">${h}</span></div>`;
+                        });
+                        html += '</div></div>';
+                        return html;
+                    }
+                ]
+            },
+
+            report: {
+                prompts: [
+                    'Build a report generator with a form that has a department dropdown (all departments listed) and a date range selector with start and end dates.',
+                    'Add an output preview area below the form that shows a mock "Generated Report" with a summary section, key metrics, and findings.',
+                    'Add export options below the report: "Export as PDF", "Export as Excel", and "Email Report" buttons.'
+                ],
+                previews: [
+                    function() {
+                        let html = '<div class="mockup-title">Report Generator</div>';
+                        html += '<div class="mockup-form">';
+                        html += '<div class="mockup-form__group"><span class="mockup-form__label">Department</span><select class="mockup-form__select"><option>Emergency</option></select></div>';
+                        html += '<div class="mockup-form__row"><div class="mockup-form__group"><span class="mockup-form__label">Start Date</span><input type="date" class="mockup-form__input" value="2026-01-01"></div>';
+                        html += '<div class="mockup-form__group"><span class="mockup-form__label">End Date</span><input type="date" class="mockup-form__input" value="2026-01-31"></div></div>';
+                        html += '<div><span class="mockup-btn mockup-btn--primary">Generate Report</span></div>';
+                        html += '</div>';
+                        return html;
+                    },
+                    function() {
+                        let html = '<div class="mockup-title">Report Generator</div>';
+                        html += '<div class="mockup-form">';
+                        html += '<div class="mockup-form__group"><span class="mockup-form__label">Department</span><select class="mockup-form__select"><option>Emergency</option></select></div>';
+                        html += '<div class="mockup-form__row"><div class="mockup-form__group"><span class="mockup-form__label">Start Date</span><input type="date" class="mockup-form__input" value="2026-01-01"></div>';
+                        html += '<div class="mockup-form__group"><span class="mockup-form__label">End Date</span><input type="date" class="mockup-form__input" value="2026-01-31"></div></div>';
+                        html += '</div>';
+                        html += '<div class="mockup-report">';
+                        html += '<div class="mockup-report__title">Emergency Department &mdash; January 2026</div>';
+                        html += '<div class="mockup-report__line"><strong>Total Visits:</strong> 3,847</div>';
+                        html += '<div class="mockup-report__line"><strong>Avg. Wait Time:</strong> 24 min</div>';
+                        html += '<div class="mockup-report__line"><strong>Patient Satisfaction:</strong> 4.2 / 5.0</div>';
+                        html += '<div class="mockup-report__line" style="margin-top:10px;color:var(--text-secondary);">Peak volume occurred during week 3 (Jan 15-21) with 1,102 visits. Staffing was below target for 3 of 7 days during this period. Recommendation: increase float pool allocation for Q2 peak projections.</div>';
+                        html += '</div>';
+                        return html;
+                    },
+                    function() {
+                        let html = '<div class="mockup-title">Report Generator</div>';
+                        html += '<div class="mockup-form">';
+                        html += '<div class="mockup-form__group"><span class="mockup-form__label">Department</span><select class="mockup-form__select"><option>Emergency</option></select></div>';
+                        html += '<div class="mockup-form__row"><div class="mockup-form__group"><span class="mockup-form__label">Start Date</span><input type="date" class="mockup-form__input" value="2026-01-01"></div>';
+                        html += '<div class="mockup-form__group"><span class="mockup-form__label">End Date</span><input type="date" class="mockup-form__input" value="2026-01-31"></div></div>';
+                        html += '</div>';
+                        html += '<div class="mockup-report">';
+                        html += '<div class="mockup-report__title">Emergency Department &mdash; January 2026</div>';
+                        html += '<div class="mockup-report__line"><strong>Total Visits:</strong> 3,847</div>';
+                        html += '<div class="mockup-report__line"><strong>Avg. Wait Time:</strong> 24 min</div>';
+                        html += '<div class="mockup-report__line"><strong>Patient Satisfaction:</strong> 4.2 / 5.0</div>';
+                        html += '<div class="mockup-report__line" style="margin-top:10px;color:var(--text-secondary);">Peak volume occurred during week 3 (Jan 15-21) with 1,102 visits. Staffing was below target for 3 of 7 days during this period. Recommendation: increase float pool allocation for Q2 peak projections.</div>';
+                        html += '<div class="mockup-export-btns">';
+                        html += '<span class="mockup-btn">&#128196; Export as PDF</span>';
+                        html += '<span class="mockup-btn">&#128202; Export as Excel</span>';
+                        html += '<span class="mockup-btn">&#9993; Email Report</span>';
+                        html += '</div>';
+                        html += '</div>';
+                        return html;
+                    }
+                ]
+            }
+        };
+
+        /* ─────────────────────────────────────
+           DOM REFERENCES
+        ───────────────────────────────────── */
+        const promptArea = document.getElementById('promptArea');
+        const buildBtn = document.getElementById('buildBtn');
+        const iterateBtn = document.getElementById('iterateBtn');
+        const previewContent = document.getElementById('previewContent');
+        const previewEmpty = document.getElementById('previewEmpty');
+        const previewLoading = document.getElementById('previewLoading');
+        const stepLabel = document.getElementById('stepLabel');
+        const stepDots = document.querySelectorAll('[data-step-dot]');
+        const scenarioBtns = document.querySelectorAll('.scenario-btn');
+
+        let currentScenario = 'staffing';
+        let currentStep = 0; // 0 = not started, 1-3 = steps
+        let built = false;   // whether current step has been built
+
+        /* ─────────────────────────────────────
+           SCENARIO SELECTION
+        ───────────────────────────────────── */
+        function selectScenario(key) {
+            currentScenario = key;
+            currentStep = 0;
+            built = false;
+
+            scenarioBtns.forEach(btn => {
+                btn.classList.toggle('scenario-btn--active', btn.dataset.scenario === key);
+            });
+
+            // Reset to step 1
+            loadStep(1);
+        }
+
+        scenarioBtns.forEach(btn => {
+            btn.addEventListener('click', () => selectScenario(btn.dataset.scenario));
+        });
+
+        /* ─────────────────────────────────────
+           STEP LOADING
+        ───────────────────────────────────── */
+        function loadStep(step) {
+            currentStep = step;
+            built = false;
+
+            const data = scenarios[currentScenario];
+            promptArea.value = data.prompts[step - 1];
+
+            // Update step indicator
+            stepLabel.textContent = `Prompt ${step} of 3`;
+            stepDots.forEach(dot => {
+                const dotStep = parseInt(dot.dataset.stepDot);
+                dot.classList.remove('step-indicator__dot--active', 'step-indicator__dot--done');
+                if (dotStep === step) {
+                    dot.classList.add('step-indicator__dot--active');
+                } else if (dotStep < step) {
+                    dot.classList.add('step-indicator__dot--done');
+                }
+            });
+
+            // Reset preview for step 1
+            if (step === 1) {
+                previewContent.classList.remove('preview__content--visible');
+                previewContent.innerHTML = '';
+                previewEmpty.style.display = 'flex';
+            }
+
+            // Button states
+            buildBtn.disabled = false;
+            iterateBtn.disabled = true;
+            iterateBtn.style.opacity = '0';
+        }
+
+        /* ─────────────────────────────────────
+           BUILD ACTION
+        ───────────────────────────────────── */
+        function triggerBuild() {
+            if (built) return;
+            built = true;
+            buildBtn.disabled = true;
+
+            // Show loading
+            previewEmpty.style.display = 'none';
+            previewLoading.classList.add('preview__loading--active');
+            previewContent.classList.remove('preview__content--visible');
+
+            // Simulate build time
+            setTimeout(() => {
+                const data = scenarios[currentScenario];
+                previewContent.innerHTML = data.previews[currentStep - 1]();
+                previewLoading.classList.remove('preview__loading--active');
+
+                // Animate in
+                requestAnimationFrame(() => {
+                    previewContent.classList.add('preview__content--visible');
+                });
+
+                // Show iterate button if not on last step
+                if (currentStep < 3) {
+                    iterateBtn.disabled = false;
+                    iterateBtn.style.opacity = '1';
+                }
+            }, 1200);
+        }
+
+        buildBtn.addEventListener('click', triggerBuild);
+
+        iterateBtn.addEventListener('click', () => {
+            if (currentStep < 3) {
+                loadStep(currentStep + 1);
+                // Auto-build the next step after a brief pause
+                setTimeout(triggerBuild, 200);
+            }
+        });
+
+        // Initialize with staffing scenario, step 1
+        loadStep(1);
+
+        /* ─────────────────────────────────────
+           MOBILE NAV TOGGLE
+        ───────────────────────────────────── */
+        (function() {
+            var hamburger = document.getElementById('nav-hamburger');
+            var navLinks = document.querySelector('.nav__links');
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', function() {
+                    hamburger.classList.toggle('nav__hamburger--open');
+                    navLinks.classList.toggle('nav__links--open');
+                });
+                navLinks.querySelectorAll('.nav__link').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        hamburger.classList.remove('nav__hamburger--open');
+                        navLinks.classList.remove('nav__links--open');
+                    });
+                });
+            }
+        })();
+
+        /* ─────────────────────────────────────
+           SCROLL REVEAL
+        ───────────────────────────────────── */
+        const revealEls = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal--visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+        revealEls.forEach(function(el) { revealObserver.observe(el); });
+
+        /* ─────────────────────────────────────
+           LOCALSTORAGE — MARK VISITED
+        ───────────────────────────────────── */
+        (function() {
+            try {
+                var visited = JSON.parse(localStorage.getItem('ai-tutorial-visited') || '[]');
+                if (!Array.isArray(visited)) visited = [];
+                if (visited.indexOf('vibe-coding') === -1) {
+                    visited.push('vibe-coding');
+                    localStorage.setItem('ai-tutorial-visited', JSON.stringify(visited));
+                }
+            } catch (e) { /* silently handle */ }
+        })();
+
+        /* ─────────────────────────────────────
+           NAV — VISITED STATUS
+        ───────────────────────────────────── */
+        (function() {
+            try {
+                var visited = JSON.parse(localStorage.getItem('ai-tutorial-visited') || '[]');
+                if (!Array.isArray(visited)) return;
+                document.querySelectorAll('.nav__link[data-module]').forEach(function(link) {
+                    var mod = link.getAttribute('data-module');
+                    if (visited.indexOf(mod) !== -1 && !link.classList.contains('nav__link--active')) {
+                        link.classList.add('nav__link--completed');
+                    }
+                });
+            } catch (e) { /* silently handle */ }
+        })();
+
+    })();
+    </script>
+
+</body>
+</html>

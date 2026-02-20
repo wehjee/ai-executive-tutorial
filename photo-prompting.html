@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Prompting — Enterprise AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        /* ═══════════════════════════════════════════
+           SANDBOX — PROMPT BUILDER STUDIO
+        ═══════════════════════════════════════════ */
+        .sandbox__scenarios {
+            display: flex;
+            gap: 6px;
+        }
+
+        .scenario-btn {
+            padding: 6px 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 5px;
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s var(--ease-out-expo);
+            white-space: nowrap;
+        }
+
+        .scenario-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-active);
+        }
+
+        .scenario-btn--active {
+            color: var(--accent-warm);
+            border-color: var(--accent-warm);
+            background: var(--accent-warm-dim);
+        }
+
+        .assembled-prompt {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 2;
+            min-height: 180px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            word-wrap: break-word;
+        }
+
+        .assembled-prompt--empty {
+            color: var(--text-muted);
+            font-style: italic;
+            font-weight: 300;
+        }
+
+        .assembled-prompt .prompt-subject { color: var(--accent-warm); font-weight: 400; }
+        .assembled-prompt .prompt-environment { color: var(--accent-teal); font-weight: 400; }
+        .assembled-prompt .prompt-lighting { color: var(--accent-lavender); font-weight: 400; }
+        .assembled-prompt .prompt-composition { color: var(--text-primary); font-weight: 400; }
+        .assembled-prompt .prompt-style { color: var(--accent-gold); font-weight: 400; }
+
+
+        .copy-btn-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        .copy-btn-row .btn--sm {
+            transition: all 0.3s var(--ease-out-expo);
+        }
+
+        .copy-btn-row .btn--sm.copied {
+            background: var(--accent-teal);
+            color: #FFFFFF;
+            border-color: var(--accent-teal);
+        }
+
+        .prompt-flow-hint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: var(--accent-teal-dim);
+            border: 1px solid var(--accent-teal);
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent-teal);
+            animation: pulseHint 2s ease-in-out infinite;
+        }
+
+        .prompt-flow-hint svg {
+            flex-shrink: 0;
+            animation: bounceDown 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bounceDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(3px); }
+        }
+
+        @keyframes pulseHint {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* ═══════════════════════════════════════════
+           HEADSHOT STUDIO
+        ═══════════════════════════════════════════ */
+        .field__textarea {
+            width: 100%;
+            padding: 12px 14px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            resize: vertical;
+            transition: border-color 0.25s var(--ease-out-expo);
+            font-weight: 300;
+        }
+
+        .field__textarea:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+        }
+
+        .field__textarea::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .field__hint {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            letter-spacing: 0.02em;
+            transition: all 0.3s var(--ease-out-expo);
+        }
+
+        .field__hint--detected {
+            color: var(--accent-teal);
+            font-weight: 500;
+        }
+
+        /* ─── Input Tabs (Upload / Selfie) ─── */
+        .headshot-input-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .headshot-tab {
+            flex: 1;
+            padding: 10px 16px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s var(--ease-out-expo);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .headshot-tab:not(:last-child) {
+            border-right: 1px solid var(--border-subtle);
+        }
+
+        .headshot-tab--active {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .headshot-tab:hover:not(.headshot-tab--active) {
+            background: var(--bg-card-hover);
+            color: var(--text-secondary);
+        }
+
+        .headshot-tab__icon {
+            display: flex;
+            align-items: center;
+        }
+
+        /* ─── Upload Zone ─── */
+        .headshot-upload {
+            border: 2px dashed var(--border-subtle);
+            border-radius: 10px;
+            padding: 40px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+            background: var(--bg-secondary);
+        }
+
+        .headshot-upload:hover {
+            border-color: var(--accent-teal);
+            background: var(--accent-teal-dim);
+        }
+
+        .headshot-upload.headshot-upload--dragover {
+            border-color: var(--accent-teal);
+            background: var(--accent-teal-dim);
+            transform: scale(1.01);
+        }
+
+        .headshot-upload__icon {
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .headshot-upload__text {
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .headshot-upload__hint {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+        }
+
+        /* ─── Selfie Camera ─── */
+        .headshot-selfie {
+            border-radius: 10px;
+            overflow: hidden;
+            background: #111;
+            position: relative;
+        }
+
+        .headshot-selfie video {
+            width: 100%;
+            display: block;
+            border-radius: 10px;
+            transform: scaleX(-1);
+        }
+
+        .headshot-selfie__controls {
+            display: flex;
+            justify-content: center;
+            padding: 12px;
+            gap: 12px;
+        }
+
+        .headshot-selfie__error {
+            padding: 32px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 300;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .headshot-selfie__error-icon {
+            font-size: 24px;
+            opacity: 0.4;
+        }
+
+        /* ─── Original Photo Display ─── */
+        .headshot-original {
+            text-align: center;
+        }
+
+        .headshot-original img {
+            width: 100%;
+            max-width: 200px;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 12px;
+        }
+
+        .headshot-change-btn {
+            font-size: 12px !important;
+        }
+
+        /* ─── Generate Button ─── */
+        .btn--generate {
+            width: 100%;
+            padding: 14px 20px;
+            background: var(--accent-teal);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s var(--ease-out-expo);
+            margin-top: 16px;
+        }
+
+        .btn--generate:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            filter: brightness(1.05);
+        }
+
+        .btn--generate:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .btn--generate .btn__spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: btnSpin 0.6s linear infinite;
+        }
+
+        .btn--generate--loading .btn__spinner {
+            display: block;
+        }
+
+        .btn--generate--loading .btn__label {
+            display: none;
+        }
+
+        @keyframes btnSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ─── Result Area ─── */
+        .headshot-result {
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .headshot-result__empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 300;
+            text-align: center;
+            padding: 40px 24px;
+        }
+
+        /* ─── Before/After Comparison ─── */
+        .headshot-comparison {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .headshot-comparison__panel {
+            flex: 1;
+            text-align: center;
+        }
+
+        .headshot-comparison__label {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .headshot-comparison__frame {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            position: relative;
+            background: var(--bg-secondary);
+        }
+
+        .headshot-comparison__frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .headshot-comparison__frame--enhanced {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .headshot-comparison__arrow {
+            flex-shrink: 0;
+            color: var(--text-muted);
+            opacity: 0.4;
+        }
+
+        /* ─── Loading State ─── */
+        .headshot-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 40px 24px;
+            width: 100%;
+        }
+
+        .headshot-loading__spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-subtle);
+            border-top-color: var(--accent-teal);
+            border-radius: 50%;
+            animation: btnSpin 0.8s linear infinite;
+        }
+
+        .headshot-loading__text {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 0.04em;
+        }
+
+        /* ─── Error Message ─── */
+        .headshot-error {
+            display: none;
+            padding: 12px 16px;
+            background: rgba(220, 38, 38, 0.06);
+            border: 1px solid rgba(220, 38, 38, 0.15);
+            border-radius: 8px;
+            color: #DC2626;
+            font-size: 13px;
+            font-weight: 400;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        .headshot-error--visible {
+            display: block;
+        }
+
+        #headshot-download:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 900px) {
+            .sandbox__scenarios {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sandbox__header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .sandbox__scenarios {
+                width: 100%;
+            }
+
+            .scenario-btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .headshot-comparison {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .headshot-comparison__arrow {
+                transform: rotate(90deg);
+            }
+
+            .headshot-comparison__frame {
+                max-width: 200px;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════
+         NAVIGATION
+    ═══════════════════════════════════════════ -->
+    <nav class="nav" id="nav">
+        <a class="nav__brand" href="index.html">
+            <div class="nav__logo">✨</div>
+            <span class="nav__title">Enterprise AI  — Humana Leadership Series</span>
+        </a>
+        <div class="nav__links">
+            <a href="photo-prompting.html" class="nav__link nav__link--active" data-module="photo-prompting">Photo Prompting</a>
+            <a href="document-intel.html" class="nav__link" data-module="document-intel">Document Intelligence</a>
+            <a href="vibe-coding.html" class="nav__link" data-module="vibe-coding">Vibe Coding</a>
+            <a href="ai-agents.html" class="nav__link" data-module="ai-agents">AI Agents</a>
+        </div>
+        <button class="nav__hamburger" id="nav-hamburger" type="button" aria-label="Open menu">
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+        </button>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE HEADER
+    ═══════════════════════════════════════════ -->
+    <div class="page">
+        <header class="page__header">
+            <span class="page__number">01</span>
+            <div class="page__eyebrow page__eyebrow--photo">Module 01 — Visual Creation</div>
+            <h1 class="page__title">The Art of Photo Prompting</h1>
+            <p class="page__intro">AI can now generate photorealistic images, marketing materials, and visual concepts from text descriptions alone. The difference between amateur and professional results? How you write the prompt.</p>
+        </header>
+
+        <!-- ═══════════════════════════════════════════
+             TUTORIAL CONTENT
+        ═══════════════════════════════════════════ -->
+        <div class="page__content">
+            <div class="content-grid">
+
+                <!-- 5-Layer Prompt Architecture -->
+                <div class="card card--full reveal">
+                    <div class="card__badge card__badge--tip">&#9670; Core Framework</div>
+                    <div class="card__title">The 5-Layer Prompt Architecture</div>
+                    <p class="card__text">Every great image prompt contains five layers of information. Think of it like writing a creative brief for a world-class photographer — the more precise the brief, the better the result.</p>
+                    <div class="framework" style="margin-top: 32px;">
+                        <div class="framework__step">
+                            <div class="framework__step-icon">&#127919;</div>
+                            <div class="framework__step-title">Subject</div>
+                            <div class="framework__step-desc">Who or what is the focal point</div>
+                        </div>
+                        <div class="framework__arrow">&rarr;</div>
+                        <div class="framework__step">
+                            <div class="framework__step-icon">&#127757;</div>
+                            <div class="framework__step-title">Environment</div>
+                            <div class="framework__step-desc">Setting, background, context</div>
+                        </div>
+                        <div class="framework__arrow">&rarr;</div>
+                        <div class="framework__step">
+                            <div class="framework__step-icon">&#128161;</div>
+                            <div class="framework__step-title">Lighting</div>
+                            <div class="framework__step-desc">Mood, time of day, direction</div>
+                        </div>
+                        <div class="framework__arrow">&rarr;</div>
+                        <div class="framework__step">
+                            <div class="framework__step-icon">&#128208;</div>
+                            <div class="framework__step-title">Composition</div>
+                            <div class="framework__step-desc">Angle, framing, depth of field</div>
+                        </div>
+                        <div class="framework__arrow">&rarr;</div>
+                        <div class="framework__step">
+                            <div class="framework__step-icon">&#127912;</div>
+                            <div class="framework__step-title">Style</div>
+                            <div class="framework__step-desc">Artistic direction, references</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- The Vague Prompt -->
+                <div class="card reveal reveal--delay-1">
+                    <div class="card__badge card__badge--warn">&#10005; Common Mistake</div>
+                    <div class="card__title">The Vague Prompt</div>
+                    <p class="card__text">Most people write prompts like text messages — short, vague, and hoping the AI reads their mind. It doesn't.</p>
+                    <div class="prompt-example prompt-example--bad" style="margin-top: 20px;">
+                        <div class="prompt-example__label">
+                            <span>Weak Prompt</span>
+                        </div>
+                        <div class="prompt-example__text">A doctor in a hospital</div>
+                    </div>
+                </div>
+
+                <!-- The Layered Prompt -->
+                <div class="card reveal reveal--delay-2">
+                    <div class="card__badge card__badge--step">&#10003; Professional Result</div>
+                    <div class="card__title">The Layered Prompt</div>
+                    <p class="card__text">A well-crafted prompt gives the AI a complete creative brief. Every detail you add eliminates a decision the AI would otherwise guess on.</p>
+                    <div class="prompt-example" style="margin-top: 20px;">
+                        <div class="prompt-example__label">
+                            <span>Strong Prompt</span>
+                        </div>
+                        <div class="prompt-example__text">
+                            <span class="highlight">A senior female physician</span> reviewing patient data on a tablet, standing in a <span class="highlight--teal">modern hospital corridor with floor-to-ceiling windows</span>, <span class="highlight--lavender">soft morning light casting warm shadows</span>, shot at eye level with shallow depth of field, <span class="highlight">cinematic and editorial style, muted earth tones</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6-Step Prompting Process -->
+                <div class="card card--full reveal">
+                    <div class="card__badge card__badge--step">&#10003; Step-by-Step</div>
+                    <div class="card__title">Your 6-Step Prompting Process</div>
+                    <ol class="steps">
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Start with the Subject</h4>
+                                <p>Be specific about who or what: age range, gender, ethnicity, expression, attire, posture. "A person" becomes "A confident woman in her 50s wearing a navy blazer."</p>
+                            </div>
+                        </li>
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Define the Environment</h4>
+                                <p>Where is this happening? Indoor vs. outdoor, modern vs. traditional, clean vs. textured. "In a hospital" becomes "In a sunlit atrium of a modern research hospital with living green walls."</p>
+                            </div>
+                        </li>
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Set the Lighting</h4>
+                                <p>Lighting defines mood more than any other element. Specify: golden hour, overcast, studio lighting, dramatic side-light, or soft diffused natural light. This single detail transforms the entire image.</p>
+                            </div>
+                        </li>
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Specify Camera &amp; Composition</h4>
+                                <p>Think like a photographer: eye-level, bird's eye, close-up portrait, wide establishing shot. Add depth of field (blurred background = "shallow depth of field"). Add aspect ratio if needed.</p>
+                            </div>
+                        </li>
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Declare the Style</h4>
+                                <p>Reference a visual style: editorial photography, corporate headshot, documentary, cinematic, minimalist, warm and inviting. You can even reference visual styles: "in the style of Apple product photography."</p>
+                            </div>
+                        </li>
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Iterate — Don't Settle</h4>
+                                <p>Your first result is a draft, not a final. Adjust 1-2 parameters at a time. Change "morning light" to "dramatic side light." Swap "editorial" for "candid documentary." Each iteration sharpens the result.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <!-- Healthcare Applications -->
+                <div class="card card--full reveal">
+                    <div class="card__badge card__badge--tip">&#9670; Healthcare Applications</div>
+                    <div class="card__title">Where You'll Use This</div>
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th>Use Case</th>
+                                <th>Example</th>
+                                <th>Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Internal Communications</td>
+                                <td>Generate visuals for town halls, newsletters, and leadership updates without a photo shoot</td>
+                                <td>Saves weeks and thousands in production costs</td>
+                            </tr>
+                            <tr>
+                                <td>Patient Education</td>
+                                <td>Create culturally diverse, relatable imagery for patient-facing materials</td>
+                                <td>Improves engagement and representation</td>
+                            </tr>
+                            <tr>
+                                <td>LinkedIn &amp; Professional Headshots</td>
+                                <td>Transform a casual photo into a polished corporate headshot for LinkedIn and company directories</td>
+                                <td>Professional presence without expensive photography sessions</td>
+                            </tr>
+                            <tr>
+                                <td>Presentation Decks</td>
+                                <td>Replace stock photos with custom, on-brand imagery in board presentations</td>
+                                <td>Elevates executive presence and visual storytelling</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 HANDS-ON SANDBOX: PROMPT BUILDER STUDIO
+            ═══════════════════════════════════════════ -->
+            <div class="sandbox reveal">
+                <div class="sandbox__header">
+                    <span class="sandbox__title">Step 1 &mdash; Build Your Headshot Prompt</span>
+                    <div class="sandbox__scenarios">
+                        <button class="scenario-btn" data-scenario="corporate-classic">Corporate Classic</button>
+                        <button class="scenario-btn" data-scenario="modern-creative">Modern Creative</button>
+                        <button class="scenario-btn" data-scenario="executive-formal">Executive Formal</button>
+                    </div>
+                </div>
+                <div class="sandbox__split">
+                    <!-- Left Pane: Form -->
+                    <div class="sandbox__pane sandbox__pane--left">
+                        <span class="sandbox__pane-label">Prompt Layers</span>
+
+                        <div class="field">
+                            <label class="field__label" for="prompt-subject">Subject</label>
+                            <input type="text" class="field__input" id="prompt-subject" placeholder="e.g., A senior female physician reviewing patient data on a tablet" data-layer="subject">
+                        </div>
+
+                        <div class="field">
+                            <label class="field__label" for="prompt-environment">Environment</label>
+                            <input type="text" class="field__input" id="prompt-environment" placeholder="e.g., Modern hospital corridor with floor-to-ceiling windows" data-layer="environment">
+                        </div>
+
+                        <div class="field">
+                            <label class="field__label" for="prompt-lighting">Lighting</label>
+                            <select class="field__select" id="prompt-lighting" data-layer="lighting">
+                                <option value="">Select lighting...</option>
+                                <option value="Golden Hour">Golden Hour</option>
+                                <option value="Soft Morning Light">Soft Morning Light</option>
+                                <option value="Studio Lighting">Studio Lighting</option>
+                                <option value="Dramatic Side-Light">Dramatic Side-Light</option>
+                                <option value="Overcast/Diffused">Overcast/Diffused</option>
+                                <option value="Natural Window Light">Natural Window Light</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label class="field__label" for="prompt-composition">Composition</label>
+                            <select class="field__select" id="prompt-composition" data-layer="composition">
+                                <option value="">Select composition...</option>
+                                <option value="Eye-Level Shot">Eye-Level Shot</option>
+                                <option value="Bird's Eye View">Bird's Eye View</option>
+                                <option value="Close-Up Portrait">Close-Up Portrait</option>
+                                <option value="Wide Establishing Shot">Wide Establishing Shot</option>
+                                <option value="Over-the-Shoulder">Over-the-Shoulder</option>
+                                <option value="Low Angle">Low Angle</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label class="field__label" for="prompt-style">Style</label>
+                            <select class="field__select" id="prompt-style" data-layer="style">
+                                <option value="">Select style...</option>
+                                <option value="Editorial Photography">Editorial Photography</option>
+                                <option value="Cinematic">Cinematic</option>
+                                <option value="Documentary">Documentary</option>
+                                <option value="Minimalist">Minimalist</option>
+                                <option value="Product Photography">Product Photography</option>
+                                <option value="Warm & Inviting">Warm &amp; Inviting</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Right Pane: Preview -->
+                    <div class="sandbox__pane">
+                        <span class="sandbox__pane-label">Your Headshot Prompt</span>
+
+                        <div class="assembled-prompt assembled-prompt--empty" id="assembled-prompt">
+                            Choose a style above or fill in the layers to build your headshot prompt...
+                        </div>
+
+
+                        <div class="copy-btn-row">
+                            <button class="btn btn--sm" id="copy-prompt">
+                                Copy to Clipboard
+                                <span class="btn__arrow">&rarr;</span>
+                            </button>
+                        </div>
+                        <div class="prompt-flow-hint" id="prompt-flow-hint" style="display:none;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                            <span>Now upload your photo below to see this style applied</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 HANDS-ON SANDBOX: LINKEDIN HEADSHOT STUDIO
+            ═══════════════════════════════════════════ -->
+            <div class="sandbox reveal">
+                <div class="sandbox__header">
+                    <span class="sandbox__title">Step 2 &mdash; Generate Your Headshot</span>
+                </div>
+                <div class="sandbox__split">
+                    <!-- Left Pane: Photo Input + Prompt + Generate -->
+                    <div class="sandbox__pane sandbox__pane--left">
+                        <span class="sandbox__pane-label">Your Photo</span>
+
+                        <!-- Upload / Selfie Tabs -->
+                        <div class="headshot-input-tabs">
+                            <button class="headshot-tab headshot-tab--active" data-tab="upload">
+                                <span class="headshot-tab__icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span>
+                                Upload Photo
+                            </button>
+                            <button class="headshot-tab" data-tab="selfie">
+                                <span class="headshot-tab__icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></span>
+                                Take Selfie
+                            </button>
+                        </div>
+
+                        <!-- Upload Zone -->
+                        <div class="headshot-upload" id="headshot-upload">
+                            <div class="headshot-upload__icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            </div>
+                            <div class="headshot-upload__text">Drop your photo here or click to upload</div>
+                            <div class="headshot-upload__hint">JPG or PNG &bull; Your photo stays in your browser</div>
+                            <input type="file" id="headshot-file" accept="image/*" hidden>
+                        </div>
+
+                        <!-- Selfie Camera -->
+                        <div class="headshot-selfie" id="headshot-selfie" style="display:none;">
+                            <video id="selfie-video" autoplay playsinline muted></video>
+                            <div class="headshot-selfie__controls">
+                                <button class="btn btn--sm" id="selfie-capture">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                                    Capture Photo
+                                </button>
+                            </div>
+                            <canvas id="selfie-canvas" style="display:none;"></canvas>
+                        </div>
+
+                        <!-- Selfie Error (camera denied/unavailable) -->
+                        <div class="headshot-selfie__error" id="selfie-error" style="display:none;">
+                            <div class="headshot-selfie__error-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34m-7.72-2.06a4 4 0 1 1-5.56-5.56"></path></svg>
+                            </div>
+                            <span>Camera access unavailable. Please use the Upload tab instead.</span>
+                        </div>
+
+                        <!-- Photo Preview (after upload/capture) -->
+                        <div class="headshot-original" id="headshot-original" style="display:none;">
+                            <img id="headshot-original-img" alt="Your uploaded photo">
+                            <button class="btn btn--sm headshot-change-btn" id="headshot-change">Change Photo</button>
+                        </div>
+
+                        <!-- Prompt Textarea -->
+                        <div class="field">
+                            <label class="field__label" for="headshot-prompt">Your Prompt</label>
+                            <textarea class="field__textarea" id="headshot-prompt" rows="4" placeholder="Paste your headshot prompt from Step 1 above, or type your own style description..."></textarea>
+                            <div class="field__hint" id="headshot-prompt-status">Describe how you want your headshot styled</div>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <button class="btn--generate" id="headshot-generate" disabled>
+                            <span class="btn__label">&#10022; Generate Headshot</span>
+                            <span class="btn__spinner"></span>
+                            <span class="btn__loading-text" style="display:none;">Generating&hellip;</span>
+                        </button>
+
+                        <!-- Error Display -->
+                        <div class="headshot-error" id="headshot-error"></div>
+                    </div>
+
+                    <!-- Right Pane: Result -->
+                    <div class="sandbox__pane">
+                        <span class="sandbox__pane-label">Your LinkedIn Headshot</span>
+
+                        <div class="headshot-result" id="headshot-result">
+                            <!-- Empty state -->
+                            <div class="headshot-result__empty" id="headshot-empty">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.3"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                <span>Upload a photo and click Generate to create your professional headshot</span>
+                            </div>
+
+                            <!-- Loading state -->
+                            <div class="headshot-loading" id="headshot-loading" style="display:none;">
+                                <div class="headshot-loading__spinner"></div>
+                                <div class="headshot-loading__text">Creating your headshot&hellip;</div>
+                            </div>
+
+                            <!-- Before/After comparison (shown after generation) -->
+                            <div class="headshot-comparison" id="headshot-comparison" style="display:none;">
+                                <div class="headshot-comparison__panel">
+                                    <span class="headshot-comparison__label">Original</span>
+                                    <div class="headshot-comparison__frame">
+                                        <img id="headshot-before" alt="Original photo">
+                                    </div>
+                                </div>
+                                <div class="headshot-comparison__arrow">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </div>
+                                <div class="headshot-comparison__panel">
+                                    <span class="headshot-comparison__label">AI Generated</span>
+                                    <div class="headshot-comparison__frame headshot-comparison__frame--enhanced">
+                                        <img id="headshot-after" alt="AI generated headshot">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="copy-btn-row">
+                            <button class="btn btn--sm" id="headshot-download" disabled>
+                                Download Headshot
+                                <span class="btn__arrow">&rarr;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 EXECUTIVE TAKEAWAY
+            ═══════════════════════════════════════════ -->
+            <div class="takeaway takeaway--photo reveal">
+                <div class="takeaway__label">Executive Takeaway</div>
+                <div class="takeaway__title">You are the creative director. AI is the camera.</div>
+                <p class="takeaway__text">The quality of AI-generated images is directly proportional to the quality of your instructions. Executives who learn to write precise visual prompts will never depend on a stock photo library — or a design agency's timeline — again.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE NAVIGATION
+    ═══════════════════════════════════════════ -->
+    <div class="page-nav">
+        <a href="index.html" class="page-nav__link">
+            <span class="page-nav__label">&larr; Previous</span>
+            <span class="page-nav__title">Overview</span>
+        </a>
+        <a href="document-intel.html" class="page-nav__link page-nav__link--next">
+            <span class="page-nav__label">Next &rarr;</span>
+            <span class="page-nav__title">Document Intelligence</span>
+        </a>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════════ -->
+    <footer class="footer">
+        <span class="footer__text">Enterprise AI — Humana Leadership Series</span>
+        <span class="footer__text">Confidential</span>
+    </footer>
+
+    <!-- ═══════════════════════════════════════════
+         JAVASCRIPT
+    ═══════════════════════════════════════════ -->
+    <script>
+    (function () {
+        'use strict';
+
+        // ─── Mark module as visited ───
+        const STORAGE_KEY = 'ai-tutorial-visited';
+        const MODULE_ID = 'photo-prompting';
+
+        function getVisited() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function markVisited(id) {
+            const visited = getVisited();
+            if (!visited.includes(id)) {
+                visited.push(id);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(visited));
+            }
+        }
+
+        markVisited(MODULE_ID);
+
+        // ─── Nav: mark completed modules ───
+        const visited = getVisited();
+        document.querySelectorAll('.nav__link[data-module]').forEach(function (link) {
+            const mod = link.getAttribute('data-module');
+            if (visited.includes(mod) && !link.classList.contains('nav__link--active')) {
+                link.classList.add('nav__link--completed');
+            }
+        });
+
+        // ─── Mobile Nav Toggle ───
+        (function() {
+            var hamburger = document.getElementById('nav-hamburger');
+            var navLinks = document.querySelector('.nav__links');
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', function() {
+                    hamburger.classList.toggle('nav__hamburger--open');
+                    navLinks.classList.toggle('nav__links--open');
+                });
+                navLinks.querySelectorAll('.nav__link').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        hamburger.classList.remove('nav__hamburger--open');
+                        navLinks.classList.remove('nav__links--open');
+                    });
+                });
+            }
+        })();
+
+        // ─── Scroll Reveal ───
+        var revealEls = document.querySelectorAll('.reveal');
+        var revealObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal--visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+        revealEls.forEach(function (el) { revealObserver.observe(el); });
+
+        // ─── Tabs (generic, for future use on this page) ───
+        document.querySelectorAll('.tabs').forEach(function (tabGroup) {
+            var buttons = tabGroup.querySelectorAll('.tabs__btn');
+            buttons.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var targetId = btn.dataset.tab;
+                    var parent = tabGroup.parentElement;
+                    buttons.forEach(function (b) { b.classList.remove('tabs__btn--active'); });
+                    btn.classList.add('tabs__btn--active');
+                    parent.querySelectorAll('.tab-panel').forEach(function (panel) {
+                        panel.classList.remove('tab-panel--active');
+                    });
+                    var target = parent.querySelector('#' + targetId);
+                    if (target) target.classList.add('tab-panel--active');
+                });
+            });
+        });
+
+        // ─── Prompt Builder ───
+        var fields = {
+            subject: document.getElementById('prompt-subject'),
+            environment: document.getElementById('prompt-environment'),
+            lighting: document.getElementById('prompt-lighting'),
+            composition: document.getElementById('prompt-composition'),
+            style: document.getElementById('prompt-style')
+        };
+        var assembledEl = document.getElementById('assembled-prompt');
+        var copyBtn = document.getElementById('copy-prompt');
+
+        function getLayerValues() {
+            return {
+                subject: fields.subject.value.trim(),
+                environment: fields.environment.value.trim(),
+                lighting: fields.lighting.value,
+                composition: fields.composition.value,
+                style: fields.style.value
+            };
+        }
+
+        function countFilledLayers(vals) {
+            var count = 0;
+            if (vals.subject) count++;
+            if (vals.environment) count++;
+            if (vals.lighting) count++;
+            if (vals.composition) count++;
+            if (vals.style) count++;
+            return count;
+        }
+
+        function updatePromptPreview() {
+            var vals = getLayerValues();
+            var filled = countFilledLayers(vals);
+
+            // Assemble the prompt preview
+            if (filled === 0) {
+                assembledEl.innerHTML = 'Choose a style above or fill in the layers to build your headshot prompt...';
+                assembledEl.classList.add('assembled-prompt--empty');
+                return;
+            }
+
+            assembledEl.classList.remove('assembled-prompt--empty');
+            var parts = [];
+
+            if (vals.subject) {
+                parts.push('<span class="prompt-subject">' + escapeHtml(vals.subject) + '</span>');
+            }
+            if (vals.environment) {
+                parts.push('in a <span class="prompt-environment">' + escapeHtml(vals.environment) + '</span>');
+            }
+            if (vals.lighting) {
+                parts.push('<span class="prompt-lighting">' + escapeHtml(vals.lighting) + ' lighting</span>');
+            }
+            if (vals.composition) {
+                parts.push('shot as a <span class="prompt-composition">' + escapeHtml(vals.composition) + '</span>');
+            }
+            if (vals.style) {
+                parts.push('<span class="prompt-style">' + escapeHtml(vals.style) + ' style</span>');
+            }
+
+            assembledEl.innerHTML = parts.join(', ');
+        }
+
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        // Listen for changes
+        Object.keys(fields).forEach(function (key) {
+            var el = fields[key];
+            el.addEventListener('input', updatePromptPreview);
+            el.addEventListener('change', updatePromptPreview);
+        });
+
+        // ─── Copy to Clipboard ───
+        copyBtn.addEventListener('click', function () {
+            var vals = getLayerValues();
+            var filled = countFilledLayers(vals);
+            if (filled === 0) return;
+
+            var parts = [];
+            if (vals.subject) parts.push(vals.subject);
+            if (vals.environment) parts.push('in a ' + vals.environment);
+            if (vals.lighting) parts.push(vals.lighting + ' lighting');
+            if (vals.composition) parts.push('shot as a ' + vals.composition);
+            if (vals.style) parts.push(vals.style + ' style');
+
+            var text = parts.join(', ');
+
+            navigator.clipboard.writeText(text).then(function () {
+                copyBtn.classList.add('copied');
+                copyBtn.innerHTML = 'Copied <span class="btn__arrow">&#10003;</span>';
+                setTimeout(function () {
+                    copyBtn.classList.remove('copied');
+                    copyBtn.innerHTML = 'Copy to Clipboard <span class="btn__arrow">&rarr;</span>';
+                }, 2000);
+            });
+        });
+
+        // ─── Scenario Presets (LinkedIn Headshot Styles) ───
+        var scenarios = {
+            'corporate-classic': {
+                subject: 'A confident professional in a tailored navy blazer, relaxed posture, warm approachable smile',
+                environment: 'Clean studio backdrop with soft neutral gray, no distractions',
+                lighting: 'Studio Lighting',
+                composition: 'Close-Up Portrait',
+                style: 'Editorial Photography'
+            },
+            'modern-creative': {
+                subject: 'A forward-thinking leader in smart casual attire, slight smile, looking directly at camera',
+                environment: 'Contemporary open office with blurred greenery and natural textures in background',
+                lighting: 'Natural Window Light',
+                composition: 'Eye-Level Shot',
+                style: 'Warm & Inviting'
+            },
+            'executive-formal': {
+                subject: 'A distinguished executive in a charcoal suit and white shirt, composed expression, arms at sides',
+                environment: 'Minimalist corner office with city skyline softly blurred through floor-to-ceiling windows',
+                lighting: 'Dramatic Side-Light',
+                composition: 'Close-Up Portrait',
+                style: 'Cinematic'
+            }
+        };
+
+        var scenarioBtns = document.querySelectorAll('.scenario-btn');
+        var flowHint = document.getElementById('prompt-flow-hint');
+
+        scenarioBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var key = btn.getAttribute('data-scenario');
+                var preset = scenarios[key];
+                if (!preset) return;
+
+                // Toggle active state
+                scenarioBtns.forEach(function (b) { b.classList.remove('scenario-btn--active'); });
+                btn.classList.add('scenario-btn--active');
+
+                // Fill fields
+                fields.subject.value = preset.subject;
+                fields.environment.value = preset.environment;
+                fields.lighting.value = preset.lighting;
+                fields.composition.value = preset.composition;
+                fields.style.value = preset.style;
+
+                updatePromptPreview();
+
+                // Show flow hint
+                flowHint.style.display = '';
+
+                // Auto-fill the prompt textarea in Headshot Studio
+                var promptTextarea = document.getElementById('headshot-prompt');
+                if (promptTextarea) {
+                    var vals = getLayerValues();
+                    var promptParts = [];
+                    if (vals.subject) promptParts.push(vals.subject);
+                    if (vals.environment) promptParts.push('in a ' + vals.environment);
+                    if (vals.lighting) promptParts.push(vals.lighting + ' lighting');
+                    if (vals.composition) promptParts.push('shot as a ' + vals.composition);
+                    if (vals.style) promptParts.push(vals.style + ' style');
+                    promptTextarea.value = promptParts.join(', ');
+                    promptTextarea.dispatchEvent(new Event('input'));
+                }
+            });
+        });
+
+        // ═══════════════════════════════════════════
+        // LINKEDIN HEADSHOT STUDIO
+        // ═══════════════════════════════════════════
+
+        // ─── API Configuration ───
+        var GEMINI_API_KEY = 'AIzaSyCnBC1adVA5o24oeEcyEADurKXaJr4-RT4';
+        var GEMINI_MODEL = 'gemini-2.5-flash-image';
+        var GEMINI_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent';
+
+        // ─── DOM References ───
+        var uploadZone = document.getElementById('headshot-upload');
+        var fileInput = document.getElementById('headshot-file');
+        var selfieZone = document.getElementById('headshot-selfie');
+        var selfieVideo = document.getElementById('selfie-video');
+        var selfieCapture = document.getElementById('selfie-capture');
+        var selfieCanvas = document.getElementById('selfie-canvas');
+        var selfieError = document.getElementById('selfie-error');
+        var originalContainer = document.getElementById('headshot-original');
+        var originalImg = document.getElementById('headshot-original-img');
+        var changeBtn = document.getElementById('headshot-change');
+        var emptyState = document.getElementById('headshot-empty');
+        var loadingState = document.getElementById('headshot-loading');
+        var comparison = document.getElementById('headshot-comparison');
+        var beforeImg = document.getElementById('headshot-before');
+        var afterImg = document.getElementById('headshot-after');
+        var downloadBtn = document.getElementById('headshot-download');
+        var generateBtn = document.getElementById('headshot-generate');
+        var promptTextareaEl = document.getElementById('headshot-prompt');
+        var promptStatus = document.getElementById('headshot-prompt-status');
+        var errorDisplay = document.getElementById('headshot-error');
+        var inputTabs = document.querySelectorAll('.headshot-tab');
+
+        var photoLoaded = false;
+        var photoDataUrl = null;
+        var generatedImageUrl = null;
+        var cameraStream = null;
+        var isGenerating = false;
+
+        // ─── Input Tab Switching ───
+        inputTabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                var targetTab = tab.getAttribute('data-tab');
+                inputTabs.forEach(function (t) { t.classList.remove('headshot-tab--active'); });
+                tab.classList.add('headshot-tab--active');
+
+                if (targetTab === 'upload') {
+                    uploadZone.style.display = '';
+                    selfieZone.style.display = 'none';
+                    selfieError.style.display = 'none';
+                    stopCamera();
+                } else if (targetTab === 'selfie') {
+                    uploadZone.style.display = 'none';
+                    selfieZone.style.display = '';
+                    selfieError.style.display = 'none';
+                    startCamera();
+                }
+
+                // Hide original if showing (let user re-capture/re-upload)
+                if (!photoLoaded) return;
+            });
+        });
+
+        // ─── Camera Functions ───
+        function startCamera() {
+            if (cameraStream) return; // already running
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                selfieZone.style.display = 'none';
+                selfieError.style.display = '';
+                return;
+            }
+
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+            }).then(function (stream) {
+                cameraStream = stream;
+                selfieVideo.srcObject = stream;
+                selfieZone.style.display = '';
+                selfieError.style.display = 'none';
+            }).catch(function (err) {
+                console.warn('Camera access denied:', err);
+                selfieZone.style.display = 'none';
+                selfieError.style.display = '';
+            });
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(function (track) { track.stop(); });
+                cameraStream = null;
+                selfieVideo.srcObject = null;
+            }
+        }
+
+        // ─── Selfie Capture ───
+        selfieCapture.addEventListener('click', function () {
+            if (!cameraStream) return;
+
+            var vw = selfieVideo.videoWidth;
+            var vh = selfieVideo.videoHeight;
+            selfieCanvas.width = vw;
+            selfieCanvas.height = vh;
+            var ctx = selfieCanvas.getContext('2d');
+            // Mirror the capture to match the mirrored video preview
+            ctx.translate(vw, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(selfieVideo, 0, 0, vw, vh);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+            var dataUrl = selfieCanvas.toDataURL('image/jpeg', 0.9);
+            loadPhotoFromDataUrl(dataUrl);
+            stopCamera();
+        });
+
+        // ─── File Upload ───
+        uploadZone.addEventListener('click', function () {
+            fileInput.click();
+        });
+
+        uploadZone.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            uploadZone.classList.add('headshot-upload--dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', function () {
+            uploadZone.classList.remove('headshot-upload--dragover');
+        });
+
+        uploadZone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            uploadZone.classList.remove('headshot-upload--dragover');
+            var files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                loadPhotoFromFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files.length > 0) {
+                loadPhotoFromFile(fileInput.files[0]);
+            }
+        });
+
+        changeBtn.addEventListener('click', function () {
+            fileInput.value = '';
+            photoLoaded = false;
+            photoDataUrl = null;
+            generatedImageUrl = null;
+            originalContainer.style.display = 'none';
+            uploadZone.style.display = '';
+            selfieZone.style.display = 'none';
+            emptyState.style.display = '';
+            comparison.style.display = 'none';
+            loadingState.style.display = 'none';
+            downloadBtn.disabled = true;
+            updateGenerateButton();
+
+            // Reset to upload tab
+            inputTabs.forEach(function (t) { t.classList.remove('headshot-tab--active'); });
+            inputTabs[0].classList.add('headshot-tab--active');
+        });
+
+        function loadPhotoFromFile(file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                loadPhotoFromDataUrl(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadPhotoFromDataUrl(dataUrl) {
+            photoDataUrl = dataUrl;
+            photoLoaded = true;
+
+            // Show original preview
+            originalImg.src = dataUrl;
+            uploadZone.style.display = 'none';
+            selfieZone.style.display = 'none';
+            originalContainer.style.display = '';
+
+            // Show the original in the "before" panel, keep result empty until generated
+            beforeImg.src = dataUrl;
+
+            // Reset result state
+            generatedImageUrl = null;
+            emptyState.style.display = '';
+            comparison.style.display = 'none';
+            loadingState.style.display = 'none';
+            downloadBtn.disabled = true;
+
+            // Update generate button
+            updateGenerateButton();
+            hideError();
+        }
+
+        // ─── Generate Button State ───
+        function updateGenerateButton() {
+            var promptText = promptTextareaEl.value.trim();
+            var hasPrompt = promptText.length > 10;
+            generateBtn.disabled = !(photoLoaded && hasPrompt) || isGenerating;
+        }
+
+        promptTextareaEl.addEventListener('input', function () {
+            updateGenerateButton();
+            // Update hint
+            var text = promptTextareaEl.value.trim();
+            if (text.length > 10) {
+                promptStatus.textContent = 'Ready to generate — click the button below';
+                promptStatus.classList.add('field__hint--detected');
+            } else {
+                promptStatus.textContent = 'Describe how you want your headshot styled';
+                promptStatus.classList.remove('field__hint--detected');
+            }
+        });
+
+        // ─── Error Display ───
+        function showError(message) {
+            errorDisplay.textContent = message;
+            errorDisplay.classList.add('headshot-error--visible');
+        }
+
+        function hideError() {
+            errorDisplay.textContent = '';
+            errorDisplay.classList.remove('headshot-error--visible');
+        }
+
+        // ─── Generate Headshot via Gemini API ───
+        generateBtn.addEventListener('click', function () {
+            if (!photoLoaded || isGenerating) return;
+            generateHeadshot();
+        });
+
+        function generateHeadshot() {
+            isGenerating = true;
+            hideError();
+
+            // Show loading state
+            generateBtn.classList.add('btn--generate--loading');
+            generateBtn.querySelector('.btn__label').style.display = 'none';
+            generateBtn.querySelector('.btn__loading-text').style.display = '';
+            generateBtn.disabled = true;
+            emptyState.style.display = 'none';
+            comparison.style.display = 'none';
+            loadingState.style.display = '';
+
+            // Prepare the image data
+            var base64Data = photoDataUrl.split(',')[1];
+            var mimeType = photoDataUrl.split(';')[0].split(':')[1] || 'image/jpeg';
+
+            // Build the prompt
+            var userPrompt = promptTextareaEl.value.trim();
+            var systemPrompt = 'Transform this photo into a professional LinkedIn headshot. ' +
+                'Style instructions: ' + userPrompt + '. ' +
+                'Keep the person\'s face and identity clearly recognizable. ' +
+                'Create a clean, professional background. Apply flattering, even lighting. ' +
+                'The result should look like a high-quality corporate headshot suitable for LinkedIn.';
+
+            // Build request body (Gemini API uses camelCase)
+            var requestBody = {
+                contents: [{
+                    parts: [
+                        { text: systemPrompt },
+                        {
+                            inlineData: {
+                                mimeType: mimeType,
+                                data: base64Data
+                            }
+                        }
+                    ]
+                }],
+                generationConfig: {
+                    responseModalities: ['TEXT', 'IMAGE']
+                }
+            };
+
+            // Make API call
+            fetch(GEMINI_ENDPOINT + '?key=' + GEMINI_API_KEY, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
+            })
+            .then(function (response) {
+                if (!response.ok) {
+                    return response.json().then(function (errData) {
+                        throw new Error(errData.error ? errData.error.message : 'API request failed (' + response.status + ')');
+                    });
+                }
+                return response.json();
+            })
+            .then(function (data) {
+                // Find the image part in the response
+                // Gemini API returns camelCase keys (inlineData, mimeType)
+                var imageData = null;
+                var imageMime = 'image/png';
+                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+                    data.candidates[0].content.parts.forEach(function (part) {
+                        // Check camelCase format (inlineData)
+                        if (part.inlineData && part.inlineData.data) {
+                            imageData = part.inlineData.data;
+                            imageMime = part.inlineData.mimeType || 'image/png';
+                        }
+                        // Also check snake_case format (inline_data) as fallback
+                        else if (part.inline_data && part.inline_data.data) {
+                            imageData = part.inline_data.data;
+                            imageMime = part.inline_data.mime_type || 'image/png';
+                        }
+                    });
+                }
+
+                if (!imageData) {
+                    throw new Error('No image was generated. The AI may not have been able to process this request. Try a different prompt or photo.');
+                }
+
+                // Display the generated image
+                generatedImageUrl = 'data:' + imageMime + ';base64,' + imageData;
+
+                afterImg.src = generatedImageUrl;
+                beforeImg.src = photoDataUrl;
+
+                loadingState.style.display = 'none';
+                comparison.style.display = '';
+                downloadBtn.disabled = false;
+            })
+            .catch(function (err) {
+                console.error('Headshot generation error:', err);
+                loadingState.style.display = 'none';
+                emptyState.style.display = '';
+
+                var errorMsg = err.message || 'Something went wrong. Please try again.';
+                if (errorMsg.includes('API_KEY') || errorMsg.includes('API key')) {
+                    errorMsg = 'Invalid API key. Please check the configuration.';
+                }
+                showError(errorMsg);
+            })
+            .finally(function () {
+                isGenerating = false;
+                generateBtn.classList.remove('btn--generate--loading');
+                generateBtn.querySelector('.btn__label').style.display = '';
+                generateBtn.querySelector('.btn__loading-text').style.display = 'none';
+                updateGenerateButton();
+            });
+        }
+
+        // ─── Download ───
+        downloadBtn.addEventListener('click', function () {
+            if (!generatedImageUrl) return;
+
+            // Convert base64 data URL to blob for download
+            var parts = generatedImageUrl.split(',');
+            var mime = parts[0].match(/:(.*?);/)[1];
+            var bstr = atob(parts[1]);
+            var n = bstr.length;
+            var u8arr = new Uint8Array(n);
+            while (n--) { u8arr[n] = bstr.charCodeAt(n); }
+            var blob = new Blob([u8arr], { type: mime });
+
+            var link = document.createElement('a');
+            link.download = 'linkedin-headshot.png';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            URL.revokeObjectURL(link.href);
+        });
+
+    })();
+    </script>
+</body>
+</html>

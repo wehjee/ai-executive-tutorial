@@ -1,0 +1,2350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agents — Enterprise AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        /* ═══════════════════════════════════════════
+           GOAL OPTION CARDS
+        ═══════════════════════════════════════════ */
+        .goal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .goal-card {
+            background: var(--bg-primary);
+            border: 1.5px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .goal-card:hover {
+            border-color: var(--border-active);
+            background: var(--bg-card-hover);
+        }
+
+        .goal-card--active {
+            border-color: var(--accent-gold);
+            background: rgba(154, 138, 47, 0.04);
+            box-shadow: 0 0 0 1px var(--accent-gold);
+        }
+
+        .goal-card--active:hover {
+            border-color: var(--accent-gold);
+            background: rgba(154, 138, 47, 0.06);
+        }
+
+        .goal-card__icon {
+            font-size: 24px;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .goal-card__name {
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .goal-card__desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        /* ═══════════════════════════════════════════
+           TOOL TOGGLE BUTTONS
+        ═══════════════════════════════════════════ */
+        .tool-toggles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tool-toggle {
+            padding: 9px 18px;
+            border: 1.5px solid var(--border-subtle);
+            border-radius: 100px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.25s var(--ease-out-expo);
+            user-select: none;
+        }
+
+        .tool-toggle:hover {
+            border-color: var(--border-active);
+            color: var(--text-primary);
+        }
+
+        .tool-toggle--active {
+            background: var(--text-primary);
+            border-color: var(--text-primary);
+            color: #FFFFFF;
+            font-weight: 500;
+        }
+
+        .tool-toggle--active:hover {
+            background: #333;
+            border-color: #333;
+            color: #FFFFFF;
+        }
+
+        .tool-count {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            display: block;
+        }
+
+        /* ═══════════════════════════════════════════
+           GUARDRAIL TOGGLE SWITCHES
+        ═══════════════════════════════════════════ */
+        .guardrails-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .guardrail-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .guardrail-item__label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .toggle-switch__track {
+            position: absolute;
+            inset: 0;
+            background: var(--border-active);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.25s var(--ease-out-expo);
+        }
+
+        .toggle-switch__track::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #FFFFFF;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            transition: transform 0.25s var(--ease-out-expo);
+        }
+
+        .toggle-switch input:checked + .toggle-switch__track {
+            background: var(--accent-gold);
+        }
+
+        .toggle-switch input:checked + .toggle-switch__track::after {
+            transform: translateX(20px);
+        }
+
+        /* ═══════════════════════════════════════════
+           SANDBOX STEPS
+        ═══════════════════════════════════════════ */
+        .sandbox-step {
+            margin-bottom: 36px;
+            padding-bottom: 36px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sandbox-step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .sandbox-step--hidden {
+            display: none;
+        }
+
+        .sandbox-step--entering {
+            animation: stepReveal 0.5s var(--ease-out-expo) forwards;
+        }
+
+        @keyframes stepReveal {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sandbox-step__label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .sandbox-step__title {
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        /* ═══════════════════════════════════════════
+           FLOW DIAGRAM
+        ═══════════════════════════════════════════ */
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            padding: 24px 0;
+        }
+
+        .flow-node {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 2px solid var(--border-subtle);
+            background: var(--bg-primary);
+            display: grid;
+            place-items: center;
+            transition: all 0.4s var(--ease-out-expo);
+            position: relative;
+        }
+
+        .flow-node__icon {
+            font-size: 18px;
+            opacity: 0.3;
+            transition: opacity 0.4s var(--ease-out-expo);
+        }
+
+        .flow-node__label {
+            position: absolute;
+            left: calc(100% + 14px);
+            white-space: nowrap;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            transition: color 0.4s var(--ease-out-expo);
+        }
+
+        .flow-node--active {
+            border-color: var(--accent-gold);
+            background: rgba(154, 138, 47, 0.08);
+        }
+
+        .flow-node--active .flow-node__icon {
+            opacity: 1;
+        }
+
+        .flow-node--active .flow-node__label {
+            color: var(--accent-gold);
+        }
+
+        .flow-connector {
+            width: 2px;
+            height: 28px;
+            background: var(--border-subtle);
+            transition: background 0.4s var(--ease-out-expo);
+        }
+
+        .flow-connector--active {
+            background: var(--accent-gold);
+        }
+
+        /* ═══════════════════════════════════════════
+           BLUEPRINT MEMO
+        ═══════════════════════════════════════════ */
+        .blueprint-output {
+            display: none;
+            animation: stepReveal 0.5s var(--ease-out-expo) forwards;
+        }
+
+        .blueprint-output--visible {
+            display: block;
+        }
+
+        .blueprint-memo {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .blueprint-memo__bar {
+            height: 3px;
+            background: var(--accent-gold);
+        }
+
+        .blueprint-memo__body {
+            padding: 28px;
+        }
+
+        .blueprint-memo__header {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        .blueprint-section {
+            margin-bottom: 20px;
+        }
+
+        .blueprint-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .blueprint-section__label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .blueprint-section__value {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        .blueprint-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .blueprint-chip {
+            padding: 4px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 100px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .blueprint-guardrail {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.8;
+        }
+
+        .blueprint-guardrail::before {
+            content: '\2713  ';
+            color: var(--accent-teal);
+            font-weight: 500;
+        }
+
+        .blueprint-risk {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: var(--font-mono);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .blueprint-risk--low {
+            background: rgba(58, 143, 126, 0.1);
+            color: var(--accent-teal);
+        }
+
+        .blueprint-risk--medium {
+            background: rgba(154, 138, 47, 0.1);
+            color: var(--accent-gold);
+        }
+
+        .blueprint-risk--high {
+            background: rgba(176, 86, 86, 0.1);
+            color: var(--accent-rose);
+        }
+
+        .blueprint-risk__dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .blueprint-risk--low .blueprint-risk__dot { background: var(--accent-teal); }
+        .blueprint-risk--medium .blueprint-risk__dot { background: var(--accent-gold); }
+        .blueprint-risk--high .blueprint-risk__dot { background: var(--accent-rose); }
+
+        /* ═══════════════════════════════════════════
+           SANDBOX LAYOUT (configurator + flow)
+        ═══════════════════════════════════════════ */
+        .sandbox-layout {
+            display: grid;
+            grid-template-columns: 1fr 140px;
+            gap: 32px;
+            align-items: start;
+        }
+
+        .sandbox-configurator {
+            min-width: 0;
+        }
+
+        .sandbox-sidebar {
+            position: sticky;
+            top: 100px;
+        }
+
+        /* ═══════════════════════════════════════════
+           SCORECARD
+        ═══════════════════════════════════════════ */
+        .scorecard {
+            margin-top: 48px;
+        }
+
+        .scorecard__item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .scorecard__item:last-child {
+            border-bottom: none;
+        }
+
+        .scorecard__question {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .scorecard__rating {
+            display: flex;
+            gap: 6px;
+        }
+
+        .rating-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border-subtle);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out-expo);
+            display: grid;
+            place-items: center;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            font-weight: 400;
+            padding: 0;
+        }
+
+        .rating-dot:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .rating-dot--active {
+            background: var(--accent-gold);
+            border-color: var(--accent-gold);
+            color: #FFFFFF;
+        }
+
+        .rating-dot--active:hover {
+            background: var(--accent-gold);
+            border-color: var(--accent-gold);
+            color: #FFFFFF;
+        }
+
+        .scorecard__result {
+            margin-top: 28px;
+            padding: 24px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .scorecard__result--visible {
+            display: block;
+            animation: stepReveal 0.4s var(--ease-out-expo) forwards;
+        }
+
+        .scorecard__score {
+            font-family: var(--font-display);
+            font-size: 42px;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .scorecard__score span {
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+
+        .scorecard__recommendation {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        /* ═══════════════════════════════════════════
+           AGENT DEMO — TEST YOUR AGENT
+        ═══════════════════════════════════════════ */
+        .agent-demo {
+            display: none;
+            animation: stepReveal 0.5s var(--ease-out-expo) forwards;
+        }
+
+        .agent-demo--visible {
+            display: block;
+        }
+
+        .agent-demo__intro {
+            text-align: center;
+            padding: 32px 28px 0;
+        }
+
+        .agent-demo__intro-title {
+            font-family: var(--font-display);
+            font-size: 22px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .agent-demo__intro-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            max-width: 480px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Scenario selector for demo */
+        .demo-scenarios {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 24px 28px 0;
+        }
+
+        .demo-scenario-btn {
+            padding: 8px 18px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+        }
+
+        .demo-scenario-btn:hover {
+            color: var(--text-secondary);
+            border-color: var(--border-active);
+            background: var(--bg-secondary);
+        }
+
+        .demo-scenario-btn--active {
+            background: var(--accent-gold);
+            color: #FFFFFF;
+            border-color: var(--accent-gold);
+        }
+
+        .demo-scenario-btn--active:hover {
+            background: #827523;
+            border-color: #827523;
+            color: #FFFFFF;
+        }
+
+        /* Agent conversation / log area */
+        .agent-log {
+            padding: 24px 28px 28px;
+        }
+
+        .agent-log__feed {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            min-height: 200px;
+            max-height: 520px;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+        }
+
+        .agent-log__empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            color: var(--text-muted);
+            gap: 12px;
+        }
+
+        .agent-log__empty-icon {
+            font-size: 32px;
+            opacity: 0.3;
+        }
+
+        .agent-log__empty-text {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+        }
+
+        /* Individual log entry */
+        .agent-entry {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            opacity: 0;
+            transform: translateY(10px);
+            animation: agentEntryIn 0.4s var(--ease-out-expo) forwards;
+        }
+
+        .agent-entry:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes agentEntryIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .agent-entry__header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .agent-entry__icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .agent-entry__icon--think {
+            background: rgba(123, 107, 168, 0.12);
+            color: var(--accent-lavender);
+        }
+
+        .agent-entry__icon--tool {
+            background: rgba(58, 143, 126, 0.12);
+            color: var(--accent-teal);
+        }
+
+        .agent-entry__icon--guardrail {
+            background: rgba(154, 138, 47, 0.12);
+            color: var(--accent-gold);
+        }
+
+        .agent-entry__icon--output {
+            background: rgba(26, 25, 23, 0.08);
+            color: var(--text-primary);
+        }
+
+        .agent-entry__icon--error {
+            background: rgba(176, 86, 86, 0.12);
+            color: var(--accent-rose);
+        }
+
+        .agent-entry__type {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .agent-entry__type--think { color: var(--accent-lavender); }
+        .agent-entry__type--tool { color: var(--accent-teal); }
+        .agent-entry__type--guardrail { color: var(--accent-gold); }
+        .agent-entry__type--output { color: var(--text-primary); }
+        .agent-entry__type--error { color: var(--accent-rose); }
+
+        .agent-entry__time {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .agent-entry__body {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.7;
+            padding-left: 38px;
+        }
+
+        .agent-entry__body strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .agent-entry__body code {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            background: var(--bg-secondary);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: var(--text-primary);
+        }
+
+        /* Data snippet inside a tool call */
+        .agent-data {
+            margin-top: 10px;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            overflow-x: auto;
+        }
+
+        .agent-data__row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+
+        .agent-data__label {
+            color: var(--text-muted);
+        }
+
+        .agent-data__value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .agent-data__value--green { color: var(--accent-teal); }
+        .agent-data__value--yellow { color: var(--accent-gold); }
+        .agent-data__value--red { color: var(--accent-rose); }
+
+        /* Final output card */
+        .agent-output-card {
+            margin-top: 10px;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-gold);
+        }
+
+        .agent-output-card__title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .agent-output-card__text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        /* Run / Reset controls */
+        .agent-controls {
+            display: flex;
+            gap: 10px;
+            padding: 0 28px 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn--run-agent {
+            background: var(--accent-gold);
+            color: #FFFFFF;
+            border-color: var(--accent-gold);
+        }
+
+        .btn--run-agent:hover {
+            background: #827523;
+            border-color: #827523;
+        }
+
+        .btn--run-agent:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .btn--run-agent .btn-spinner {
+            display: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #FFFFFF;
+            border-radius: 50%;
+            animation: btnSpin 0.6s linear infinite;
+        }
+
+        .btn--run-agent--loading .btn-spinner {
+            display: inline-block;
+        }
+
+        .btn--run-agent--loading .btn-text {
+            display: none;
+        }
+
+        @keyframes btnSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Progress bar */
+        .agent-progress {
+            height: 3px;
+            background: var(--border-subtle);
+            border-radius: 2px;
+            margin: 0 28px 20px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .agent-progress--visible {
+            display: block;
+        }
+
+        .agent-progress__bar {
+            height: 100%;
+            background: var(--accent-gold);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.4s var(--ease-out-expo);
+        }
+
+        /* ═══════════════════════════════════════════
+           RESPONSIVE OVERRIDES
+        ═══════════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .sandbox-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sandbox-sidebar {
+                position: static;
+            }
+
+            .flow-diagram {
+                flex-direction: row;
+                justify-content: center;
+                gap: 0;
+            }
+
+            .flow-connector {
+                width: 28px;
+                height: 2px;
+            }
+
+            .flow-node__label {
+                left: 50%;
+                top: calc(100% + 8px);
+                transform: translateX(-50%);
+                font-size: 9px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .goal-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .scorecard__item {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .guardrail-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .demo-scenarios {
+                padding: 16px 20px 0;
+            }
+
+            .agent-log {
+                padding: 16px 20px 20px;
+            }
+
+            .agent-controls {
+                padding: 0 20px 20px;
+            }
+
+            .agent-progress {
+                margin: 0 20px 16px;
+            }
+
+            .agent-entry__body {
+                padding-left: 0;
+                margin-top: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════
+         NAVIGATION
+    ═══════════════════════════════════════════ -->
+    <nav class="nav">
+        <a href="index.html" class="nav__brand">
+            <div class="nav__logo">✨</div>
+            <span class="nav__title">Enterprise AI  — Humana Leadership Series</span>
+        </a>
+        <div class="nav__links">
+            <a href="photo-prompting.html" class="nav__link" data-module="photo-prompting">Photo Prompting</a>
+            <a href="document-intel.html" class="nav__link" data-module="document-intel">Documents</a>
+            <a href="vibe-coding.html" class="nav__link" data-module="vibe-coding">Vibe Coding</a>
+            <a href="ai-agents.html" class="nav__link nav__link--active" data-module="ai-agents">AI Agents</a>
+        </div>
+        <button class="nav__hamburger" id="nav-hamburger" type="button" aria-label="Open menu">
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+        </button>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE HEADER
+    ═══════════════════════════════════════════ -->
+    <div class="page">
+        <header class="page__header">
+            <div class="page__number">04</div>
+            <div class="page__eyebrow page__eyebrow--agents">Module 04 — AI Agents</div>
+            <h1 class="page__title">Building Systems That Work for You</h1>
+            <p class="page__intro">An AI agent is more than a chatbot. It's a system that can reason, make decisions, take actions, and learn from outcomes — operating on your behalf with defined guardrails. This is where AI moves from tool to team member.</p>
+        </header>
+
+        <!-- ═══════════════════════════════════════════
+             TUTORIAL CONTENT
+        ═══════════════════════════════════════════ -->
+        <div class="page__content">
+
+            <!-- ─── Chatbot vs. Copilot vs. Agent ─── -->
+            <div class="content-grid">
+                <div class="card card--full card--no-hover reveal">
+                    <div class="card__badge card__badge--gold">Framework</div>
+                    <h2 class="card__title">Chatbot vs. Copilot vs. Agent</h2>
+                    <p class="card__text">Understanding the spectrum of AI capability helps you match the right approach to the right problem.</p>
+                    <table class="matrix-table" style="margin-top: 20px;">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>What It Does</th>
+                                <th>Healthcare Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Chatbot</td>
+                                <td>Answers questions from a fixed script or knowledge base. Reactive only.</td>
+                                <td>Patient FAQ bot on your website answering visiting hours and billing questions.</td>
+                            </tr>
+                            <tr>
+                                <td>Copilot</td>
+                                <td>Assists a human in real-time, suggesting actions but never acting alone.</td>
+                                <td>AI that drafts clinical notes while the physician reviews and approves each one.</td>
+                            </tr>
+                            <tr>
+                                <td>Agent</td>
+                                <td>Reasons through multi-step tasks, uses tools, and acts autonomously within guardrails.</td>
+                                <td>System that monitors denials, gathers evidence, drafts appeals, and submits — escalating only edge cases.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ─── Side-by-side: What Makes an Agent + Where Agents Create Value ─── -->
+            <div class="content-grid">
+                <div class="card reveal">
+                    <div class="card__badge card__badge--gold">Anatomy</div>
+                    <h2 class="card__title">What Makes an Agent</h2>
+                    <ol class="steps">
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Goal</h4>
+                                <p>A clear, measurable objective the agent is working toward. Without a defined goal, it's just a chatbot with extra steps.</p>
+                            </div>
+                        </li>
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Tools & Access</h4>
+                                <p>Connections to systems it can read from and write to — EHR, email, scheduling, payer portals, document storage.</p>
+                            </div>
+                        </li>
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Reasoning</h4>
+                                <p>The ability to break complex tasks into steps, evaluate options, handle exceptions, and adapt when things don't go as planned.</p>
+                            </div>
+                        </li>
+                        <li class="steps__item">
+                            <div class="steps__num"></div>
+                            <div class="steps__content">
+                                <h4>Guardrails</h4>
+                                <p>Rules that define what the agent can and cannot do. Escalation triggers, approval requirements, and audit logging.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="card reveal reveal--delay-1">
+                    <div class="card__badge card__badge--tip">Opportunities</div>
+                    <h2 class="card__title">Where Agents Create Value</h2>
+                    <ul class="checklist">
+                        <li class="checklist__item">
+                            <span class="checklist__icon">&#10003;</span>
+                            <span><strong>Prior Authorization</strong> — Automated evidence gathering, clinical criteria matching, and submission tracking across payer portals.</span>
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">&#10003;</span>
+                            <span><strong>Patient Intake</strong> — Pre-visit form completion, insurance eligibility verification, and appointment preparation workflows.</span>
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">&#10003;</span>
+                            <span><strong>Revenue Cycle</strong> — Denial pattern analysis, automated appeal generation, and charge capture optimization.</span>
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">&#10003;</span>
+                            <span><strong>Quality Reporting</strong> — Continuous measure monitoring, gap identification, and documentation improvement suggestions.</span>
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">&#10003;</span>
+                            <span><strong>Executive Briefing</strong> — Daily operational digest combining census data, financial metrics, and flagged events into one summary.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ─── Executive's Agent Evaluation Checklist ─── -->
+            <div class="content-grid">
+                <div class="card card--full card--no-hover reveal">
+                    <div class="card__badge card__badge--gold">Evaluation</div>
+                    <h2 class="card__title">Executive's Agent Evaluation Checklist</h2>
+                    <p class="card__text" style="margin-bottom: 16px;">Before greenlighting any agent project, walk through these five questions. They separate high-impact automation from expensive experiments.</p>
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Why It Matters</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Is the process clearly defined with documented steps?</td>
+                                <td>Agents can't automate what hasn't been standardized. Undefined processes produce undefined results.</td>
+                            </tr>
+                            <tr>
+                                <td>Is there a measurable success metric?</td>
+                                <td>Without a KPI, you can't tell if the agent is working. Turnaround time, accuracy rate, and cost per transaction are good starting points.</td>
+                            </tr>
+                            <tr>
+                                <td>Does it involve high volume, repetitive decisions?</td>
+                                <td>Agents excel at scale. If the process happens 10 times a day, the ROI compounds. If it happens once a month, a copilot may be enough.</td>
+                            </tr>
+                            <tr>
+                                <td>Are the required data sources accessible via API or structured export?</td>
+                                <td>An agent that can't reach the data it needs will stall. Integration feasibility determines timeline and cost.</td>
+                            </tr>
+                            <tr>
+                                <td>Is there a clear escalation path for edge cases?</td>
+                                <td>Every agent will encounter situations it wasn't designed for. A defined human-in-the-loop protocol prevents failures from becoming incidents.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 SANDBOX: Agent Blueprint Designer
+            ═══════════════════════════════════════════ -->
+            <div class="sandbox reveal" id="blueprint-sandbox">
+                <div class="sandbox__header">
+                    <span class="sandbox__title">Agent Blueprint Designer</span>
+                    <span class="sandbox__title" style="font-size: 10px; color: var(--text-muted); font-weight: 300; text-transform: none; letter-spacing: 0.02em;">Interactive</span>
+                </div>
+                <div class="sandbox__body">
+                    <div class="sandbox-layout">
+                        <div class="sandbox-configurator">
+
+                            <!-- Step 1: Choose a Goal -->
+                            <div class="sandbox-step" id="step-1">
+                                <span class="sandbox-step__label">Step 1</span>
+                                <div class="sandbox-step__title">What should this agent accomplish?</div>
+                                <div class="goal-grid">
+                                    <button class="goal-card" data-goal="prior-auth" type="button">
+                                        <span class="goal-card__icon">&#128203;</span>
+                                        <span class="goal-card__name">Prior Authorization</span>
+                                        <span class="goal-card__desc">Automate evidence gathering and submission</span>
+                                    </button>
+                                    <button class="goal-card" data-goal="patient-intake" type="button">
+                                        <span class="goal-card__icon">&#127973;</span>
+                                        <span class="goal-card__name">Patient Intake</span>
+                                        <span class="goal-card__desc">Pre-visit forms, insurance verification</span>
+                                    </button>
+                                    <button class="goal-card" data-goal="exec-briefing" type="button">
+                                        <span class="goal-card__icon">&#128202;</span>
+                                        <span class="goal-card__name">Executive Briefing</span>
+                                        <span class="goal-card__desc">Daily digest of metrics and events</span>
+                                    </button>
+                                    <button class="goal-card" data-goal="denial-mgmt" type="button">
+                                        <span class="goal-card__icon">&#9889;</span>
+                                        <span class="goal-card__name">Denial Management</span>
+                                        <span class="goal-card__desc">Appeal generation and resubmission</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Select Tools -->
+                            <div class="sandbox-step sandbox-step--hidden" id="step-2">
+                                <span class="sandbox-step__label">Step 2</span>
+                                <div class="sandbox-step__title">What systems can this agent access?</div>
+                                <div class="tool-toggles">
+                                    <button class="tool-toggle" data-tool="ehr" type="button">EHR System</button>
+                                    <button class="tool-toggle" data-tool="email" type="button">Email</button>
+                                    <button class="tool-toggle" data-tool="scheduling" type="button">Scheduling</button>
+                                    <button class="tool-toggle" data-tool="payer" type="button">Payer Portal</button>
+                                    <button class="tool-toggle" data-tool="docs" type="button">Document Storage</button>
+                                    <button class="tool-toggle" data-tool="analytics" type="button">Analytics Dashboard</button>
+                                </div>
+                                <span class="tool-count"><span id="tool-count-num">0</span> of 6 selected — select at least 2 to continue</span>
+                            </div>
+
+                            <!-- Step 3: Define Guardrails -->
+                            <div class="sandbox-step sandbox-step--hidden" id="step-3">
+                                <span class="sandbox-step__label">Step 3</span>
+                                <div class="sandbox-step__title">What rules should this agent follow?</div>
+                                <div class="guardrails-list">
+                                    <div class="guardrail-item">
+                                        <span class="guardrail-item__label">Require human approval before final submission</span>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked data-guardrail="human-approval">
+                                            <span class="toggle-switch__track"></span>
+                                        </label>
+                                    </div>
+                                    <div class="guardrail-item">
+                                        <span class="guardrail-item__label">Escalate to supervisor when confidence is below 80%</span>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked data-guardrail="escalate-low-confidence">
+                                            <span class="toggle-switch__track"></span>
+                                        </label>
+                                    </div>
+                                    <div class="guardrail-item">
+                                        <span class="guardrail-item__label">Never access patient clinical notes directly</span>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked data-guardrail="no-clinical-notes">
+                                            <span class="toggle-switch__track"></span>
+                                        </label>
+                                    </div>
+                                    <div class="guardrail-item">
+                                        <span class="guardrail-item__label">Log all actions for audit trail</span>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked data-guardrail="audit-logging">
+                                            <span class="toggle-switch__track"></span>
+                                        </label>
+                                    </div>
+                                    <div class="guardrail-item">
+                                        <span class="guardrail-item__label">Pause operations outside business hours</span>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" data-guardrail="business-hours">
+                                            <span class="toggle-switch__track"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 4: Generate Blueprint -->
+                            <div class="sandbox-step sandbox-step--hidden" id="step-4">
+                                <span class="sandbox-step__label">Step 4</span>
+                                <div class="sandbox-step__title">Review your agent configuration</div>
+                                <button class="btn btn--primary" id="generate-blueprint" type="button">
+                                    Generate Blueprint <span class="btn__arrow">&rarr;</span>
+                                </button>
+                            </div>
+
+                            <!-- Blueprint Output -->
+                            <div class="blueprint-output" id="blueprint-output">
+                                <div class="blueprint-memo">
+                                    <div class="blueprint-memo__bar"></div>
+                                    <div class="blueprint-memo__body">
+                                        <div class="blueprint-memo__header">Agent Blueprint</div>
+
+                                        <div class="blueprint-section">
+                                            <span class="blueprint-section__label">Goal</span>
+                                            <div class="blueprint-section__value" id="bp-goal"></div>
+                                        </div>
+
+                                        <div class="blueprint-section">
+                                            <span class="blueprint-section__label">Connected Systems</span>
+                                            <div class="blueprint-chips" id="bp-tools"></div>
+                                        </div>
+
+                                        <div class="blueprint-section">
+                                            <span class="blueprint-section__label">Guardrails</span>
+                                            <div id="bp-guardrails"></div>
+                                        </div>
+
+                                        <div class="blueprint-section">
+                                            <span class="blueprint-section__label">Recommended First Step</span>
+                                            <div class="blueprint-section__value" id="bp-recommendation"></div>
+                                        </div>
+
+                                        <div class="blueprint-section">
+                                            <span class="blueprint-section__label">Risk Assessment</span>
+                                            <div id="bp-risk"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 20px; text-align: center;">
+                                    <button class="btn btn--sm" id="start-over" type="button">Start Over</button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Flow Diagram Sidebar -->
+                        <div class="sandbox-sidebar">
+                            <div class="flow-diagram">
+                                <div class="flow-node" id="flow-goal">
+                                    <span class="flow-node__icon">&#127919;</span>
+                                    <span class="flow-node__label">Goal</span>
+                                </div>
+                                <div class="flow-connector" id="flow-conn-1"></div>
+                                <div class="flow-node" id="flow-tools">
+                                    <span class="flow-node__icon">&#128279;</span>
+                                    <span class="flow-node__label">Tools</span>
+                                </div>
+                                <div class="flow-connector" id="flow-conn-2"></div>
+                                <div class="flow-node" id="flow-guardrails">
+                                    <span class="flow-node__icon">&#128737;</span>
+                                    <span class="flow-node__label">Rules</span>
+                                </div>
+                                <div class="flow-connector" id="flow-conn-3"></div>
+                                <div class="flow-node" id="flow-output">
+                                    <span class="flow-node__icon">&#9989;</span>
+                                    <span class="flow-node__label">Output</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 SANDBOX: Test Your Agent
+            ═══════════════════════════════════════════ -->
+            <div class="sandbox agent-demo" id="agent-demo">
+                <div class="sandbox__header">
+                    <span class="sandbox__title">Test Your Agent</span>
+                    <span class="sandbox__title" style="font-size: 10px; color: var(--text-muted); font-weight: 300; text-transform: none; letter-spacing: 0.02em;">Simulation</span>
+                </div>
+
+                <div class="agent-demo__intro">
+                    <div class="agent-demo__intro-title">Watch Your Agent Work</div>
+                    <div class="agent-demo__intro-desc">Select a scenario below and watch your configured agent reason through a real task — accessing tools, checking guardrails, and producing results.</div>
+                </div>
+
+                <div class="demo-scenarios" id="demo-scenarios">
+                    <!-- Scenario buttons are dynamically populated based on the selected goal -->
+                </div>
+
+                <div class="agent-progress" id="agent-progress">
+                    <div class="agent-progress__bar" id="agent-progress-bar"></div>
+                </div>
+
+                <div class="agent-log">
+                    <div class="agent-log__feed" id="agent-log-feed">
+                        <div class="agent-log__empty" id="agent-log-empty">
+                            <div class="agent-log__empty-icon">&#9881;</div>
+                            <div class="agent-log__empty-text">Select a scenario and click "Run Agent"</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-controls">
+                    <button class="btn btn--run-agent" id="run-agent-btn" disabled type="button">
+                        <span class="btn-spinner"></span>
+                        <span class="btn-text">Run Agent &rarr;</span>
+                    </button>
+                    <button class="btn btn--sm" id="reset-agent-btn" type="button" style="display:none;">Run Again</button>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 INTERACTIVE EVALUATION SCORECARD
+            ═══════════════════════════════════════════ -->
+            <div class="scorecard reveal">
+                <div class="card card--full card--no-hover">
+                    <div class="card__badge card__badge--gold">Assessment</div>
+                    <h2 class="card__title">Agent Readiness Scorecard</h2>
+                    <p class="card__text" style="margin-bottom: 8px;">Rate each factor from 1 (not ready) to 5 (fully ready) for the process you're considering.</p>
+
+                    <div class="scorecard__item" data-question="0">
+                        <span class="scorecard__question">Is the process clearly defined with documented steps?</span>
+                        <div class="scorecard__rating">
+                            <button class="rating-dot" data-value="1" type="button">1</button>
+                            <button class="rating-dot" data-value="2" type="button">2</button>
+                            <button class="rating-dot" data-value="3" type="button">3</button>
+                            <button class="rating-dot" data-value="4" type="button">4</button>
+                            <button class="rating-dot" data-value="5" type="button">5</button>
+                        </div>
+                    </div>
+
+                    <div class="scorecard__item" data-question="1">
+                        <span class="scorecard__question">Is there a measurable success metric?</span>
+                        <div class="scorecard__rating">
+                            <button class="rating-dot" data-value="1" type="button">1</button>
+                            <button class="rating-dot" data-value="2" type="button">2</button>
+                            <button class="rating-dot" data-value="3" type="button">3</button>
+                            <button class="rating-dot" data-value="4" type="button">4</button>
+                            <button class="rating-dot" data-value="5" type="button">5</button>
+                        </div>
+                    </div>
+
+                    <div class="scorecard__item" data-question="2">
+                        <span class="scorecard__question">Does it involve high volume, repetitive decisions?</span>
+                        <div class="scorecard__rating">
+                            <button class="rating-dot" data-value="1" type="button">1</button>
+                            <button class="rating-dot" data-value="2" type="button">2</button>
+                            <button class="rating-dot" data-value="3" type="button">3</button>
+                            <button class="rating-dot" data-value="4" type="button">4</button>
+                            <button class="rating-dot" data-value="5" type="button">5</button>
+                        </div>
+                    </div>
+
+                    <div class="scorecard__item" data-question="3">
+                        <span class="scorecard__question">Are the required data sources accessible via API or structured export?</span>
+                        <div class="scorecard__rating">
+                            <button class="rating-dot" data-value="1" type="button">1</button>
+                            <button class="rating-dot" data-value="2" type="button">2</button>
+                            <button class="rating-dot" data-value="3" type="button">3</button>
+                            <button class="rating-dot" data-value="4" type="button">4</button>
+                            <button class="rating-dot" data-value="5" type="button">5</button>
+                        </div>
+                    </div>
+
+                    <div class="scorecard__item" data-question="4">
+                        <span class="scorecard__question">Is there a clear escalation path for edge cases?</span>
+                        <div class="scorecard__rating">
+                            <button class="rating-dot" data-value="1" type="button">1</button>
+                            <button class="rating-dot" data-value="2" type="button">2</button>
+                            <button class="rating-dot" data-value="3" type="button">3</button>
+                            <button class="rating-dot" data-value="4" type="button">4</button>
+                            <button class="rating-dot" data-value="5" type="button">5</button>
+                        </div>
+                    </div>
+
+                    <div class="scorecard__result" id="scorecard-result">
+                        <div class="scorecard__score" id="scorecard-score">0 <span>/ 25</span></div>
+                        <div class="scorecard__recommendation" id="scorecard-recommendation"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 EXECUTIVE TAKEAWAY
+            ═══════════════════════════════════════════ -->
+            <div class="takeaway takeaway--agents reveal">
+                <div class="takeaway__label">Executive Takeaway</div>
+                <h3 class="takeaway__title">The question isn't whether to use AI agents. It's which processes to automate first.</h3>
+                <p class="takeaway__text">Start with the process that is highest volume, most clearly defined, and has the most measurable outcome. Build your first agent there, prove value in 90 days, and use that momentum to expand. The organizations that move fastest won't be the ones with the biggest budgets — they'll be the ones with the clearest thinking about where autonomy creates leverage.</p>
+            </div>
+
+        </div><!-- end .page__content -->
+
+        <!-- ═══════════════════════════════════════════
+             PAGE NAVIGATION
+        ═══════════════════════════════════════════ -->
+        <nav class="page-nav">
+            <a href="vibe-coding.html" class="page-nav__link">
+                <span class="page-nav__label">Previous</span>
+                <span class="page-nav__title">&larr; Vibe Coding</span>
+            </a>
+            <a href="index.html" class="page-nav__link page-nav__link--next">
+                <span class="page-nav__label">Overview</span>
+                <span class="page-nav__title">Back to Overview &rarr;</span>
+            </a>
+        </nav>
+
+    </div><!-- end .page -->
+
+    <!-- ═══════════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════════ -->
+    <footer class="footer">
+        <span class="footer__text">Enterprise AI — Humana Leadership Series</span>
+        <span class="footer__text">Confidential</span>
+    </footer>
+
+    <!-- ═══════════════════════════════════════════
+         JAVASCRIPT
+    ═══════════════════════════════════════════ -->
+    <script>
+    (function() {
+        'use strict';
+
+        // ─── Mark this module as visited ───
+        try {
+            const visited = JSON.parse(localStorage.getItem('ai-tutorial-visited') || '[]');
+            if (Array.isArray(visited) && !visited.includes('ai-agents')) {
+                visited.push('ai-agents');
+                localStorage.setItem('ai-tutorial-visited', JSON.stringify(visited));
+            }
+        } catch (e) {}
+
+        // ─── Nav visited status ───
+        try {
+            const visited = JSON.parse(localStorage.getItem('ai-tutorial-visited') || '[]');
+            if (Array.isArray(visited)) {
+                document.querySelectorAll('.nav__link[data-module]').forEach(function(link) {
+                    const mod = link.getAttribute('data-module');
+                    if (visited.includes(mod) && !link.classList.contains('nav__link--active')) {
+                        link.classList.add('nav__link--completed');
+                    }
+                });
+            }
+        } catch (e) {}
+
+        // ─── Mobile Nav Toggle ───
+        var hamburger = document.getElementById('nav-hamburger');
+        var navLinks = document.querySelector('.nav__links');
+        if (hamburger && navLinks) {
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('nav__hamburger--open');
+                navLinks.classList.toggle('nav__links--open');
+            });
+            navLinks.querySelectorAll('.nav__link').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    hamburger.classList.remove('nav__hamburger--open');
+                    navLinks.classList.remove('nav__links--open');
+                });
+            });
+        }
+
+        // ─── Scroll Reveal ───
+        var revealEls = document.querySelectorAll('.reveal');
+        var revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal--visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+        revealEls.forEach(function(el) { revealObserver.observe(el); });
+
+        // ═══════════════════════════════════════════
+        //  AGENT BLUEPRINT DESIGNER
+        // ═══════════════════════════════════════════
+
+        var state = {
+            goal: null,
+            tools: [],
+            guardrails: {},
+            blueprintGenerated: false
+        };
+
+        var goalData = {
+            'prior-auth': {
+                name: 'Prior Authorization',
+                desc: 'Automate evidence gathering and submission',
+                recommendation: 'Start by mapping your top 10 most-denied procedure codes. Build the agent to handle those first, using your existing payer portal credentials and clinical documentation templates.',
+                risk: 'medium'
+            },
+            'patient-intake': {
+                name: 'Patient Intake',
+                desc: 'Pre-visit forms, insurance verification',
+                recommendation: 'Begin with a single department or clinic location. Configure the agent to send pre-visit forms 48 hours before appointments and verify insurance eligibility automatically.',
+                risk: 'low'
+            },
+            'exec-briefing': {
+                name: 'Executive Briefing',
+                desc: 'Daily digest of metrics and events',
+                recommendation: 'Define the 5 metrics that matter most to your leadership team. Connect the agent to your analytics dashboard and have it generate a morning briefing email by 7 AM each day.',
+                risk: 'low'
+            },
+            'denial-mgmt': {
+                name: 'Denial Management',
+                desc: 'Appeal generation and resubmission',
+                recommendation: 'Analyze your last 90 days of denials to identify the top 3 denial reason codes. Train the agent on your successful appeal templates and start with automated first-level appeals only.',
+                risk: 'high'
+            }
+        };
+
+        var toolLabels = {
+            'ehr': 'EHR System',
+            'email': 'Email',
+            'scheduling': 'Scheduling',
+            'payer': 'Payer Portal',
+            'docs': 'Document Storage',
+            'analytics': 'Analytics Dashboard'
+        };
+
+        var guardrailLabels = {
+            'human-approval': 'Require human approval before final submission',
+            'escalate-low-confidence': 'Escalate to supervisor when confidence is below 80%',
+            'no-clinical-notes': 'Never access patient clinical notes directly',
+            'audit-logging': 'Log all actions for audit trail',
+            'business-hours': 'Pause operations outside business hours'
+        };
+
+        // ─── Step elements ───
+        var step1 = document.getElementById('step-1');
+        var step2 = document.getElementById('step-2');
+        var step3 = document.getElementById('step-3');
+        var step4 = document.getElementById('step-4');
+        var blueprintOutput = document.getElementById('blueprint-output');
+
+        // ─── Flow diagram elements ───
+        var flowGoal = document.getElementById('flow-goal');
+        var flowTools = document.getElementById('flow-tools');
+        var flowGuardrails = document.getElementById('flow-guardrails');
+        var flowOutput = document.getElementById('flow-output');
+        var flowConn1 = document.getElementById('flow-conn-1');
+        var flowConn2 = document.getElementById('flow-conn-2');
+        var flowConn3 = document.getElementById('flow-conn-3');
+
+        function showStep(el) {
+            el.classList.remove('sandbox-step--hidden');
+            el.classList.add('sandbox-step--entering');
+        }
+
+        function hideStep(el) {
+            el.classList.add('sandbox-step--hidden');
+            el.classList.remove('sandbox-step--entering');
+        }
+
+        function updateFlowDiagram() {
+            // Goal
+            if (state.goal) {
+                flowGoal.classList.add('flow-node--active');
+            } else {
+                flowGoal.classList.remove('flow-node--active');
+            }
+
+            // Tools
+            if (state.tools.length >= 2) {
+                flowTools.classList.add('flow-node--active');
+                flowConn1.classList.add('flow-connector--active');
+            } else {
+                flowTools.classList.remove('flow-node--active');
+                flowConn1.classList.remove('flow-connector--active');
+            }
+
+            // Guardrails
+            var activeGuardrails = Object.values(state.guardrails).filter(function(v) { return v; }).length;
+            if (activeGuardrails >= 1 && state.tools.length >= 2) {
+                flowGuardrails.classList.add('flow-node--active');
+                flowConn2.classList.add('flow-connector--active');
+            } else {
+                flowGuardrails.classList.remove('flow-node--active');
+                flowConn2.classList.remove('flow-connector--active');
+            }
+
+            // Output
+            if (state.blueprintGenerated) {
+                flowOutput.classList.add('flow-node--active');
+                flowConn3.classList.add('flow-connector--active');
+            } else {
+                flowOutput.classList.remove('flow-node--active');
+                flowConn3.classList.remove('flow-connector--active');
+            }
+
+            // Update label counts
+            flowTools.querySelector('.flow-node__label').textContent = state.tools.length > 0 ? state.tools.length + ' Tools' : 'Tools';
+            flowGuardrails.querySelector('.flow-node__label').textContent = activeGuardrails > 0 ? activeGuardrails + ' Rules' : 'Rules';
+        }
+
+        // ─── Step 1: Goal selection ───
+        var goalCards = document.querySelectorAll('.goal-card');
+        goalCards.forEach(function(card) {
+            card.addEventListener('click', function() {
+                var goal = this.getAttribute('data-goal');
+
+                // Deselect all
+                goalCards.forEach(function(c) { c.classList.remove('goal-card--active'); });
+                // Select this one
+                this.classList.add('goal-card--active');
+
+                state.goal = goal;
+
+                // Show step 2
+                showStep(step2);
+
+                updateFlowDiagram();
+            });
+        });
+
+        // ─── Step 2: Tool toggles ───
+        var toolToggles = document.querySelectorAll('.tool-toggle');
+        var toolCountEl = document.getElementById('tool-count-num');
+
+        toolToggles.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var tool = this.getAttribute('data-tool');
+                var idx = state.tools.indexOf(tool);
+
+                if (idx > -1) {
+                    state.tools.splice(idx, 1);
+                    this.classList.remove('tool-toggle--active');
+                } else {
+                    state.tools.push(tool);
+                    this.classList.add('tool-toggle--active');
+                }
+
+                toolCountEl.textContent = state.tools.length;
+
+                // Show/hide step 3
+                if (state.tools.length >= 2) {
+                    showStep(step3);
+                    // Show step 4 if guardrails have been acknowledged
+                    checkGuardrailsForStep4();
+                } else {
+                    hideStep(step3);
+                    hideStep(step4);
+                }
+
+                updateFlowDiagram();
+            });
+        });
+
+        // ─── Step 3: Guardrail toggles ───
+        var guardrailInputs = document.querySelectorAll('[data-guardrail]');
+
+        function readGuardrails() {
+            guardrailInputs.forEach(function(input) {
+                state.guardrails[input.getAttribute('data-guardrail')] = input.checked;
+            });
+        }
+
+        // Initialize guardrails state
+        readGuardrails();
+
+        function checkGuardrailsForStep4() {
+            readGuardrails();
+            var anyActive = Object.values(state.guardrails).some(function(v) { return v; });
+            if (anyActive && state.tools.length >= 2) {
+                showStep(step4);
+            } else {
+                hideStep(step4);
+            }
+            updateFlowDiagram();
+        }
+
+        guardrailInputs.forEach(function(input) {
+            input.addEventListener('change', function() {
+                checkGuardrailsForStep4();
+            });
+        });
+
+        // ─── Step 4: Generate Blueprint ───
+        var generateBtn = document.getElementById('generate-blueprint');
+        generateBtn.addEventListener('click', function() {
+            readGuardrails();
+
+            var goal = goalData[state.goal];
+            if (!goal) return;
+
+            // Populate goal
+            document.getElementById('bp-goal').innerHTML = '<strong>' + goal.name + '</strong> — ' + goal.desc;
+
+            // Populate tools
+            var toolsContainer = document.getElementById('bp-tools');
+            toolsContainer.innerHTML = '';
+            state.tools.forEach(function(tool) {
+                var chip = document.createElement('span');
+                chip.className = 'blueprint-chip';
+                chip.textContent = toolLabels[tool] || tool;
+                toolsContainer.appendChild(chip);
+            });
+
+            // Populate guardrails
+            var guardrailsContainer = document.getElementById('bp-guardrails');
+            guardrailsContainer.innerHTML = '';
+            Object.keys(state.guardrails).forEach(function(key) {
+                if (state.guardrails[key]) {
+                    var div = document.createElement('div');
+                    div.className = 'blueprint-guardrail';
+                    div.textContent = guardrailLabels[key] || key;
+                    guardrailsContainer.appendChild(div);
+                }
+            });
+
+            // Populate recommendation
+            document.getElementById('bp-recommendation').textContent = goal.recommendation;
+
+            // Populate risk
+            var riskEl = document.getElementById('bp-risk');
+            var riskLevel = goal.risk;
+            riskEl.innerHTML = '<span class="blueprint-risk blueprint-risk--' + riskLevel + '"><span class="blueprint-risk__dot"></span>' + riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1) + '</span>';
+
+            // Show blueprint, hide step 4
+            hideStep(step4);
+            blueprintOutput.classList.add('blueprint-output--visible');
+
+            state.blueprintGenerated = true;
+            updateFlowDiagram();
+
+            // Show the agent demo sandbox
+            showAgentDemo();
+        });
+
+        // ─── Start Over ───
+        var startOverBtn = document.getElementById('start-over');
+        startOverBtn.addEventListener('click', function() {
+            // Reset state
+            state.goal = null;
+            state.tools = [];
+            state.blueprintGenerated = false;
+
+            // Reset goal cards
+            goalCards.forEach(function(c) { c.classList.remove('goal-card--active'); });
+
+            // Reset tool toggles
+            toolToggles.forEach(function(btn) { btn.classList.remove('tool-toggle--active'); });
+            toolCountEl.textContent = '0';
+
+            // Reset guardrails to defaults
+            guardrailInputs.forEach(function(input) {
+                var key = input.getAttribute('data-guardrail');
+                input.checked = (key !== 'business-hours');
+            });
+            readGuardrails();
+
+            // Hide steps 2-4 and blueprint
+            hideStep(step2);
+            hideStep(step3);
+            hideStep(step4);
+            blueprintOutput.classList.remove('blueprint-output--visible');
+
+            updateFlowDiagram();
+
+            // Hide agent demo
+            agentDemo.classList.remove('agent-demo--visible');
+            resetAgentLog();
+
+            // Scroll back to sandbox
+            document.getElementById('blueprint-sandbox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        // Initialize flow diagram
+        updateFlowDiagram();
+
+        // ═══════════════════════════════════════════
+        //  AGENT DEMO — TEST YOUR AGENT
+        // ═══════════════════════════════════════════
+
+        var agentDemo = document.getElementById('agent-demo');
+        var demoScenariosEl = document.getElementById('demo-scenarios');
+        var agentLogFeed = document.getElementById('agent-log-feed');
+        var agentLogEmpty = document.getElementById('agent-log-empty');
+        var agentProgressEl = document.getElementById('agent-progress');
+        var agentProgressBar = document.getElementById('agent-progress-bar');
+        var runAgentBtn = document.getElementById('run-agent-btn');
+        var resetAgentBtn = document.getElementById('reset-agent-btn');
+
+        var demoState = {
+            scenario: null,
+            running: false,
+            entries: [],
+            timeouts: []
+        };
+
+        // ─── Scenario data per goal ───
+        var demoScenarios = {
+            'prior-auth': [
+                {
+                    name: 'Knee Replacement PA',
+                    key: 'knee',
+                    desc: 'Process a prior authorization for total knee arthroplasty'
+                },
+                {
+                    name: 'MRI Pre-Auth',
+                    key: 'mri',
+                    desc: 'Handle an MRI authorization request with missing documentation'
+                }
+            ],
+            'patient-intake': [
+                {
+                    name: 'New Patient Onboard',
+                    key: 'new-patient',
+                    desc: 'Complete intake for a new patient with upcoming appointment'
+                },
+                {
+                    name: 'Insurance Verify',
+                    key: 'insurance',
+                    desc: 'Verify insurance eligibility and benefits for a scheduled visit'
+                }
+            ],
+            'exec-briefing': [
+                {
+                    name: 'Morning Briefing',
+                    key: 'morning',
+                    desc: 'Generate the daily 7 AM executive briefing'
+                },
+                {
+                    name: 'Incident Digest',
+                    key: 'incident',
+                    desc: 'Compile a summary of overnight critical incidents'
+                }
+            ],
+            'denial-mgmt': [
+                {
+                    name: 'Medical Necessity Appeal',
+                    key: 'med-necessity',
+                    desc: 'Draft an appeal for a medical necessity denial'
+                },
+                {
+                    name: 'Coding Error Review',
+                    key: 'coding-error',
+                    desc: 'Identify and correct a coding-related denial'
+                }
+            ]
+        };
+
+        // ─── Simulation step sequences per scenario ───
+        var demoSequences = {
+            'knee': function(tools, guardrails) {
+                var steps = [
+                    { type: 'think', body: 'Received a prior authorization request for <strong>total knee arthroplasty (CPT 27447)</strong> for patient J. Martinez. Let me gather the required clinical documentation.' },
+                    { type: 'tool', tool: 'ehr', body: 'Querying EHR for patient J. Martinez...<br>Retrieved: diagnosis history, imaging reports, physical therapy records, and failed conservative treatment documentation.' },
+                    { type: 'think', body: 'Analyzing payer requirements for <strong>UnitedHealthcare — Commercial PPO</strong>. This procedure requires: confirmed diagnosis of osteoarthritis, documented failure of conservative treatment (≥6 months), and recent imaging.' },
+                    { type: 'tool', tool: 'docs', body: 'Pulling clinical criteria template from document storage...<br>Matching patient records against UHC prior auth checklist.' },
+                    { type: 'tool', tool: 'payer', body: 'Connecting to UnitedHealthcare portal...<br>Uploading clinical documentation package (12 pages).<br>Submission ID: <code>PA-2026-04892</code>' }
+                ];
+
+                // Add guardrail checks based on user's configuration
+                if (guardrails['human-approval']) {
+                    steps.push({ type: 'guardrail', rule: 'human-approval', body: '<strong>Guardrail triggered:</strong> Human approval required before final submission. Routing to Dr. Chen for clinical sign-off before transmitting to payer.' });
+                }
+                if (guardrails['audit-logging']) {
+                    steps.push({ type: 'guardrail', rule: 'audit-logging', body: '<strong>Audit log entry created:</strong> PA request #04892 — all actions, data accessed, and decisions recorded with timestamps.' });
+                }
+                if (guardrails['escalate-low-confidence']) {
+                    steps.push({ type: 'think', body: 'Confidence level: <strong>94%</strong> — all required documentation present and criteria met. No escalation needed.' });
+                }
+
+                // Add email notification if email tool is available
+                if (tools.indexOf('email') > -1) {
+                    steps.push({ type: 'tool', tool: 'email', body: 'Sending confirmation email to care coordinator with PA submission details and expected turnaround time (3-5 business days).' });
+                }
+
+                steps.push({ type: 'output', body: '', outputTitle: 'Prior Authorization Submitted', outputBody: '<strong>Patient:</strong> J. Martinez<br><strong>Procedure:</strong> Total Knee Arthroplasty (CPT 27447)<br><strong>Payer:</strong> UnitedHealthcare Commercial PPO<br><strong>Status:</strong> Submitted — awaiting payer review<br><strong>Tracking ID:</strong> PA-2026-04892<br><strong>Expected Response:</strong> 3-5 business days<br><strong>Documentation:</strong> 12 pages uploaded (complete)' });
+                return steps;
+            },
+            'mri': function(tools, guardrails) {
+                var steps = [
+                    { type: 'think', body: 'Prior authorization request for <strong>lumbar MRI (CPT 72148)</strong> for patient R. Thompson. Checking clinical documentation status.' },
+                    { type: 'tool', tool: 'ehr', body: 'Querying EHR for patient R. Thompson...<br>Found: referral from Dr. Patel (orthopedics), chief complaint: chronic lower back pain ×3 months.' },
+                    { type: 'think', body: 'Analyzing payer requirements for <strong>Aetna — HMO</strong>. MRI pre-auth requires: documented conservative treatment failure, physical examination findings, and referring physician attestation.' },
+                    { type: 'think', body: '⚠️ <strong>Gap detected:</strong> No physical therapy records found. Aetna requires documented PT trial of at least 4 weeks before approving advanced imaging.' }
+                ];
+
+                if (guardrails['escalate-low-confidence']) {
+                    steps.push({ type: 'guardrail', rule: 'escalate-low-confidence', body: '<strong>Escalation triggered:</strong> Confidence is <strong>62%</strong> — below 80% threshold. Missing PT documentation significantly reduces approval likelihood. Routing to supervisor for review.' });
+                }
+
+                if (tools.indexOf('email') > -1) {
+                    steps.push({ type: 'tool', tool: 'email', body: 'Sending documentation request to Dr. Patel\'s office: "Please provide physical therapy records or attestation of conservative treatment for patient R. Thompson, needed for MRI pre-authorization."' });
+                }
+
+                if (tools.indexOf('scheduling') > -1) {
+                    steps.push({ type: 'tool', tool: 'scheduling', body: 'Setting follow-up reminder for 48 hours — if PT records not received, re-escalate to care coordinator.' });
+                }
+
+                if (guardrails['audit-logging']) {
+                    steps.push({ type: 'guardrail', rule: 'audit-logging', body: '<strong>Audit log:</strong> PA request paused — missing documentation flagged, outreach initiated, follow-up scheduled.' });
+                }
+
+                steps.push({ type: 'output', body: '', outputTitle: 'Authorization — Action Required', outputBody: '<strong>Patient:</strong> R. Thompson<br><strong>Procedure:</strong> Lumbar MRI (CPT 72148)<br><strong>Payer:</strong> Aetna HMO<br><strong>Status:</strong> Paused — missing PT documentation<br><strong>Action Taken:</strong> Requested records from referring physician<br><strong>Follow-up:</strong> 48-hour auto-reminder set<br><strong>Next Step:</strong> Resubmit upon receipt of documentation' });
+                return steps;
+            },
+            'new-patient': function(tools, guardrails) {
+                var steps = [
+                    { type: 'think', body: 'New patient intake triggered for <strong>Sarah Chen</strong>, scheduled appointment in 48 hours with Dr. Williams (Internal Medicine). Beginning pre-visit workflow.' },
+                    { type: 'tool', tool: 'ehr', body: 'Creating patient record in EHR...<br>Sending digital intake forms: demographics, medical history, medication list, allergies, and consent forms.' },
+                    { type: 'think', body: 'Patient submitted forms online. Reviewing responses: <strong>3 active medications</strong>, <strong>penicillin allergy noted</strong>, previous surgery (appendectomy, 2019). No red flags in history.' }
+                ];
+
+                if (tools.indexOf('payer') > -1) {
+                    steps.push({ type: 'tool', tool: 'payer', body: 'Verifying insurance eligibility with <strong>Blue Cross Blue Shield</strong>...<br>Coverage: Active | Plan: PPO Select<br>Copay: $35 specialist | Deductible: $1,200 ($480 remaining)' });
+                }
+
+                if (tools.indexOf('scheduling') > -1) {
+                    steps.push({ type: 'tool', tool: 'scheduling', body: 'Confirming appointment slot: <strong>Thursday 2:15 PM</strong> with Dr. Williams.<br>Estimated visit duration: 45 min (new patient comprehensive).' });
+                }
+
+                if (guardrails['no-clinical-notes']) {
+                    steps.push({ type: 'guardrail', rule: 'no-clinical-notes', body: '<strong>Access boundary respected:</strong> Patient-submitted forms processed. Clinical notes will only be created by the physician during the visit.' });
+                }
+
+                if (tools.indexOf('email') > -1) {
+                    steps.push({ type: 'tool', tool: 'email', body: 'Sending appointment confirmation to patient: date, time, location, parking instructions, what to bring, and estimated copay of $35.' });
+                }
+
+                if (guardrails['audit-logging']) {
+                    steps.push({ type: 'guardrail', rule: 'audit-logging', body: '<strong>Audit log:</strong> Complete intake workflow recorded — forms received, insurance verified, appointment confirmed.' });
+                }
+
+                steps.push({ type: 'output', body: '', outputTitle: 'Patient Intake Complete', outputBody: '<strong>Patient:</strong> Sarah Chen (New)<br><strong>Provider:</strong> Dr. Williams — Internal Medicine<br><strong>Appointment:</strong> Thursday, 2:15 PM<br><strong>Insurance:</strong> BCBS PPO Select — Verified Active<br><strong>Copay:</strong> $35 | Deductible Remaining: $480<br><strong>Forms:</strong> All submitted and reviewed<br><strong>Alerts:</strong> Penicillin allergy flagged in chart' });
+                return steps;
+            },
+            'insurance': function(tools, guardrails) {
+                var steps = [
+                    { type: 'think', body: 'Insurance verification request for <strong>Michael Torres</strong>, scheduled for cardiac stress test on Monday. Verifying coverage and pre-auth requirements.' },
+                    { type: 'tool', tool: 'payer', body: 'Connecting to <strong>Cigna — Open Access Plus</strong>...<br>Member ID verified. Policy status: Active.' },
+                    { type: 'think', body: 'Checking benefit details for cardiac stress test (CPT 93015). This procedure may require pre-authorization depending on plan tier.' },
+                    { type: 'tool', tool: 'payer', body: 'Benefits check complete:<br>Cardiac stress test — <strong>pre-authorization required</strong><br>In-network coverage: 80% after deductible<br>Patient responsibility: estimated $185' }
+                ];
+
+                if (tools.indexOf('ehr') > -1) {
+                    steps.push({ type: 'tool', tool: 'ehr', body: 'Pulling clinical justification from EHR: chest pain ×2 weeks, abnormal ECG findings, family history of cardiac disease. Documentation supports medical necessity.' });
+                }
+
+                if (guardrails['escalate-low-confidence']) {
+                    steps.push({ type: 'think', body: 'Confidence level: <strong>91%</strong> — clinical documentation strongly supports medical necessity. Proceeding with pre-auth submission.' });
+                }
+
+                if (guardrails['human-approval']) {
+                    steps.push({ type: 'guardrail', rule: 'human-approval', body: '<strong>Guardrail triggered:</strong> Routing pre-auth request to billing supervisor for sign-off before submission to Cigna.' });
+                }
+
+                if (guardrails['audit-logging']) {
+                    steps.push({ type: 'guardrail', rule: 'audit-logging', body: '<strong>Audit log:</strong> Insurance verified, pre-auth initiated, clinical documentation attached, supervisor approval requested.' });
+                }
+
+                steps.push({ type: 'output', body: '', outputTitle: 'Insurance Verification Complete', outputBody: '<strong>Patient:</strong> Michael Torres<br><strong>Payer:</strong> Cigna Open Access Plus — Active<br><strong>Procedure:</strong> Cardiac Stress Test (CPT 93015)<br><strong>Pre-Auth:</strong> Required — submission in progress<br><strong>Coverage:</strong> 80% after deductible (in-network)<br><strong>Est. Patient Cost:</strong> $185<br><strong>Status:</strong> Pending supervisor approval' });
+                return steps;
+            },
+            'morning': function(tools, guardrails) {
+                var steps = [
+                    { type: 'think', body: 'Initiating daily executive briefing generation. Current time: <strong>6:45 AM</strong>. Collecting data from all connected systems for the overnight period.' },
+                    { type: 'tool', tool: 'analytics', body: 'Pulling analytics dashboard data...<br>Census: 342 patients (94.5% occupancy)<br>ED volume: 67 visits overnight (+12% vs. average)<br>Average length of stay: 4.2 days' },
+                    { type: 'tool', tool: 'ehr', body: 'Scanning for critical events...<br>Found: 2 rapid responses, 1 code blue (patient stable), 3 unplanned ICU transfers.' }
+                ];
+
+                if (tools.indexOf('scheduling') > -1) {
+                    steps.push({ type: 'tool', tool: 'scheduling', body: 'Checking today\'s schedule...<br>27 surgeries scheduled (3 complex ortho)<br>12 discharges planned<br>Staffing: 2 call-outs in Med-Surg (coverage arranged)' });
+                }
+
+                steps.push({ type: 'think', body: 'Analyzing trends: ED volume is trending <strong>12% above average</strong> — flagging for awareness. ICU occupancy at <strong>96%</strong> may create capacity issues if transfers continue. Generating executive summary.' });
+
+                if (tools.indexOf('email') > -1 || tools.indexOf('docs') > -1) {
+                    var toolUsed = tools.indexOf('email') > -1 ? 'email' : 'docs';
+                    steps.push({ type: 'tool', tool: toolUsed, body: toolUsed === 'email' ? 'Formatting briefing and sending to executive distribution list (8 recipients) at 7:00 AM.' : 'Saving briefing to shared executive folder: <code>/Briefings/2026-02-20-AM.pdf</code>' });
+                }
+
+                if (guardrails['business-hours']) {
+                    steps.push({ type: 'guardrail', rule: 'business-hours', body: '<strong>Note:</strong> This briefing was queued at 6:45 AM and will be delivered at 7:00 AM per business hours policy.' });
+                }
+
+                if (guardrails['audit-logging']) {
+                    steps.push({ type: 'guardrail', rule: 'audit-logging', body: '<strong>Audit log:</strong> Morning briefing generated — 4 data sources queried, all metrics validated, delivery confirmed.' });
+                }
+
+                steps.push({ type: 'output', body: '', outputTitle: 'Executive Morning Briefing — Feb 20, 2026', outputBody: '<strong>Census:</strong> 342 patients (94.5% occupancy)<br><strong>ED Volume:</strong> 67 overnight visits ⚠️ +12% above average<br><strong>Critical Events:</strong> 2 rapid responses, 1 code blue (resolved), 3 ICU transfers<br><strong>ICU Status:</strong> 96% occupancy — capacity watch<br><strong>Today:</strong> 27 surgeries, 12 planned discharges<br><strong>Staffing:</strong> 2 Med-Surg call-outs (coverage secured)<br><strong>Action Items:</strong> Monitor ED trends, review ICU capacity plan' });
+                return steps;
+            },
+            'incident': function(tools, guardrails) {
+                var steps = [
+                    { type: 'think', body: 'Compiling critical incident digest for the past 12 hours. Scanning all connected systems for reportable events.' },
+                    { type: 'tool', tool: 'ehr', body: 'Scanning EHR for flagged events...<br>Found 4 incidents requiring executive attention.' },
+                    { type: 'tool', tool: 'analytics', body: 'Cross-referencing with quality metrics dashboard...<br>1 event matches a CMS reportable category. 1 event matches an internal safety threshold.' },
+                    { type: 'think', body: 'Categorizing incidents by severity:<br>• <strong>Critical:</strong> 1 (medication error — wrong dose administered, caught by nurse before patient harm)<br>• <strong>High:</strong> 1 (patient fall in 3-North, injury assessment pending)<br>• <strong>Moderate:</strong> 2 (equipment malfunction in OR-2, visitor complaint in ED)' }
+                ];
+
+                if (guardrails['escalate-low-confidence']) {
+                    steps.push({ type: 'guardrail', rule: 'escalate-low-confidence', body: '<strong>Escalation triggered:</strong> The medication error incident has regulatory implications. Confidence in automated classification: <strong>73%</strong>. Flagging for Risk Management manual review.' });
+                }
+
+                if (guardrails['no-clinical-notes']) {
+                    steps.push({ type: 'guardrail', rule: 'no-clinical-notes', body: '<strong>Access boundary respected:</strong> Incident details sourced from safety reporting system, not patient clinical notes. No PHI included in executive digest.' });
+                }
+
+                if (tools.indexOf('email') > -1) {
+                    steps.push({ type: 'tool', tool: 'email', body: 'Sending priority incident digest to CMO, CNO, and Risk Management with severity tags and recommended follow-up actions.' });
+                }
+
+                if (guardrails['audit-logging']) {
+                    steps.push({ type: 'guardrail', rule: 'audit-logging', body: '<strong>Audit log:</strong> Incident digest generated — 4 events compiled, 1 escalated to Risk Management, notifications sent.' });
+                }
+
+                steps.push({ type: 'output', body: '', outputTitle: 'Critical Incident Digest — Overnight', outputBody: '<strong>Period:</strong> 7 PM – 7 AM<br><strong>Total Incidents:</strong> 4<br><br>🔴 <strong>Critical — Medication Error:</strong> Wrong dose of metoprolol prepared (caught pre-administration). Root cause analysis initiated.<br>🟡 <strong>High — Patient Fall:</strong> 3-North, room 312. Injury assessment in progress. Fall protocol activated.<br>🟠 <strong>Moderate — OR Equipment:</strong> Cautery unit malfunction in OR-2. Backup deployed, no surgical delay.<br>🟠 <strong>Moderate — ED Complaint:</strong> Visitor complaint about wait time communication. Service recovery initiated.<br><br><strong>Escalated:</strong> Medication error → Risk Management for CMS review' });
+                return steps;
+            },
+            'med-necessity': function(tools, guardrails) {
+                var steps = [
+                    { type: 'think', body: 'Denial received for <strong>cardiac catheterization (CPT 93458)</strong> for patient A. Williams. Denial reason: <strong>"Medical necessity not established."</strong> Initiating appeal workflow.' },
+                    { type: 'tool', tool: 'ehr', body: 'Pulling patient clinical history from EHR...<br>Found: abnormal stress test results, elevated troponin levels (x2), chest pain presentations (3 ED visits in 60 days), cardiologist referral with urgency flag.' },
+                    { type: 'think', body: 'Analyzing denial against clinical evidence. The payer\'s denial appears to have missed the <strong>serial troponin elevations</strong> and <strong>abnormal nuclear stress test</strong>. These clearly meet InterQual criteria for diagnostic catheterization.' },
+                    { type: 'tool', tool: 'docs', body: 'Retrieving successful appeal templates for medical necessity denials...<br>Selected template: <code>APPEAL-MedNec-Cardiac-v3</code><br>Drafting appeal letter with patient-specific clinical evidence.' }
+                ];
+
+                if (tools.indexOf('payer') > -1) {
+                    steps.push({ type: 'tool', tool: 'payer', body: 'Checking payer appeal requirements for <strong>Humana — Medicare Advantage</strong>...<br>Appeal deadline: 30 days from denial (22 days remaining)<br>Submission method: Electronic portal upload<br>Peer-to-peer review: Available upon request' });
+                }
+
+                if (guardrails['human-approval']) {
+                    steps.push({ type: 'guardrail', rule: 'human-approval', body: '<strong>Guardrail triggered:</strong> Appeal letter drafted. Routing to Dr. Ramirez (cardiologist) for clinical attestation and to billing supervisor for final review before submission.' });
+                }
+
+                if (guardrails['escalate-low-confidence']) {
+                    steps.push({ type: 'think', body: 'Appeal strength assessment: <strong>89%</strong> confidence. Strong clinical evidence supports overturn. Recommending concurrent peer-to-peer review request to accelerate resolution.' });
+                }
+
+                if (guardrails['audit-logging']) {
+                    steps.push({ type: 'guardrail', rule: 'audit-logging', body: '<strong>Audit log:</strong> Denial appeal initiated — clinical evidence compiled, appeal letter drafted, physician review requested, deadline tracked.' });
+                }
+
+                steps.push({ type: 'output', body: '', outputTitle: 'Appeal Ready for Review', outputBody: '<strong>Patient:</strong> A. Williams<br><strong>Procedure:</strong> Cardiac Catheterization (CPT 93458)<br><strong>Payer:</strong> Humana Medicare Advantage<br><strong>Denial Reason:</strong> Medical necessity not established<br><strong>Appeal Strategy:</strong> Cite serial troponin elevations, abnormal nuclear stress test, and InterQual criteria match<br><strong>Appeal Deadline:</strong> 22 days remaining<br><strong>Status:</strong> Letter drafted — awaiting physician attestation<br><strong>Recommendation:</strong> Request concurrent peer-to-peer review' });
+                return steps;
+            },
+            'coding-error': function(tools, guardrails) {
+                var steps = [
+                    { type: 'think', body: 'Denial received for <strong>outpatient visit (CPT 99215)</strong> for patient B. Garcia. Denial reason: <strong>"Diagnosis code does not support level of service."</strong> Checking for coding discrepancies.' },
+                    { type: 'tool', tool: 'ehr', body: 'Pulling encounter documentation from EHR...<br>Visit notes show: comprehensive history, detailed physical exam (6 organ systems), moderate complexity medical decision-making. <strong>3 active problems addressed.</strong>' },
+                    { type: 'think', body: 'Found the issue. The claim was submitted with <strong>ICD-10: Z00.00</strong> (routine general exam) but the documentation supports <strong>ICD-10: E11.65</strong> (Type 2 diabetes with hyperglycemia) as the primary diagnosis. The E/M level 4 is clinically justified but the diagnosis code triggered the denial.' }
+                ];
+
+                if (tools.indexOf('docs') > -1) {
+                    steps.push({ type: 'tool', tool: 'docs', body: 'Cross-referencing coding guidelines...<br>Confirmed: CPT 99215 with Z00.00 is a known denial pattern for multiple payers. The documentation supports E11.65 as primary with Z00.00 as secondary.' });
+                }
+
+                if (guardrails['no-clinical-notes']) {
+                    steps.push({ type: 'guardrail', rule: 'no-clinical-notes', body: '<strong>Access boundary respected:</strong> Coding analysis performed using claim data and encounter summary. Detailed clinical notes reviewed only by coding specialist.' });
+                }
+
+                if (guardrails['human-approval']) {
+                    steps.push({ type: 'guardrail', rule: 'human-approval', body: '<strong>Guardrail triggered:</strong> Code correction requires certified coder review before resubmission. Routing corrected claim to coding team lead.' });
+                }
+
+                if (tools.indexOf('payer') > -1) {
+                    steps.push({ type: 'tool', tool: 'payer', body: 'Preparing corrected claim for resubmission to <strong>Anthem BCBS</strong>...<br>Original: Z00.00 (primary) → Corrected: E11.65 (primary), Z00.00 (secondary)<br>Estimated recovery: <strong>$287</strong>' });
+                }
+
+                if (guardrails['audit-logging']) {
+                    steps.push({ type: 'guardrail', rule: 'audit-logging', body: '<strong>Audit log:</strong> Coding error identified and corrected — ICD-10 swap documented, resubmission prepared, pattern flagged for coder education.' });
+                }
+
+                steps.push({ type: 'output', body: '', outputTitle: 'Coding Correction Identified', outputBody: '<strong>Patient:</strong> B. Garcia<br><strong>Original Claim:</strong> CPT 99215 + ICD-10 Z00.00<br><strong>Denial Reason:</strong> Diagnosis doesn\'t support service level<br><strong>Root Cause:</strong> Incorrect primary diagnosis code<br><strong>Correction:</strong> Primary → E11.65, Secondary → Z00.00<br><strong>Estimated Recovery:</strong> $287<br><strong>Status:</strong> Corrected claim pending coder review<br><strong>Pattern Alert:</strong> Z00.00/99215 mismatch flagged for team training' });
+                return steps;
+            }
+        };
+
+        // ─── Show demo after blueprint generation ───
+        function showAgentDemo() {
+            // Populate scenario buttons based on goal
+            var scenarios = demoScenarios[state.goal] || [];
+            demoScenariosEl.innerHTML = '';
+            scenarios.forEach(function(s) {
+                var btn = document.createElement('button');
+                btn.className = 'demo-scenario-btn';
+                btn.setAttribute('data-demo-scenario', s.key);
+                btn.textContent = s.name;
+                btn.setAttribute('title', s.desc);
+                btn.setAttribute('type', 'button');
+                btn.addEventListener('click', function() {
+                    selectDemoScenario(s.key);
+                });
+                demoScenariosEl.appendChild(btn);
+            });
+
+            // Reset state
+            demoState.scenario = null;
+            demoState.running = false;
+            resetAgentLog();
+
+            // Show the demo
+            agentDemo.classList.add('agent-demo--visible');
+
+            // Scroll to it
+            setTimeout(function() {
+                agentDemo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+
+        function selectDemoScenario(key) {
+            demoState.scenario = key;
+
+            // Update button states
+            var btns = demoScenariosEl.querySelectorAll('.demo-scenario-btn');
+            btns.forEach(function(btn) {
+                btn.classList.toggle('demo-scenario-btn--active', btn.getAttribute('data-demo-scenario') === key);
+            });
+
+            // Enable run button
+            runAgentBtn.disabled = false;
+
+            // Reset the log
+            resetAgentLog();
+        }
+
+        function resetAgentLog() {
+            // Clear timeouts
+            demoState.timeouts.forEach(function(t) { clearTimeout(t); });
+            demoState.timeouts = [];
+            demoState.running = false;
+            demoState.entries = [];
+
+            // Reset UI
+            agentLogFeed.innerHTML = '';
+            agentLogFeed.appendChild(agentLogEmpty);
+            agentLogEmpty.style.display = 'flex';
+
+            agentProgressEl.classList.remove('agent-progress--visible');
+            agentProgressBar.style.width = '0%';
+
+            runAgentBtn.classList.remove('btn--run-agent--loading');
+            runAgentBtn.disabled = demoState.scenario === null;
+            resetAgentBtn.style.display = 'none';
+        }
+
+        // ─── Run the agent simulation ───
+        runAgentBtn.addEventListener('click', function() {
+            if (demoState.running || !demoState.scenario) return;
+            demoState.running = true;
+
+            // Get current tools and guardrails from blueprint state
+            var currentTools = state.tools.slice();
+            var currentGuardrails = {};
+            Object.keys(state.guardrails).forEach(function(k) {
+                currentGuardrails[k] = state.guardrails[k];
+            });
+
+            // Get the sequence
+            var seqFn = demoSequences[demoState.scenario];
+            if (!seqFn) return;
+            var steps = seqFn(currentTools, currentGuardrails);
+
+            // Clear log
+            agentLogFeed.innerHTML = '';
+            agentLogEmpty.style.display = 'none';
+
+            // Show progress
+            agentProgressEl.classList.add('agent-progress--visible');
+            agentProgressBar.style.width = '0%';
+
+            // Disable run, show loading
+            runAgentBtn.classList.add('btn--run-agent--loading');
+            runAgentBtn.disabled = true;
+
+            // Animate entries with delays
+            var baseDelay = 600;
+            var stepDelay = 1000;
+            var elapsedSec = 0;
+
+            steps.forEach(function(step, i) {
+                var delay = baseDelay + (i * stepDelay);
+                var t = setTimeout(function() {
+                    elapsedSec += (i === 0 ? 1 : 2);
+                    addLogEntry(step, elapsedSec);
+
+                    // Update progress
+                    var pct = Math.round(((i + 1) / steps.length) * 100);
+                    agentProgressBar.style.width = pct + '%';
+
+                    // Auto-scroll to bottom
+                    agentLogFeed.scrollTop = agentLogFeed.scrollHeight;
+
+                    // If last step, finish
+                    if (i === steps.length - 1) {
+                        setTimeout(function() {
+                            runAgentBtn.classList.remove('btn--run-agent--loading');
+                            resetAgentBtn.style.display = 'inline-flex';
+                            demoState.running = false;
+                        }, 400);
+                    }
+                }, delay);
+                demoState.timeouts.push(t);
+            });
+        });
+
+        resetAgentBtn.addEventListener('click', function() {
+            resetAgentLog();
+            runAgentBtn.disabled = false;
+        });
+
+        // ─── Add a log entry to the feed ───
+        function addLogEntry(step, elapsedSec) {
+            var entry = document.createElement('div');
+            entry.className = 'agent-entry';
+
+            var icons = {
+                'think': '&#129504;',
+                'tool': '&#128279;',
+                'guardrail': '&#128737;',
+                'output': '&#9989;',
+                'error': '&#9888;'
+            };
+
+            var typeLabels = {
+                'think': 'Reasoning',
+                'tool': 'Tool Call',
+                'guardrail': 'Guardrail Check',
+                'output': 'Output',
+                'error': 'Error'
+            };
+
+            var typeClass = step.type;
+            var toolSuffix = step.tool ? ' — ' + (toolLabels[step.tool] || step.tool) : '';
+
+            var timeStr = elapsedSec + 's';
+
+            var html = '<div class="agent-entry__header">';
+            html += '<div class="agent-entry__icon agent-entry__icon--' + typeClass + '">' + icons[typeClass] + '</div>';
+            html += '<span class="agent-entry__type agent-entry__type--' + typeClass + '">' + typeLabels[typeClass] + toolSuffix + '</span>';
+            html += '<span class="agent-entry__time">' + timeStr + '</span>';
+            html += '</div>';
+
+            html += '<div class="agent-entry__body">';
+            html += step.body;
+
+            // Add output card if this is an output step
+            if (step.type === 'output' && step.outputTitle) {
+                html += '<div class="agent-output-card">';
+                html += '<div class="agent-output-card__title">' + step.outputTitle + '</div>';
+                html += '<div class="agent-output-card__text">' + step.outputBody + '</div>';
+                html += '</div>';
+            }
+
+            html += '</div>';
+
+            entry.innerHTML = html;
+            agentLogFeed.appendChild(entry);
+        }
+
+        // ─── Hide demo on start over ───
+        var origStartOverClick = startOverBtn.onclick;
+
+        // ═══════════════════════════════════════════
+        //  EVALUATION SCORECARD
+        // ═══════════════════════════════════════════
+
+        var scores = [0, 0, 0, 0, 0];
+        var scorecardItems = document.querySelectorAll('.scorecard__item');
+        var scorecardResult = document.getElementById('scorecard-result');
+        var scorecardScore = document.getElementById('scorecard-score');
+        var scorecardRec = document.getElementById('scorecard-recommendation');
+
+        scorecardItems.forEach(function(item) {
+            var questionIdx = parseInt(item.getAttribute('data-question'), 10);
+            var dots = item.querySelectorAll('.rating-dot');
+
+            dots.forEach(function(dot) {
+                dot.addEventListener('click', function() {
+                    var val = parseInt(this.getAttribute('data-value'), 10);
+                    scores[questionIdx] = val;
+
+                    // Update active states for this row
+                    dots.forEach(function(d) {
+                        var dVal = parseInt(d.getAttribute('data-value'), 10);
+                        if (dVal <= val) {
+                            d.classList.add('rating-dot--active');
+                        } else {
+                            d.classList.remove('rating-dot--active');
+                        }
+                    });
+
+                    // Calculate total
+                    var total = scores.reduce(function(a, b) { return a + b; }, 0);
+                    var answered = scores.filter(function(s) { return s > 0; }).length;
+
+                    if (answered === 5) {
+                        scorecardScore.innerHTML = total + ' <span>/ 25</span>';
+
+                        var rec = '';
+                        if (total >= 20) {
+                            rec = 'Strong candidate for agent automation. This process has the clarity, volume, and infrastructure to support autonomous operation. Move to pilot.';
+                        } else if (total >= 13) {
+                            rec = 'Proceed with pilot program. Some areas need strengthening, but the foundation is solid enough to begin a controlled test with human oversight.';
+                        } else {
+                            rec = 'Needs more process definition first. Invest in documenting workflows, establishing metrics, and improving data access before introducing an agent.';
+                        }
+                        scorecardRec.textContent = rec;
+
+                        scorecardResult.classList.add('scorecard__result--visible');
+                    }
+                });
+            });
+        });
+
+    })();
+    </script>
+</body>
+</html>

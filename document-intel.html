@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Intelligence — Enterprise AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        /* ═══════════════════════════════════════════
+           DOCUMENT SIMULATOR — Chat Bubbles
+        ═══════════════════════════════════════════ */
+        .chat {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 400px;
+            max-height: 560px;
+            overflow-y: auto;
+            padding: 24px;
+            scroll-behavior: smooth;
+        }
+
+        .chat::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat::-webkit-scrollbar-thumb {
+            background: var(--border-active);
+            border-radius: 4px;
+        }
+
+        .chat__empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 300px;
+            color: var(--text-muted);
+            text-align: center;
+            gap: 12px;
+        }
+
+        .chat__empty-icon {
+            font-size: 36px;
+            opacity: 0.4;
+        }
+
+        .chat__empty-text {
+            font-size: 14px;
+            font-weight: 300;
+            max-width: 280px;
+            line-height: 1.6;
+        }
+
+        .chat__file-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            align-self: flex-start;
+        }
+
+        .chat__file-chip-icon {
+            font-size: 14px;
+        }
+
+        .chat__bubble {
+            max-width: 80%;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.7;
+            font-weight: 300;
+            animation: bubbleFadeIn 0.35s var(--ease-out-expo) forwards;
+            opacity: 0;
+        }
+
+        @keyframes bubbleFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat__bubble--user {
+            align-self: flex-end;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat__bubble--ai {
+            align-self: flex-start;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .chat__bubble--ai .chat__line {
+            opacity: 0;
+            transform: translateY(4px);
+            transition: all 0.4s var(--ease-out-expo);
+        }
+
+        .chat__bubble--ai .chat__line--visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .chat__bubble--ai strong {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .chat__typing {
+            align-self: flex-start;
+            display: flex;
+            gap: 4px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            border-bottom-left-radius: 4px;
+            animation: bubbleFadeIn 0.3s var(--ease-out-expo) forwards;
+            opacity: 0;
+        }
+
+        .chat__typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            animation: typingPulse 1.4s ease-in-out infinite;
+        }
+
+        .chat__typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .chat__typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingPulse {
+            0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+            30% { opacity: 1; transform: translateY(-3px); }
+        }
+
+        /* ═══════════════════════════════════════════
+           DOCUMENT SIMULATOR — Document Selector
+        ═══════════════════════════════════════════ */
+        .doc-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .doc-selector__label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            width: 100%;
+            margin-bottom: 4px;
+        }
+
+        .doc-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+        }
+
+        .doc-btn:hover {
+            border-color: var(--border-active);
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+        }
+
+        .doc-btn--selected {
+            border-color: var(--accent-teal);
+            background: var(--accent-teal-dim);
+            color: var(--accent-teal);
+            font-weight: 500;
+        }
+
+        .doc-btn--selected:hover {
+            border-color: var(--accent-teal);
+            background: var(--accent-teal-dim);
+            color: var(--accent-teal);
+        }
+
+        .doc-btn__icon {
+            font-size: 15px;
+        }
+
+        /* ═══════════════════════════════════════════
+           DOCUMENT SIMULATOR — Suggestions
+        ═══════════════════════════════════════════ */
+        .suggestions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 4px 0;
+            animation: bubbleFadeIn 0.4s var(--ease-out-expo) forwards;
+            opacity: 0;
+        }
+
+        .suggestion-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: transparent;
+            border: 1px solid var(--border-active);
+            border-radius: 20px;
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.25s var(--ease-out-expo);
+        }
+
+        .suggestion-pill:hover {
+            background: var(--text-primary);
+            border-color: var(--text-primary);
+            color: #FFFFFF;
+        }
+
+        .suggestion-pill--used {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* ═══════════════════════════════════════════
+           DOCUMENT SIMULATOR — Input Bar
+        ═══════════════════════════════════════════ */
+        .chat-input {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-primary);
+        }
+
+        .chat-input__field {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input__field:focus {
+            border-color: var(--accent-teal);
+        }
+
+        .chat-input__field:disabled {
+            background: var(--bg-secondary);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .chat-input__send {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-size: 14px;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.25s var(--ease-out-expo);
+        }
+
+        .chat-input__send:hover:not(:disabled) {
+            background: var(--text-primary);
+            border-color: var(--text-primary);
+            color: #FFFFFF;
+        }
+
+        .chat-input__send:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ═══════════════════════════════════════════
+           RESPONSIVE — Page-Specific
+        ═══════════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .doc-selector {
+                padding: 16px 20px;
+            }
+
+            .chat {
+                padding: 20px;
+                min-height: 340px;
+                max-height: 480px;
+            }
+
+            .chat-input {
+                padding: 12px 20px;
+            }
+
+            .chat__bubble {
+                max-width: 90%;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .doc-btn {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            .suggestion-pill {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+
+            .chat {
+                min-height: 300px;
+                max-height: 420px;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════
+         NAVIGATION
+    ═══════════════════════════════════════════ -->
+    <nav class="nav" id="nav">
+        <a href="index.html" class="nav__brand">
+            <div class="nav__logo">✨</div>
+            <span class="nav__title">Enterprise AI  — Humana Leadership Series</span>
+        </a>
+        <div class="nav__links">
+            <a href="photo-prompting.html" class="nav__link" data-module="photo-prompting">Photo Prompting</a>
+            <a href="document-intel.html" class="nav__link nav__link--active" data-module="document-intel">Document Intel</a>
+            <a href="vibe-coding.html" class="nav__link" data-module="vibe-coding">Vibe Coding</a>
+            <a href="ai-agents.html" class="nav__link" data-module="ai-agents">AI Agents</a>
+        </div>
+        <button class="nav__hamburger" id="nav-hamburger" type="button" aria-label="Open menu">
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+        </button>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE HEADER
+    ═══════════════════════════════════════════ -->
+    <div class="page">
+        <header class="page__header">
+            <span class="page__number">02</span>
+            <div class="page__eyebrow page__eyebrow--docs">Module 02 — Document Intelligence</div>
+            <h1 class="page__title">From Documents to Decisions</h1>
+            <p class="page__intro">Upload spreadsheets, reports, clinical data, or policy documents — and have AI analyze, summarize, and transform them into executive-ready presentations in minutes.</p>
+        </header>
+
+        <!-- ═══════════════════════════════════════════
+             TUTORIAL CONTENT
+        ═══════════════════════════════════════════ -->
+        <div class="page__content">
+            <div class="content-grid">
+
+                <!-- Three Steps to a Board-Ready Deck -->
+                <div class="card card--full reveal">
+                    <div class="card__badge card__badge--step">&#10003; The Workflow</div>
+                    <div class="card__title">Three Steps to a Board-Ready Deck</div>
+                    <div class="framework" style="margin-top: 24px;">
+                        <div class="framework__step">
+                            <div class="framework__step-icon">&#128206;</div>
+                            <div class="framework__step-title">Upload</div>
+                            <div class="framework__step-desc">Drag in your documents, spreadsheets, or data files</div>
+                        </div>
+                        <div class="framework__arrow">&rarr;</div>
+                        <div class="framework__step">
+                            <div class="framework__step-icon">&#129504;</div>
+                            <div class="framework__step-title">Instruct</div>
+                            <div class="framework__step-desc">Tell AI what to find, analyze, and present</div>
+                        </div>
+                        <div class="framework__arrow">&rarr;</div>
+                        <div class="framework__step">
+                            <div class="framework__step-icon">&#128202;</div>
+                            <div class="framework__step-title">Output</div>
+                            <div class="framework__step-desc">Receive a structured presentation or analysis</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- What is Context -->
+                <div class="card reveal reveal--delay-1">
+                    <div class="card__badge card__badge--tip">&#9670; Key Concept</div>
+                    <div class="card__title">What is "Context"?</div>
+                    <p class="card__text">When you upload a document to an AI, you're giving it <strong>context</strong> — the information it needs to reason about your specific situation. Unlike a Google search, AI doesn't just find answers. It reads your documents, understands relationships between data points, and generates new insights specific to your organization.</p>
+                </div>
+
+                <!-- What to Keep in Mind -->
+                <div class="card reveal reveal--delay-2">
+                    <div class="card__badge card__badge--warn">&#9888; Guardrails</div>
+                    <div class="card__title">What to Keep in Mind</div>
+                    <ul class="checklist">
+                        <li class="checklist__item">
+                            <span class="checklist__icon">!</span>
+                            <span>Verify all numbers and claims AI surfaces — it can misread complex tables</span>
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">!</span>
+                            <span>Be aware of PHI / HIPAA — do not upload protected health information to public AI tools</span>
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">!</span>
+                            <span>AI works best with structured data — clean spreadsheets yield better results than messy ones</span>
+                        </li>
+                        <li class="checklist__item">
+                            <span class="checklist__icon">!</span>
+                            <span>Always review the output as the subject-matter expert — AI is the analyst, you are the editor-in-chief</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Ready-to-Use Prompts -->
+                <div class="card card--full reveal">
+                    <div class="card__badge card__badge--step">&#10003; Prompt Templates</div>
+                    <div class="card__title">Ready-to-Use Prompts for Healthcare Executives</div>
+
+                    <div class="tabs" id="tabs-docs">
+                        <button class="tabs__btn tabs__btn--active" data-tab="tab-quarterly">Quarterly Review</button>
+                        <button class="tabs__btn" data-tab="tab-board">Board Deck</button>
+                        <button class="tabs__btn" data-tab="tab-analysis">Data Analysis</button>
+                    </div>
+
+                    <div class="tab-panel tab-panel--active" id="tab-quarterly">
+                        <div class="prompt-example">
+                            <div class="prompt-example__label"><span>Prompt Template</span></div>
+                            <div class="prompt-example__text">
+                                I've uploaded our <span class="highlight">Q3 operational report and financial summary</span>. Please:<br><br>
+                                1. Identify the <span class="highlight--teal">top 3 positive trends</span> and <span class="highlight--teal">top 3 areas of concern</span><br>
+                                2. Compare key metrics against Q2 performance<br>
+                                3. Create a <span class="highlight--lavender">10-slide executive summary</span> with:<br>
+                                &nbsp;&nbsp;&nbsp;— One key insight per slide<br>
+                                &nbsp;&nbsp;&nbsp;— Supporting data point for each<br>
+                                &nbsp;&nbsp;&nbsp;— Recommended action items on the final slide<br>
+                                4. Use <span class="highlight">clear, non-technical language</span> appropriate for a board audience
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="tab-board">
+                        <div class="prompt-example">
+                            <div class="prompt-example__label"><span>Prompt Template</span></div>
+                            <div class="prompt-example__text">
+                                Attached are our <span class="highlight">patient satisfaction scores, readmission rates, and staffing data</span> for the past 12 months. Please:<br><br>
+                                1. Create a <span class="highlight--teal">board-ready narrative</span> that connects these three data sources<br>
+                                2. Highlight any <span class="highlight--lavender">correlations</span> between staffing levels and outcomes<br>
+                                3. Structure as a <span class="highlight">presentation outline</span> with executive summary, key findings, and strategic recommendations<br>
+                                4. Flag any data points that could raise board questions — and prepare suggested responses
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="tab-analysis">
+                        <div class="prompt-example">
+                            <div class="prompt-example__label"><span>Prompt Template</span></div>
+                            <div class="prompt-example__text">
+                                I've uploaded a spreadsheet with <span class="highlight">18 months of departmental cost data</span>. Please:<br><br>
+                                1. Identify the <span class="highlight--teal">top 5 cost drivers</span> and their growth trajectory<br>
+                                2. Flag any <span class="highlight--lavender">anomalies or unusual spikes</span><br>
+                                3. Compare our cost structure against typical healthcare benchmarks<br>
+                                4. Summarize in <span class="highlight">3 bullet points</span> I can share with my CFO today
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 HANDS-ON SANDBOX
+            ═══════════════════════════════════════════ -->
+            <div class="sandbox reveal" id="sandbox">
+                <div class="sandbox__header">
+                    <span class="sandbox__title">Document Analysis Simulator</span>
+                    <button class="btn btn--sm" id="sandbox-reset" style="display: none;">Reset</button>
+                </div>
+
+                <div class="doc-selector" id="doc-selector">
+                    <span class="doc-selector__label">Select a document to analyze</span>
+                    <button class="doc-btn" data-doc="q3-report">
+                        <span class="doc-btn__icon">&#128196;</span>
+                        Q3 Operational Report
+                    </button>
+                    <button class="doc-btn" data-doc="patient-survey">
+                        <span class="doc-btn__icon">&#128202;</span>
+                        Patient Satisfaction Survey
+                    </button>
+                    <button class="doc-btn" data-doc="cost-analysis">
+                        <span class="doc-btn__icon">&#128176;</span>
+                        Departmental Cost Analysis
+                    </button>
+                </div>
+
+                <div class="sandbox__body" style="padding: 0;">
+                    <div class="chat" id="chat-area">
+                        <div class="chat__empty" id="chat-empty">
+                            <div class="chat__empty-icon">&#128203;</div>
+                            <div class="chat__empty-text">Select a document above to start an analysis session</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input" id="chat-input-bar">
+                    <input type="text" class="chat-input__field" id="chat-input" placeholder="Select a document above to begin..." disabled>
+                    <button class="chat-input__send" id="chat-send" disabled>&uarr;</button>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 EXECUTIVE TAKEAWAY
+            ═══════════════════════════════════════════ -->
+            <div class="takeaway takeaway--docs reveal">
+                <div class="takeaway__label">Executive Takeaway</div>
+                <div class="takeaway__title">Your documents are no longer static files. They're conversations waiting to happen.</div>
+                <p class="takeaway__text">The executive who can turn a 200-page report into a 10-slide board presentation in 15 minutes has a structural advantage. AI doesn't replace your judgment — it eliminates the hours of synthesis between raw data and decision-ready insight.</p>
+            </div>
+
+        </div>
+
+        <!-- ═══════════════════════════════════════════
+             PAGE NAVIGATION
+        ═══════════════════════════════════════════ -->
+        <div class="page-nav">
+            <a href="photo-prompting.html" class="page-nav__link">
+                <span class="page-nav__label">Previous</span>
+                <span class="page-nav__title">&larr; Photo Prompting</span>
+            </a>
+            <a href="vibe-coding.html" class="page-nav__link page-nav__link--next">
+                <span class="page-nav__label">Next</span>
+                <span class="page-nav__title">Vibe Coding &rarr;</span>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════════ -->
+    <footer class="footer">
+        <span class="footer__text">Enterprise AI — Humana Leadership Series</span>
+        <span class="footer__text">Confidential</span>
+    </footer>
+
+    <!-- ═══════════════════════════════════════════
+         JAVASCRIPT
+    ═══════════════════════════════════════════ -->
+    <script>
+    (function() {
+        'use strict';
+
+        // ─── Mark Module as Visited ───
+        const STORAGE_KEY = 'ai-tutorial-visited';
+        const MODULE_ID = 'document-intel';
+
+        function getVisited() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function markVisited(id) {
+            const visited = getVisited();
+            if (!visited.includes(id)) {
+                visited.push(id);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(visited));
+            }
+        }
+
+        markVisited(MODULE_ID);
+
+        // ─── Nav Visited Status ───
+        const visited = getVisited();
+        document.querySelectorAll('.nav__link[data-module]').forEach(link => {
+            const mod = link.getAttribute('data-module');
+            if (visited.includes(mod) && !link.classList.contains('nav__link--active')) {
+                link.classList.add('nav__link--completed');
+            }
+        });
+
+        // ─── Mobile Nav Toggle ───
+        (function() {
+            var hamburger = document.getElementById('nav-hamburger');
+            var navLinks = document.querySelector('.nav__links');
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', function() {
+                    hamburger.classList.toggle('nav__hamburger--open');
+                    navLinks.classList.toggle('nav__links--open');
+                });
+                navLinks.querySelectorAll('.nav__link').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        hamburger.classList.remove('nav__hamburger--open');
+                        navLinks.classList.remove('nav__links--open');
+                    });
+                });
+            }
+        })();
+
+        // ─── Scroll Reveal ───
+        const revealEls = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal--visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+        revealEls.forEach(el => revealObserver.observe(el));
+
+        // ─── Tabs ───
+        document.querySelectorAll('.tabs').forEach(tabGroup => {
+            const buttons = tabGroup.querySelectorAll('.tabs__btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.dataset.tab;
+                    const parent = tabGroup.parentElement;
+                    buttons.forEach(b => b.classList.remove('tabs__btn--active'));
+                    btn.classList.add('tabs__btn--active');
+                    parent.querySelectorAll('.tab-panel').forEach(panel => {
+                        panel.classList.remove('tab-panel--active');
+                    });
+                    const target = parent.querySelector('#' + targetId);
+                    if (target) target.classList.add('tab-panel--active');
+                });
+            });
+        });
+
+        // ═══════════════════════════════════════════
+        //  DOCUMENT ANALYSIS SIMULATOR
+        // ═══════════════════════════════════════════
+
+        const chatArea = document.getElementById('chat-area');
+        const chatEmpty = document.getElementById('chat-empty');
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        const resetBtn = document.getElementById('sandbox-reset');
+        const docBtns = document.querySelectorAll('.doc-btn');
+
+        let selectedDoc = null;
+        let isTyping = false;
+
+        // ─── Suggestion prompts per document ───
+        const suggestions = {
+            'q3-report': [
+                'Summarize key findings',
+                'Create board presentation outline',
+                'Identify trends and anomalies'
+            ],
+            'patient-survey': [
+                'Summarize key findings',
+                'Create board presentation outline',
+                'Identify trends and anomalies'
+            ],
+            'cost-analysis': [
+                'Summarize key findings',
+                'Create board presentation outline',
+                'Identify trends and anomalies'
+            ]
+        };
+
+        // ─── Pre-written AI responses ───
+        const responses = {
+            'q3-report': {
+                'Summarize key findings': [
+                    '<strong>Executive Summary — Q3 Operational Report</strong>',
+                    '',
+                    '<strong>Key Finding 1:</strong> Emergency department throughput improved 14% quarter-over-quarter, driven by new triage protocols implemented in July.',
+                    '',
+                    '<strong>Key Finding 2:</strong> Average length of stay decreased from 4.8 to 4.2 days across medical-surgical units, outperforming the regional benchmark of 4.5 days.',
+                    '',
+                    '<strong>Key Finding 3:</strong> Operating margin improved to 3.1% from 2.4% in Q2, primarily from volume recovery in orthopedic and cardiac service lines.',
+                    '',
+                    '<strong>Areas of Concern:</strong> Nursing vacancy rate remains elevated at 12.3%, with the highest gaps in ICU and labor & delivery units.',
+                    '',
+                    '<strong>Recommended Action:</strong> Prioritize retention incentives for critical care staff and accelerate partnership discussions with two regional nursing programs.'
+                ],
+                'Create board presentation outline': [
+                    '<strong>Board Presentation Outline — Q3 Review</strong>',
+                    '',
+                    '<strong>Slide 1:</strong> Executive Summary — Q3 at a glance with 3 headline metrics',
+                    '<strong>Slide 2:</strong> Financial Performance — Revenue, margin, and volume trends vs. budget',
+                    '<strong>Slide 3:</strong> Operational Efficiency — ED throughput and length of stay improvements',
+                    '<strong>Slide 4:</strong> Quality Metrics — Readmission rates, patient safety indicators',
+                    '<strong>Slide 5:</strong> Workforce — Vacancy rates, turnover, recruitment pipeline',
+                    '<strong>Slide 6:</strong> Service Line Performance — Top and bottom performers by contribution margin',
+                    '<strong>Slide 7:</strong> Patient Experience — HCAHPS trends and key driver analysis',
+                    '<strong>Slide 8:</strong> Strategic Initiatives — Progress on annual plan milestones',
+                    '<strong>Slide 9:</strong> Risk Factors — Staffing, payer mix, regulatory changes',
+                    '<strong>Slide 10:</strong> Recommended Actions — 3 priorities for Q4 with owners and timelines'
+                ],
+                'Identify trends and anomalies': [
+                    '<strong>Trend & Anomaly Analysis — Q3</strong>',
+                    '',
+                    '<strong>Positive Trend:</strong> Outpatient revenue has grown 8% for three consecutive quarters, suggesting successful shift toward ambulatory care strategy.',
+                    '',
+                    '<strong>Positive Trend:</strong> Supply chain costs decreased 3.2% following GPO renegotiation, tracking ahead of annual savings target.',
+                    '',
+                    '<strong>Anomaly Detected:</strong> Pharmacy costs spiked 22% in August — appears driven by a single high-cost biologic for three oncology patients. Likely non-recurring.',
+                    '',
+                    '<strong>Concern:</strong> Payer mix shifted 2 points toward Medicaid, which may pressure margins in Q4 if the trend continues.',
+                    '',
+                    '<strong>Recommendation:</strong> Investigate pharmacy cost anomaly to confirm it is non-recurring. Monitor payer mix weekly through Q4.'
+                ]
+            },
+            'patient-survey': {
+                'Summarize key findings': [
+                    '<strong>Patient Satisfaction Survey — Key Findings</strong>',
+                    '',
+                    '<strong>Overall Score:</strong> 78.4 out of 100, up 2.1 points from the previous quarter. Trending positively but still below the 80-point target.',
+                    '',
+                    '<strong>Highest Rated:</strong> Nursing communication (86.2) and cleanliness of environment (84.7) continue to be organizational strengths.',
+                    '',
+                    '<strong>Lowest Rated:</strong> Responsiveness to call buttons (68.1) and discharge communication (71.3) remain the primary detractors.',
+                    '',
+                    '<strong>Notable Shift:</strong> Food quality scores improved 6 points following the dining services vendor change in June.',
+                    '',
+                    '<strong>Recommendation:</strong> Implement call-button response time tracking in nursing workflows and develop a standardized discharge communication checklist.'
+                ],
+                'Create board presentation outline': [
+                    '<strong>Board Presentation — Patient Experience</strong>',
+                    '',
+                    '<strong>Slide 1:</strong> Overall Satisfaction Snapshot — Score trend line over 4 quarters',
+                    '<strong>Slide 2:</strong> Domain Breakdown — Heatmap of all HCAHPS domains',
+                    '<strong>Slide 3:</strong> Top Performers — Nursing communication and environment scores',
+                    '<strong>Slide 4:</strong> Opportunity Areas — Call response and discharge planning',
+                    '<strong>Slide 5:</strong> Department Comparison — Unit-level satisfaction variation',
+                    '<strong>Slide 6:</strong> Correlation Analysis — Staffing ratios vs. satisfaction scores',
+                    '<strong>Slide 7:</strong> Patient Verbatims — 3 representative positive and 3 negative comments',
+                    '<strong>Slide 8:</strong> Action Plan — Initiatives underway with projected impact',
+                    '<strong>Slide 9:</strong> Benchmark Position — Where we stand vs. regional peers',
+                    '<strong>Slide 10:</strong> Q4 Targets — Specific goals and accountability owners'
+                ],
+                'Identify trends and anomalies': [
+                    '<strong>Trend & Anomaly Analysis — Patient Satisfaction</strong>',
+                    '',
+                    '<strong>Positive Trend:</strong> Overall scores have improved for 3 consecutive quarters, correlating with the patient experience task force launched in Q1.',
+                    '',
+                    '<strong>Correlation Found:</strong> Units with nurse-to-patient ratios below 1:5 score 11 points higher on communication metrics than units above 1:6.',
+                    '',
+                    '<strong>Anomaly:</strong> Satisfaction scores on weekends are 9.3 points lower than weekday scores, suggesting a staffing or service gap during off-peak hours.',
+                    '',
+                    '<strong>Emerging Concern:</strong> Pain management scores declined for the second consecutive quarter, potentially related to updated opioid prescribing guidelines.',
+                    '',
+                    '<strong>Recommendation:</strong> Commission a weekend experience audit and review pain management communication protocols with clinical leadership.'
+                ]
+            },
+            'cost-analysis': {
+                'Summarize key findings': [
+                    '<strong>Departmental Cost Analysis — Summary</strong>',
+                    '',
+                    '<strong>Top Cost Driver:</strong> Labor costs represent 58% of total operating expense, growing at 6.2% annually — above the 4% budget assumption.',
+                    '',
+                    '<strong>Fastest Growing:</strong> Contract labor spending increased 34% over 18 months, now representing $12.4M annually, driven primarily by nursing agency staffing.',
+                    '',
+                    '<strong>Most Efficient:</strong> Laboratory services reduced per-test costs by 8% through automation investments, now performing at top-quartile efficiency.',
+                    '',
+                    '<strong>Anomaly Flagged:</strong> Facilities management costs spiked 18% in Month 14 due to emergency HVAC replacement — one-time capital expense miscategorized as operating.',
+                    '',
+                    '<strong>CFO Summary:</strong> Labor cost inflation is the primary margin risk. Contract labor conversion to permanent staff could save $3.2M annually. Lab automation model should be replicated in radiology and pharmacy.'
+                ],
+                'Create board presentation outline': [
+                    '<strong>Board Presentation — Cost Structure Analysis</strong>',
+                    '',
+                    '<strong>Slide 1:</strong> Total Cost Overview — 18-month trend with year-over-year comparison',
+                    '<strong>Slide 2:</strong> Cost Composition — Pie chart of major categories (labor, supplies, purchased services, facilities)',
+                    '<strong>Slide 3:</strong> Labor Deep Dive — Permanent vs. contract labor trends',
+                    '<strong>Slide 4:</strong> Supply Chain — Cost per case trends and GPO performance',
+                    '<strong>Slide 5:</strong> Department Comparison — Cost per unit of service across all departments',
+                    '<strong>Slide 6:</strong> Benchmark Analysis — How our cost structure compares to CMS benchmarks',
+                    '<strong>Slide 7:</strong> Anomalies & One-Time Items — Items to exclude from trend analysis',
+                    '<strong>Slide 8:</strong> Savings Opportunities — Quantified initiatives with implementation timeline',
+                    '<strong>Slide 9:</strong> Risk Factors — Inflation, labor market, supply chain disruption',
+                    '<strong>Slide 10:</strong> Recommended Actions — Top 3 cost reduction priorities for next fiscal year'
+                ],
+                'Identify trends and anomalies': [
+                    '<strong>Trend & Anomaly Analysis — Cost Data</strong>',
+                    '',
+                    '<strong>Trend:</strong> Total operating costs growing at 5.8% annually while revenue grows at 4.1%, creating a widening margin gap that will become critical within 3 quarters.',
+                    '',
+                    '<strong>Trend:</strong> Purchased services costs have declined 4% over 18 months, reflecting successful insourcing of transcription and coding services.',
+                    '',
+                    '<strong>Anomaly:</strong> Pharmacy costs in Month 11 were 2.4 standard deviations above the mean — investigation reveals a bulk purchase of flu vaccines that should normalize.',
+                    '',
+                    '<strong>Anomaly:</strong> Overtime hours in surgical services increased 40% in Months 15-18 despite stable case volumes, suggesting scheduling inefficiency.',
+                    '',
+                    '<strong>Recommendation:</strong> Launch surgical scheduling optimization project immediately. Model contract-to-permanent labor conversion business case for Q1 board review.'
+                ]
+            }
+        };
+
+        // ─── Document Labels ───
+        const docLabels = {
+            'q3-report': { icon: '&#128196;', name: 'Q3 Operational Report' },
+            'patient-survey': { icon: '&#128202;', name: 'Patient Satisfaction Survey' },
+            'cost-analysis': { icon: '&#128176;', name: 'Departmental Cost Analysis' }
+        };
+
+        // ─── Select Document ───
+        function selectDocument(docId) {
+            if (isTyping) return;
+
+            selectedDoc = docId;
+
+            // Update button states
+            docBtns.forEach(btn => {
+                btn.classList.toggle('doc-btn--selected', btn.dataset.doc === docId);
+            });
+
+            // Enable input
+            chatInput.disabled = false;
+            chatInput.placeholder = 'Type a question about the document...';
+            chatSend.disabled = false;
+            resetBtn.style.display = '';
+
+            // Reset chat
+            chatArea.innerHTML = '';
+
+            // Show file chip
+            const chip = document.createElement('div');
+            chip.className = 'chat__file-chip';
+            chip.innerHTML = '<span class="chat__file-chip-icon">' + docLabels[docId].icon + '</span>' + docLabels[docId].name + ' attached';
+            chatArea.appendChild(chip);
+
+            // Show suggestions
+            const suggestionsWrap = document.createElement('div');
+            suggestionsWrap.className = 'suggestions';
+            suggestionsWrap.id = 'suggestions-container';
+
+            suggestions[docId].forEach(text => {
+                const pill = document.createElement('button');
+                pill.className = 'suggestion-pill';
+                pill.textContent = text;
+                pill.addEventListener('click', () => handleSuggestion(text, pill));
+                suggestionsWrap.appendChild(pill);
+            });
+
+            chatArea.appendChild(suggestionsWrap);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // ─── Handle Suggestion Click ───
+        function handleSuggestion(text, pillEl) {
+            if (isTyping || !selectedDoc) return;
+            isTyping = true;
+
+            // Disable the used pill
+            pillEl.classList.add('suggestion-pill--used');
+
+            // Add user message
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat__bubble chat__bubble--user';
+            userBubble.textContent = text;
+            chatArea.appendChild(userBubble);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            // Show typing indicator
+            const typingEl = document.createElement('div');
+            typingEl.className = 'chat__typing';
+            typingEl.innerHTML = '<div class="chat__typing-dot"></div><div class="chat__typing-dot"></div><div class="chat__typing-dot"></div>';
+            chatArea.appendChild(typingEl);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            // Get response lines
+            const lines = responses[selectedDoc][text] || ['Analysis complete.'];
+
+            // After a delay, show AI response
+            setTimeout(() => {
+                // Remove typing indicator
+                typingEl.remove();
+
+                // Create AI bubble
+                const aiBubble = document.createElement('div');
+                aiBubble.className = 'chat__bubble chat__bubble--ai';
+                chatArea.appendChild(aiBubble);
+
+                // Reveal lines one by one
+                lines.forEach((line, i) => {
+                    const lineEl = document.createElement('div');
+                    lineEl.className = 'chat__line';
+                    if (line === '') {
+                        lineEl.innerHTML = '<br>';
+                    } else {
+                        lineEl.innerHTML = line;
+                    }
+                    aiBubble.appendChild(lineEl);
+
+                    setTimeout(() => {
+                        lineEl.classList.add('chat__line--visible');
+                        chatArea.scrollTop = chatArea.scrollHeight;
+                    }, 200 * (i + 1));
+                });
+
+                // Mark typing as done after all lines reveal
+                setTimeout(() => {
+                    isTyping = false;
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                }, 200 * (lines.length + 1));
+
+            }, 1200);
+        }
+
+        // ─── Document Button Clicks ───
+        docBtns.forEach(btn => {
+            btn.addEventListener('click', () => selectDocument(btn.dataset.doc));
+        });
+
+        // ─── Reset ───
+        resetBtn.addEventListener('click', () => {
+            if (isTyping) return;
+            selectedDoc = null;
+            isTyping = false;
+
+            docBtns.forEach(btn => btn.classList.remove('doc-btn--selected'));
+
+            chatInput.disabled = true;
+            chatInput.placeholder = 'Select a document above to begin...';
+            chatSend.disabled = true;
+            resetBtn.style.display = 'none';
+
+            chatArea.innerHTML = '<div class="chat__empty" id="chat-empty"><div class="chat__empty-icon">&#128203;</div><div class="chat__empty-text">Select a document above to start an analysis session</div></div>';
+        });
+
+        // ─── Custom input (send button / enter key) ───
+        function handleCustomInput() {
+            const val = chatInput.value.trim();
+            if (!val || isTyping || !selectedDoc) return;
+            isTyping = true;
+
+            // Add user message
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat__bubble chat__bubble--user';
+            userBubble.textContent = val;
+            chatArea.appendChild(userBubble);
+            chatInput.value = '';
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            // Show typing indicator
+            const typingEl = document.createElement('div');
+            typingEl.className = 'chat__typing';
+            typingEl.innerHTML = '<div class="chat__typing-dot"></div><div class="chat__typing-dot"></div><div class="chat__typing-dot"></div>';
+            chatArea.appendChild(typingEl);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            setTimeout(() => {
+                typingEl.remove();
+
+                const aiBubble = document.createElement('div');
+                aiBubble.className = 'chat__bubble chat__bubble--ai';
+
+                const lines = [
+                    '<strong>Analysis Note</strong>',
+                    '',
+                    'This is a simulator — in a real AI session, you would receive a detailed analysis of your uploaded document based on your specific question.',
+                    '',
+                    'Try clicking one of the suggestion prompts above to see a sample analysis in action.'
+                ];
+
+                chatArea.appendChild(aiBubble);
+
+                lines.forEach((line, i) => {
+                    const lineEl = document.createElement('div');
+                    lineEl.className = 'chat__line';
+                    lineEl.innerHTML = line === '' ? '<br>' : line;
+                    aiBubble.appendChild(lineEl);
+
+                    setTimeout(() => {
+                        lineEl.classList.add('chat__line--visible');
+                        chatArea.scrollTop = chatArea.scrollHeight;
+                    }, 200 * (i + 1));
+                });
+
+                setTimeout(() => {
+                    isTyping = false;
+                }, 200 * (lines.length + 1));
+            }, 1200);
+        }
+
+        chatSend.addEventListener('click', handleCustomInput);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleCustomInput();
+        });
+
+    })();
+    </script>
+</body>
+</html>
