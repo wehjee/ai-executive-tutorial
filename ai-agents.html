@@ -1093,45 +1093,6 @@
                 </div>
             </div>
 
-            <!-- ─── Executive's Agent Evaluation Checklist ─── -->
-            <div class="content-grid">
-                <div class="card card--full card--no-hover reveal">
-                    <div class="card__badge card__badge--gold">Evaluation</div>
-                    <h2 class="card__title">Executive's Agent Evaluation Checklist</h2>
-                    <p class="card__text" style="margin-bottom: 16px;">Before greenlighting any agent project, walk through these five questions. They separate high-impact automation from expensive experiments.</p>
-                    <table class="matrix-table">
-                        <thead>
-                            <tr>
-                                <th>Question</th>
-                                <th>Why It Matters</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Is the process clearly defined with documented steps?</td>
-                                <td>Agents can't automate what hasn't been standardized. Undefined processes produce undefined results.</td>
-                            </tr>
-                            <tr>
-                                <td>Is there a measurable success metric?</td>
-                                <td>Without a KPI, you can't tell if the agent is working. Turnaround time, accuracy rate, and cost per transaction are good starting points.</td>
-                            </tr>
-                            <tr>
-                                <td>Does it involve high volume, repetitive decisions?</td>
-                                <td>Agents excel at scale. If the process happens 10 times a day, the ROI compounds. If it happens once a month, a copilot may be enough.</td>
-                            </tr>
-                            <tr>
-                                <td>Are the required data sources accessible via API or structured export?</td>
-                                <td>An agent that can't reach the data it needs will stall. Integration feasibility determines timeline and cost.</td>
-                            </tr>
-                            <tr>
-                                <td>Is there a clear escalation path for edge cases?</td>
-                                <td>Every agent will encounter situations it wasn't designed for. A defined human-in-the-loop protocol prevents failures from becoming incidents.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <!-- ═══════════════════════════════════════════
                  SANDBOX: Agent Blueprint Designer
             ═══════════════════════════════════════════ -->
@@ -1344,77 +1305,6 @@
                         <span class="btn-text">Run Agent &rarr;</span>
                     </button>
                     <button class="btn btn--sm" id="reset-agent-btn" type="button" style="display:none;">Run Again</button>
-                </div>
-            </div>
-
-            <!-- ═══════════════════════════════════════════
-                 INTERACTIVE EVALUATION SCORECARD
-            ═══════════════════════════════════════════ -->
-            <div class="scorecard reveal">
-                <div class="card card--full card--no-hover">
-                    <div class="card__badge card__badge--gold">Assessment</div>
-                    <h2 class="card__title">Agent Readiness Scorecard</h2>
-                    <p class="card__text" style="margin-bottom: 8px;">Rate each factor from 1 (not ready) to 5 (fully ready) for the process you're considering.</p>
-
-                    <div class="scorecard__item" data-question="0">
-                        <span class="scorecard__question">Is the process clearly defined with documented steps?</span>
-                        <div class="scorecard__rating">
-                            <button class="rating-dot" data-value="1" type="button">1</button>
-                            <button class="rating-dot" data-value="2" type="button">2</button>
-                            <button class="rating-dot" data-value="3" type="button">3</button>
-                            <button class="rating-dot" data-value="4" type="button">4</button>
-                            <button class="rating-dot" data-value="5" type="button">5</button>
-                        </div>
-                    </div>
-
-                    <div class="scorecard__item" data-question="1">
-                        <span class="scorecard__question">Is there a measurable success metric?</span>
-                        <div class="scorecard__rating">
-                            <button class="rating-dot" data-value="1" type="button">1</button>
-                            <button class="rating-dot" data-value="2" type="button">2</button>
-                            <button class="rating-dot" data-value="3" type="button">3</button>
-                            <button class="rating-dot" data-value="4" type="button">4</button>
-                            <button class="rating-dot" data-value="5" type="button">5</button>
-                        </div>
-                    </div>
-
-                    <div class="scorecard__item" data-question="2">
-                        <span class="scorecard__question">Does it involve high volume, repetitive decisions?</span>
-                        <div class="scorecard__rating">
-                            <button class="rating-dot" data-value="1" type="button">1</button>
-                            <button class="rating-dot" data-value="2" type="button">2</button>
-                            <button class="rating-dot" data-value="3" type="button">3</button>
-                            <button class="rating-dot" data-value="4" type="button">4</button>
-                            <button class="rating-dot" data-value="5" type="button">5</button>
-                        </div>
-                    </div>
-
-                    <div class="scorecard__item" data-question="3">
-                        <span class="scorecard__question">Are the required data sources accessible via API or structured export?</span>
-                        <div class="scorecard__rating">
-                            <button class="rating-dot" data-value="1" type="button">1</button>
-                            <button class="rating-dot" data-value="2" type="button">2</button>
-                            <button class="rating-dot" data-value="3" type="button">3</button>
-                            <button class="rating-dot" data-value="4" type="button">4</button>
-                            <button class="rating-dot" data-value="5" type="button">5</button>
-                        </div>
-                    </div>
-
-                    <div class="scorecard__item" data-question="4">
-                        <span class="scorecard__question">Is there a clear escalation path for edge cases?</span>
-                        <div class="scorecard__rating">
-                            <button class="rating-dot" data-value="1" type="button">1</button>
-                            <button class="rating-dot" data-value="2" type="button">2</button>
-                            <button class="rating-dot" data-value="3" type="button">3</button>
-                            <button class="rating-dot" data-value="4" type="button">4</button>
-                            <button class="rating-dot" data-value="5" type="button">5</button>
-                        </div>
-                    </div>
-
-                    <div class="scorecard__result" id="scorecard-result">
-                        <div class="scorecard__score" id="scorecard-score">0 <span>/ 25</span></div>
-                        <div class="scorecard__recommendation" id="scorecard-recommendation"></div>
-                    </div>
                 </div>
             </div>
 
