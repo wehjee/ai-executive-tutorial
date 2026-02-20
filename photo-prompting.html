@@ -544,7 +544,7 @@
             <span class="page__number">01</span>
             <div class="page__eyebrow page__eyebrow--photo">Module 01 — Prompting</div>
             <h1 class="page__title">The Art of Prompting</h1>
-            <p class="page__intro">AI can now generate photorealistic images, marketing materials, and visual concepts from text descriptions alone. The difference between amateur and professional results? How you write the prompt.</p>
+            <p class="page__intro">Every AI interaction starts with a prompt. The difference between generic output and exceptional results? How you write it. This module teaches you a repeatable framework for writing clear, structured prompts that work across any AI tool.</p>
         </header>
 
         <!-- ═══════════════════════════════════════════
@@ -557,36 +557,36 @@
                 <div class="card card--full reveal">
                     <div class="card__badge card__badge--tip">&#9670; Core Framework</div>
                     <div class="card__title">The 5-Layer Prompt Architecture</div>
-                    <p class="card__text">Every great image prompt contains five layers of information. Think of it like writing a creative brief for a world-class photographer — the more precise the brief, the better the result.</p>
+                    <p class="card__text">Every great prompt contains five layers of information. Think of it like writing a brief for a specialist — the more precise your instructions, the better the result.</p>
                     <div class="framework" style="margin-top: 32px;">
                         <div class="framework__step">
                             <div class="framework__step-icon">&#127919;</div>
-                            <div class="framework__step-title">Subject</div>
-                            <div class="framework__step-desc">Who or what is the focal point</div>
+                            <div class="framework__step-title">Role</div>
+                            <div class="framework__step-desc">Who should the AI act as</div>
                         </div>
                         <div class="framework__arrow">&rarr;</div>
                         <div class="framework__step">
                             <div class="framework__step-icon">&#127757;</div>
-                            <div class="framework__step-title">Environment</div>
-                            <div class="framework__step-desc">Setting, background, context</div>
+                            <div class="framework__step-title">Context</div>
+                            <div class="framework__step-desc">Background and constraints</div>
                         </div>
                         <div class="framework__arrow">&rarr;</div>
                         <div class="framework__step">
                             <div class="framework__step-icon">&#128161;</div>
-                            <div class="framework__step-title">Lighting</div>
-                            <div class="framework__step-desc">Mood, time of day, direction</div>
+                            <div class="framework__step-title">Task</div>
+                            <div class="framework__step-desc">What you need done, specifically</div>
                         </div>
                         <div class="framework__arrow">&rarr;</div>
                         <div class="framework__step">
                             <div class="framework__step-icon">&#128208;</div>
-                            <div class="framework__step-title">Composition</div>
-                            <div class="framework__step-desc">Angle, framing, depth of field</div>
+                            <div class="framework__step-title">Format</div>
+                            <div class="framework__step-desc">How the output should look</div>
                         </div>
                         <div class="framework__arrow">&rarr;</div>
                         <div class="framework__step">
                             <div class="framework__step-icon">&#127912;</div>
-                            <div class="framework__step-title">Style</div>
-                            <div class="framework__step-desc">Artistic direction, references</div>
+                            <div class="framework__step-title">Tone</div>
+                            <div class="framework__step-desc">Voice, style, audience level</div>
                         </div>
                     </div>
                 </div>
@@ -600,7 +600,7 @@
                         <div class="prompt-example__label">
                             <span>Weak Prompt</span>
                         </div>
-                        <div class="prompt-example__text">A doctor in a hospital</div>
+                        <div class="prompt-example__text">Write me a summary of this report</div>
                     </div>
                 </div>
 
@@ -608,99 +608,49 @@
                 <div class="card reveal reveal--delay-2">
                     <div class="card__badge card__badge--step">&#10003; Professional Result</div>
                     <div class="card__title">The Layered Prompt</div>
-                    <p class="card__text">A well-crafted prompt gives the AI a complete creative brief. Every detail you add eliminates a decision the AI would otherwise guess on.</p>
+                    <p class="card__text">A well-crafted prompt gives the AI a complete brief. Every detail you add eliminates a decision the AI would otherwise guess on.</p>
                     <div class="prompt-example" style="margin-top: 20px;">
                         <div class="prompt-example__label">
                             <span>Strong Prompt</span>
                         </div>
                         <div class="prompt-example__text">
-                            <span class="highlight">A senior female physician</span> reviewing patient data on a tablet, standing in a <span class="highlight--teal">modern hospital corridor with floor-to-ceiling windows</span>, <span class="highlight--lavender">soft morning light casting warm shadows</span>, shot at eye level with shallow depth of field, <span class="highlight">cinematic and editorial style, muted earth tones</span>
+                            <span class="highlight">Act as a senior healthcare analyst.</span> I have a 40-page quarterly report on member engagement. <span class="highlight--teal">Summarize the top 5 findings in bullet points,</span> <span class="highlight--lavender">prioritized by business impact.</span> Use plain language suitable for a <span class="highlight">C-suite audience. Keep it under 200 words.</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 6-Step Prompting Process -->
+                <!-- Applications -->
                 <div class="card card--full reveal">
-                    <div class="card__badge card__badge--step">&#10003; Step-by-Step</div>
-                    <div class="card__title">Your 6-Step Prompting Process</div>
-                    <ol class="steps">
-                        <li class="steps__item">
-                            <div class="steps__num"></div>
-                            <div class="steps__content">
-                                <h4>Start with the Subject</h4>
-                                <p>Be specific about who or what: age range, gender, ethnicity, expression, attire, posture. "A person" becomes "A confident woman in her 50s wearing a navy blazer."</p>
-                            </div>
-                        </li>
-                        <li class="steps__item">
-                            <div class="steps__num"></div>
-                            <div class="steps__content">
-                                <h4>Define the Environment</h4>
-                                <p>Where is this happening? Indoor vs. outdoor, modern vs. traditional, clean vs. textured. "In a hospital" becomes "In a sunlit atrium of a modern research hospital with living green walls."</p>
-                            </div>
-                        </li>
-                        <li class="steps__item">
-                            <div class="steps__num"></div>
-                            <div class="steps__content">
-                                <h4>Set the Lighting</h4>
-                                <p>Lighting defines mood more than any other element. Specify: golden hour, overcast, studio lighting, dramatic side-light, or soft diffused natural light. This single detail transforms the entire image.</p>
-                            </div>
-                        </li>
-                        <li class="steps__item">
-                            <div class="steps__num"></div>
-                            <div class="steps__content">
-                                <h4>Specify Camera &amp; Composition</h4>
-                                <p>Think like a photographer: eye-level, bird's eye, close-up portrait, wide establishing shot. Add depth of field (blurred background = "shallow depth of field"). Add aspect ratio if needed.</p>
-                            </div>
-                        </li>
-                        <li class="steps__item">
-                            <div class="steps__num"></div>
-                            <div class="steps__content">
-                                <h4>Declare the Style</h4>
-                                <p>Reference a visual style: editorial photography, corporate headshot, documentary, cinematic, minimalist, warm and inviting. You can even reference visual styles: "in the style of Apple product photography."</p>
-                            </div>
-                        </li>
-                        <li class="steps__item">
-                            <div class="steps__num"></div>
-                            <div class="steps__content">
-                                <h4>Iterate — Don't Settle</h4>
-                                <p>Your first result is a draft, not a final. Adjust 1-2 parameters at a time. Change "morning light" to "dramatic side light." Swap "editorial" for "candid documentary." Each iteration sharpens the result.</p>
-                            </div>
-                        </li>
-                    </ol>
-                </div>
-
-                <!-- Healthcare Applications -->
-                <div class="card card--full reveal">
-                    <div class="card__badge card__badge--tip">&#9670; Healthcare Applications</div>
+                    <div class="card__badge card__badge--tip">&#9670; Practical Applications</div>
                     <div class="card__title">Where You'll Use This</div>
                     <table class="matrix-table">
                         <thead>
                             <tr>
                                 <th>Use Case</th>
-                                <th>Example</th>
+                                <th>Example Prompt Approach</th>
                                 <th>Impact</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Internal Communications</td>
-                                <td>Generate visuals for town halls, newsletters, and leadership updates without a photo shoot</td>
-                                <td>Saves weeks and thousands in production costs</td>
+                                <td>Summarizing Reports</td>
+                                <td>Define role, audience, format, and length to get executive-ready summaries in seconds</td>
+                                <td>Hours of reading reduced to minutes</td>
                             </tr>
                             <tr>
-                                <td>Patient Education</td>
-                                <td>Create culturally diverse, relatable imagery for patient-facing materials</td>
-                                <td>Improves engagement and representation</td>
+                                <td>Drafting Communications</td>
+                                <td>Specify tone, audience, and key points to generate polished emails, memos, and announcements</td>
+                                <td>Consistent, professional messaging at speed</td>
                             </tr>
                             <tr>
-                                <td>LinkedIn &amp; Professional Headshots</td>
-                                <td>Transform a casual photo into a polished corporate headshot for LinkedIn and company directories</td>
-                                <td>Professional presence without expensive photography sessions</td>
+                                <td>Generating Visuals</td>
+                                <td>Layer subject, environment, style, and composition details for precise AI-generated images</td>
+                                <td>Custom visuals without design agencies</td>
                             </tr>
                             <tr>
-                                <td>Presentation Decks</td>
-                                <td>Replace stock photos with custom, on-brand imagery in board presentations</td>
-                                <td>Elevates executive presence and visual storytelling</td>
+                                <td>Analyzing Data</td>
+                                <td>Provide context, define the question, and specify output format for instant data insights</td>
+                                <td>Faster decisions backed by structured analysis</td>
                             </tr>
                         </tbody>
                     </table>
