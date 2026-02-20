@@ -975,15 +975,6 @@
 
         markVisited(MODULE_ID);
 
-        // ─── Nav: mark completed modules ───
-        const visited = getVisited();
-        document.querySelectorAll('.nav__link[data-module]').forEach(function (link) {
-            const mod = link.getAttribute('data-module');
-            if (visited.includes(mod) && !link.classList.contains('nav__link--active')) {
-                link.classList.add('nav__link--completed');
-            }
-        });
-
         // ─── Mobile Nav Toggle ───
         (function() {
             var hamburger = document.getElementById('nav-hamburger');

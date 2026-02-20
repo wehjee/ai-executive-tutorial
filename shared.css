@@ -138,12 +138,6 @@ body::before {
     background: var(--bg-secondary);
 }
 
-.nav__link--completed::after {
-    content: ' ✓';
-    color: var(--accent-teal);
-    font-size: 11px;
-}
-
 /* ═══════════════════════════════════════════
    BUTTONS
 ═══════════════════════════════════════════ */

@@ -1460,18 +1460,6 @@
             }
         } catch (e) {}
 
-        // ─── Nav visited status ───
-        try {
-            const visited = JSON.parse(localStorage.getItem('ai-tutorial-visited') || '[]');
-            if (Array.isArray(visited)) {
-                document.querySelectorAll('.nav__link[data-module]').forEach(function(link) {
-                    const mod = link.getAttribute('data-module');
-                    if (visited.includes(mod) && !link.classList.contains('nav__link--active')) {
-                        link.classList.add('nav__link--completed');
-                    }
-                });
-            }
-        } catch (e) {}
 
         // ─── Mobile Nav Toggle ───
         var hamburger = document.getElementById('nav-hamburger');

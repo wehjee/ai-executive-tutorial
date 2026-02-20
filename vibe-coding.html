@@ -1203,21 +1203,6 @@
             } catch (e) { /* silently handle */ }
         })();
 
-        /* ─────────────────────────────────────
-           NAV — VISITED STATUS
-        ───────────────────────────────────── */
-        (function() {
-            try {
-                var visited = JSON.parse(localStorage.getItem('ai-tutorial-visited') || '[]');
-                if (!Array.isArray(visited)) return;
-                document.querySelectorAll('.nav__link[data-module]').forEach(function(link) {
-                    var mod = link.getAttribute('data-module');
-                    if (visited.indexOf(mod) !== -1 && !link.classList.contains('nav__link--active')) {
-                        link.classList.add('nav__link--completed');
-                    }
-                });
-            } catch (e) { /* silently handle */ }
-        })();
 
     })();
     </script>
