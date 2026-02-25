@@ -1119,6 +1119,17 @@ body::before {
     font-weight: 500;
 }
 
+.feedback-rating__anchors {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+
 .feedback-submit {
     width: 100%;
     padding: 12px 24px;
