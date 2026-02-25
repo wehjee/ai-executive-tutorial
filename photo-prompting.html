@@ -1519,48 +1519,12 @@
             </div>
             <div class="feedback-modal__body" id="feedback-form-body">
                 <div class="feedback-field">
-                    <label class="feedback-field__label">Which AI agent would be most valuable for your team to have built first?</label>
-                    <span class="feedback-field__hint">Think about the tasks your team spends the most time on today.</span>
-                    <textarea id="fb-q1" placeholder="e.g. An agent that drafts weekly status reports from project data..."></textarea>
-                </div>
-                <div class="feedback-field">
-                    <label class="feedback-field__label">Which AI tools have had the biggest impact on your workflow so far?</label>
-                    <span class="feedback-field__hint">Any tools or features you've tried — inside or outside this workshop.</span>
-                    <textarea id="fb-q2" placeholder="e.g. ChatGPT for email drafting, Copilot for spreadsheets..."></textarea>
+                    <label class="feedback-field__label">Share any thoughts, ideas, or feedback from today's session.</label>
+                    <textarea id="fb-q1" rows="4" placeholder="What worked well, what could be better, what you'd like to see next..."></textarea>
                 </div>
                 <div class="feedback-field">
                     <label class="feedback-field__label">If this platform had a name, what would you call it?</label>
-                    <input type="text" id="fb-q3" placeholder="e.g. Command Center, AI Hub, The Bridge...">
-                </div>
-                <div class="feedback-field">
-                    <label class="feedback-field__label">What's the one task you spend too much time on that AI should handle?</label>
-                    <span class="feedback-field__hint">The thing that makes you think "there has to be a better way."</span>
-                    <textarea id="fb-q4" placeholder="e.g. Reconciling data across multiple reports every Monday..."></textarea>
-                </div>
-                <div class="feedback-field">
-                    <label class="feedback-field__label">After today, how ready do you feel to use AI in your day-to-day work?</label>
-                    <div class="feedback-rating">
-                        <div class="feedback-rating__option">
-                            <input type="radio" name="fb-q5" id="fb-q5-1" value="1">
-                            <label for="fb-q5-1">1<span class="rating-hint">Not yet</span></label>
-                        </div>
-                        <div class="feedback-rating__option">
-                            <input type="radio" name="fb-q5" id="fb-q5-2" value="2">
-                            <label for="fb-q5-2">2</label>
-                        </div>
-                        <div class="feedback-rating__option">
-                            <input type="radio" name="fb-q5" id="fb-q5-3" value="3">
-                            <label for="fb-q5-3">3</label>
-                        </div>
-                        <div class="feedback-rating__option">
-                            <input type="radio" name="fb-q5" id="fb-q5-4" value="4">
-                            <label for="fb-q5-4">4</label>
-                        </div>
-                        <div class="feedback-rating__option">
-                            <input type="radio" name="fb-q5" id="fb-q5-5" value="5">
-                            <label for="fb-q5-5">5<span class="rating-hint">Let's go</span></label>
-                        </div>
-                    </div>
+                    <input type="text" id="fb-q2" placeholder="e.g. Command Center, AI Hub, The Bridge...">
                 </div>
                 <button class="feedback-submit" id="feedback-submit" type="button">Submit Feedback</button>
             </div>
@@ -1606,11 +1570,8 @@
 
         submitBtn.addEventListener('click', function() {
             var data = {
-                agentRequest: document.getElementById('fb-q1').value,
-                toolsUsed: document.getElementById('fb-q2').value,
-                platformName: document.getElementById('fb-q3').value,
-                painPoint: document.getElementById('fb-q4').value,
-                confidence: (document.querySelector('input[name="fb-q5"]:checked') || {}).value || ''
+                feedback: document.getElementById('fb-q1').value,
+                platformName: document.getElementById('fb-q2').value
             };
             try {
                 var existing = JSON.parse(localStorage.getItem('ai-tutorial-feedback')) || [];
