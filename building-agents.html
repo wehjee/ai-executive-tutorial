@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Agents — Enterprise AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════
+         NAVIGATION
+    ═══════════════════════════════════════════ -->
+    <nav class="nav">
+        <a href="index.html" class="nav__brand">
+            <div class="nav__logo">✨</div>
+            <span class="nav__title">Enterprise AI  — Humana Leadership Series</span>
+        </a>
+        <div class="nav__links">
+            <a href="photo-prompting.html" class="nav__link" data-module="photo-prompting">Prompting</a>
+            <a href="document-intel.html" class="nav__link" data-module="document-intel">Document Creation</a>
+            <a href="ai-agents.html" class="nav__link" data-module="ai-agents">AI Agents</a>
+            <a href="building-agents.html" class="nav__link nav__link--active" data-module="building-agents">Building Agents</a>
+        </div>
+        <button class="nav__hamburger" id="nav-hamburger" type="button" aria-label="Open menu">
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+            <span class="nav__hamburger-line"></span>
+        </button>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════
+         PAGE CONTENT
+    ═══════════════════════════════════════════ -->
+    <div class="page">
+        <header class="page__header">
+            <div class="page__number">04</div>
+            <div class="page__eyebrow page__eyebrow--vibe">Module 04 — Building Agents</div>
+            <h1 class="page__title">Building Your Own Agents</h1>
+            <p class="page__intro">Go hands-on and build your own AI agent from scratch using natural language. This module walks you through the process step by step.</p>
+        </header>
+
+        <div class="page__content">
+
+            <div class="card card--full card--no-hover reveal" style="padding: 48px; text-align: center;">
+                <p style="font-size: 15px; color: var(--text-secondary); font-weight: 300; line-height: 1.7;">This module is coming soon. Check back for the full interactive experience.</p>
+            </div>
+
+        </div><!-- end .page__content -->
+
+        <!-- ═══════════════════════════════════════════
+             PAGE NAVIGATION
+        ═══════════════════════════════════════════ -->
+        <nav class="page-nav">
+            <a href="ai-agents.html" class="page-nav__link">
+                <span class="page-nav__label">Previous</span>
+                <span class="page-nav__title">&larr; AI Agents</span>
+            </a>
+            <a href="index.html" class="page-nav__link page-nav__link--next">
+                <span class="page-nav__label">Overview</span>
+                <span class="page-nav__title">Back to Overview &rarr;</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════════ -->
+    <footer class="footer">
+        <span class="footer__text">Enterprise AI — Humana Leadership Series</span>
+        <span class="footer__text">Confidential</span>
+    </footer>
+
+    <!-- ═══════════════════════════════════════════
+         JAVASCRIPT
+    ═══════════════════════════════════════════ -->
+    <script>
+    (function() {
+        'use strict';
+
+        // ─── Mark Module as Visited ───
+        var STORAGE_KEY = 'ai-tutorial-visited';
+        var MODULE_ID = 'building-agents';
+
+        function getVisited() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function markVisited(id) {
+            var visited = getVisited();
+            if (visited.indexOf(id) === -1) {
+                visited.push(id);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(visited));
+            }
+        }
+
+        markVisited(MODULE_ID);
+
+        // ─── Mobile Nav Toggle ───
+        (function() {
+            var hamburger = document.getElementById('nav-hamburger');
+            var navLinks = document.querySelector('.nav__links');
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', function() {
+                    hamburger.classList.toggle('nav__hamburger--open');
+                    navLinks.classList.toggle('nav__links--open');
+                });
+                navLinks.querySelectorAll('.nav__link').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        hamburger.classList.remove('nav__hamburger--open');
+                        navLinks.classList.remove('nav__links--open');
+                    });
+                });
+            }
+        })();
+
+        // ─── Scroll Reveal ───
+        var revealEls = document.querySelectorAll('.reveal');
+        var revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal--visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+        revealEls.forEach(function(el) { revealObserver.observe(el); });
+
+    })();
+    </script>
+</body>
+</html>
