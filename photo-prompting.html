@@ -1523,8 +1523,12 @@
                     <textarea id="fb-q1" rows="4" placeholder="What would you like to see next?"></textarea>
                 </div>
                 <div class="feedback-field">
+                    <label class="feedback-field__label">Now that you've seen what's possible, where would AI help you most?</label>
+                    <textarea id="fb-q2" rows="3" placeholder="e.g. Summarizing reports, drafting communications, analyzing data..."></textarea>
+                </div>
+                <div class="feedback-field">
                     <label class="feedback-field__label">If this platform had a name, what would you call it?</label>
-                    <input type="text" id="fb-q2" placeholder="e.g. Command Center, AI Hub, The Bridge...">
+                    <input type="text" id="fb-q3" placeholder="e.g. Command Center, AI Hub, The Bridge...">
                 </div>
                 <button class="feedback-submit" id="feedback-submit" type="button">Submit Feedback</button>
             </div>
@@ -1571,7 +1575,8 @@
         submitBtn.addEventListener('click', function() {
             var data = {
                 feedback: document.getElementById('fb-q1').value,
-                platformName: document.getElementById('fb-q2').value
+                aiHelpMost: document.getElementById('fb-q2').value,
+                platformName: document.getElementById('fb-q3').value
             };
             try {
                 var existing = JSON.parse(localStorage.getItem('ai-tutorial-feedback')) || [];
