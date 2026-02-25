@@ -1194,7 +1194,6 @@
             <a href="document-intel.html" class="nav__link" data-module="document-intel">Document Creation</a>
             <a href="ai-agents.html" class="nav__link nav__link--active" data-module="ai-agents">AI Agents</a>
             <a href="building-agents.html" class="nav__link" data-module="building-agents">Building Agents</a>
-            <button class="nav__feedback nav__feedback--mobile" id="feedback-btn-mobile" type="button">Feedback</button>
         </div>
         <button class="nav__feedback" id="feedback-btn" type="button">Feedback</button>
         <button class="nav__hamburger" id="nav-hamburger" type="button" aria-label="Open menu">
@@ -2900,7 +2899,7 @@
                     <div class="feedback-rating">
                         <div class="feedback-rating__option">
                             <input type="radio" name="fb-q5" id="fb-q5-1" value="1">
-                            <label for="fb-q5-1">1<br><span style="font-size:10px">Not yet</span></label>
+                            <label for="fb-q5-1">1</label>
                         </div>
                         <div class="feedback-rating__option">
                             <input type="radio" name="fb-q5" id="fb-q5-2" value="2">
@@ -2916,7 +2915,7 @@
                         </div>
                         <div class="feedback-rating__option">
                             <input type="radio" name="fb-q5" id="fb-q5-5" value="5">
-                            <label for="fb-q5-5">5<br><span style="font-size:10px">Very</span></label>
+                            <label for="fb-q5-5">5</label>
                         </div>
                     </div>
                 </div>
@@ -2934,7 +2933,6 @@
     (function() {
         var overlay = document.getElementById('feedback-overlay');
         var btnDesktop = document.getElementById('feedback-btn');
-        var btnMobile = document.getElementById('feedback-btn-mobile');
         var closeBtn = document.getElementById('feedback-close');
         var submitBtn = document.getElementById('feedback-submit');
         var formBody = document.getElementById('feedback-form-body');
@@ -2951,7 +2949,6 @@
         }
 
         if (btnDesktop) btnDesktop.addEventListener('click', openModal);
-        if (btnMobile) btnMobile.addEventListener('click', openModal);
         if (closeBtn) closeBtn.addEventListener('click', closeModal);
 
         overlay.addEventListener('click', function(e) {

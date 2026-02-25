@@ -1091,7 +1091,10 @@ body::before {
 }
 
 .feedback-rating__option label {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
     padding: 8px 4px;
     font-family: var(--font-body);
     font-size: 12px;
@@ -1165,23 +1168,8 @@ body::before {
 
 @media (max-width: 900px) {
     .nav__feedback {
-        display: none;
-    }
-
-    .nav__links .nav__feedback--mobile {
-        display: block;
-        font-size: 18px;
-        padding: 14px 24px;
-        width: 100%;
-        text-align: center;
-        border-radius: 10px;
-        background: transparent;
-        border: 1px solid var(--accent-warm);
-        color: var(--accent-warm);
-        font-family: var(--font-body);
-        font-weight: 500;
-        cursor: pointer;
-        margin-top: 8px;
+        font-size: 11px;
+        padding: 4px 12px;
     }
 }
 
