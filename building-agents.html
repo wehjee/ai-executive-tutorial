@@ -24,7 +24,9 @@
             <a href="document-intel.html" class="nav__link" data-module="document-intel">Document Creation</a>
             <a href="ai-agents.html" class="nav__link" data-module="ai-agents">AI Agents</a>
             <a href="building-agents.html" class="nav__link nav__link--active" data-module="building-agents">Building Agents</a>
+            <button class="nav__feedback nav__feedback--mobile" id="feedback-btn-mobile" type="button">Feedback</button>
         </div>
+        <button class="nav__feedback" id="feedback-btn" type="button">Feedback</button>
         <button class="nav__hamburger" id="nav-hamburger" type="button" aria-label="Open menu">
             <span class="nav__hamburger-line"></span>
             <span class="nav__hamburger-line"></span>
@@ -135,5 +137,127 @@
 
     })();
     </script>
+
+    <!-- ═══════════════════════════════════════════
+         FEEDBACK MODAL
+    ═══════════════════════════════════════════ -->
+    <div class="feedback-overlay" id="feedback-overlay">
+        <div class="feedback-modal">
+            <div class="feedback-modal__header">
+                <div class="feedback-modal__title">Share Your Feedback</div>
+                <button class="feedback-modal__close" id="feedback-close" type="button">&times;</button>
+            </div>
+            <div class="feedback-modal__body" id="feedback-form-body">
+                <div class="feedback-field">
+                    <label class="feedback-field__label">Which AI agent would be most valuable for your team to have built first?</label>
+                    <span class="feedback-field__hint">Think about the tasks your team spends the most time on today.</span>
+                    <textarea id="fb-q1" placeholder="e.g. An agent that drafts weekly status reports from project data..."></textarea>
+                </div>
+                <div class="feedback-field">
+                    <label class="feedback-field__label">Which AI tools have had the biggest impact on your workflow so far?</label>
+                    <span class="feedback-field__hint">Any tools or features you've tried — inside or outside this workshop.</span>
+                    <textarea id="fb-q2" placeholder="e.g. ChatGPT for email drafting, Copilot for spreadsheets..."></textarea>
+                </div>
+                <div class="feedback-field">
+                    <label class="feedback-field__label">If this platform had a name, what would you call it?</label>
+                    <input type="text" id="fb-q3" placeholder="e.g. Command Center, AI Hub, The Bridge...">
+                </div>
+                <div class="feedback-field">
+                    <label class="feedback-field__label">What's the one task you spend too much time on that AI should handle?</label>
+                    <span class="feedback-field__hint">The thing that makes you think "there has to be a better way."</span>
+                    <textarea id="fb-q4" placeholder="e.g. Reconciling data across multiple reports every Monday..."></textarea>
+                </div>
+                <div class="feedback-field">
+                    <label class="feedback-field__label">How confident do you feel about using AI after today's session?</label>
+                    <div class="feedback-rating">
+                        <div class="feedback-rating__option">
+                            <input type="radio" name="fb-q5" id="fb-q5-1" value="1">
+                            <label for="fb-q5-1">1<br><span style="font-size:10px">Not yet</span></label>
+                        </div>
+                        <div class="feedback-rating__option">
+                            <input type="radio" name="fb-q5" id="fb-q5-2" value="2">
+                            <label for="fb-q5-2">2</label>
+                        </div>
+                        <div class="feedback-rating__option">
+                            <input type="radio" name="fb-q5" id="fb-q5-3" value="3">
+                            <label for="fb-q5-3">3</label>
+                        </div>
+                        <div class="feedback-rating__option">
+                            <input type="radio" name="fb-q5" id="fb-q5-4" value="4">
+                            <label for="fb-q5-4">4</label>
+                        </div>
+                        <div class="feedback-rating__option">
+                            <input type="radio" name="fb-q5" id="fb-q5-5" value="5">
+                            <label for="fb-q5-5">5<br><span style="font-size:10px">Very</span></label>
+                        </div>
+                    </div>
+                </div>
+                <button class="feedback-submit" id="feedback-submit" type="button">Submit Feedback</button>
+            </div>
+            <div class="feedback-thanks" id="feedback-thanks">
+                <div class="feedback-thanks__icon">&#10024;</div>
+                <div class="feedback-thanks__title">Thank you!</div>
+                <div class="feedback-thanks__text">Your feedback helps us build the right tools for your team.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var overlay = document.getElementById('feedback-overlay');
+        var btnDesktop = document.getElementById('feedback-btn');
+        var btnMobile = document.getElementById('feedback-btn-mobile');
+        var closeBtn = document.getElementById('feedback-close');
+        var submitBtn = document.getElementById('feedback-submit');
+        var formBody = document.getElementById('feedback-form-body');
+        var thanks = document.getElementById('feedback-thanks');
+
+        function openModal() {
+            overlay.classList.add('feedback-overlay--active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            overlay.classList.remove('feedback-overlay--active');
+            document.body.style.overflow = '';
+        }
+
+        if (btnDesktop) btnDesktop.addEventListener('click', openModal);
+        if (btnMobile) btnMobile.addEventListener('click', openModal);
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) closeModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && overlay.classList.contains('feedback-overlay--active')) {
+                closeModal();
+            }
+        });
+
+        submitBtn.addEventListener('click', function() {
+            var data = {
+                agentRequest: document.getElementById('fb-q1').value,
+                toolsUsed: document.getElementById('fb-q2').value,
+                platformName: document.getElementById('fb-q3').value,
+                painPoint: document.getElementById('fb-q4').value,
+                confidence: (document.querySelector('input[name="fb-q5"]:checked') || {}).value || ''
+            };
+            try {
+                var existing = JSON.parse(localStorage.getItem('ai-tutorial-feedback')) || [];
+                existing.push({ timestamp: new Date().toISOString(), answers: data });
+                localStorage.setItem('ai-tutorial-feedback', JSON.stringify(existing));
+            } catch (e) {}
+
+            formBody.style.display = 'none';
+            document.querySelector('.feedback-modal__header').style.display = 'none';
+            thanks.classList.add('feedback-thanks--visible');
+
+            setTimeout(closeModal, 2500);
+        });
+    })();
+    </script>
+
 </body>
 </html>
