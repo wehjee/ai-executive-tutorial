@@ -10,108 +10,279 @@
     <link rel="stylesheet" href="shared.css">
     <style>
         /* ═══════════════════════════════════════════
-           SANDBOX — PROMPT BUILDER STUDIO
+           PROMPT EVOLUTION
         ═══════════════════════════════════════════ */
-        .sandbox__scenarios {
-            display: flex;
-            gap: 6px;
+        .prompt-scenarios {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 28px 28px 0;
         }
 
-        .scenario-btn {
-            padding: 6px 14px;
-            border: 1px solid var(--border-subtle);
-            border-radius: 5px;
+        .prompt-scenario {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 24px 16px;
             background: var(--bg-card);
-            color: var(--text-muted);
-            font-family: var(--font-body);
-            font-size: 12px;
-            font-weight: 500;
+            border: 1.5px solid var(--border-subtle);
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.25s var(--ease-out-expo);
-            white-space: nowrap;
+            text-align: center;
+            font-family: inherit;
+            color: inherit;
         }
 
-        .scenario-btn:hover {
-            color: var(--text-primary);
-            border-color: var(--border-active);
+        .prompt-scenario:hover {
+            border-color: var(--accent-warm);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
         }
 
-        .scenario-btn--active {
-            color: var(--accent-warm);
+        .prompt-scenario--active {
             border-color: var(--accent-warm);
             background: var(--accent-warm-dim);
         }
 
-        .assembled-prompt {
+        .prompt-scenario__name {
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .prompt-scenario__sub {
+            font-family: var(--font-body);
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 300;
+            line-height: 1.4;
+        }
+
+        /* ─── Prompt Evolution Header + Progress ─── */
+        .prompt-evo__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 28px 28px 0;
+        }
+
+        .prompt-evo__label {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .prompt-evo__hint {
+            font-family: var(--font-body);
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 300;
+            padding: 6px 28px 0;
+        }
+
+        .prompt-evo__counter {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.04em;
+        }
+
+        .prompt-evo__bar {
+            display: flex;
+            gap: 6px;
+            padding: 12px 28px 0;
+        }
+
+        .prompt-evo__segment {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+        }
+
+        .prompt-evo__segment:hover {
+            background: var(--border-active);
+        }
+
+        .prompt-evo__segment--active {
+            background: var(--accent-warm);
+            border-color: var(--accent-warm);
+        }
+
+        .prompt-evo__segment--completed {
+            background: var(--accent-warm);
+            border-color: var(--accent-warm);
+            opacity: 0.45;
+        }
+
+        /* ─── Two-Pane Content ─── */
+        .prompt-evo__prompt-area {
             font-family: var(--font-mono);
             font-size: 13px;
-            line-height: 2;
-            min-height: 180px;
+            line-height: 1.8;
             padding: 20px;
             background: var(--bg-secondary);
             border: 1px solid var(--border-subtle);
             border-radius: 8px;
+            min-height: 200px;
+            color: var(--text-primary);
+            font-weight: 300;
+            white-space: pre-wrap;
             word-wrap: break-word;
         }
 
-        .assembled-prompt--empty {
+        .prompt-evo__prompt-area--empty {
             color: var(--text-muted);
             font-style: italic;
-            font-weight: 300;
-        }
-
-        .assembled-prompt .prompt-subject { color: var(--accent-warm); font-weight: 400; }
-        .assembled-prompt .prompt-environment { color: var(--accent-teal); font-weight: 400; }
-        .assembled-prompt .prompt-lighting { color: var(--accent-lavender); font-weight: 400; }
-        .assembled-prompt .prompt-composition { color: var(--text-primary); font-weight: 400; }
-        .assembled-prompt .prompt-style { color: var(--accent-gold); font-weight: 400; }
-
-
-        .copy-btn-row {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 16px;
-        }
-
-        .copy-btn-row .btn--sm {
-            transition: all 0.3s var(--ease-out-expo);
-        }
-
-        .copy-btn-row .btn--sm.copied {
-            background: var(--accent-teal);
-            color: #FFFFFF;
-            border-color: var(--accent-teal);
-        }
-
-        .prompt-flow-hint {
             display: flex;
             align-items: center;
+            justify-content: center;
+        }
+
+        .prompt-evo__output-area {
+            font-family: var(--font-body);
+            font-size: 13px;
+            line-height: 1.8;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            min-height: 200px;
+            color: var(--text-secondary);
+            font-weight: 300;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-evo__output-area--empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             gap: 8px;
+            color: var(--text-muted);
+            font-style: italic;
+            text-align: center;
+        }
+
+        .prompt-evo__output-area--empty svg {
+            opacity: 0.25;
+        }
+
+        .cursor-blink {
+            display: inline-block;
+            width: 2px;
+            height: 14px;
+            background: var(--accent-warm);
+            margin-left: 2px;
+            vertical-align: middle;
+            animation: cursorBlink 0.8s step-end infinite;
+        }
+
+        @keyframes cursorBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ─── Quality Badge ─── */
+        .prompt-evo__quality {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .prompt-evo__quality--poor { background: rgba(176, 86, 86, 0.1); color: var(--accent-rose); }
+        .prompt-evo__quality--basic { background: rgba(154, 138, 47, 0.1); color: var(--accent-gold); }
+        .prompt-evo__quality--good { background: rgba(58, 143, 126, 0.1); color: var(--accent-teal); }
+        .prompt-evo__quality--expert { background: rgba(123, 107, 168, 0.1); color: var(--accent-lavender); }
+
+        /* ─── Send Button ─── */
+        .btn--send-ai {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px 20px;
             margin-top: 16px;
-            padding: 12px 16px;
-            background: var(--accent-teal-dim);
-            border: 1px solid var(--accent-teal);
+            background: var(--accent-warm);
+            color: #FFFFFF;
+            border: none;
             border-radius: 8px;
             font-family: var(--font-body);
             font-size: 13px;
             font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+        }
+
+        .btn--send-ai:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            filter: brightness(1.05);
+        }
+
+        .btn--send-ai:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        /* ─── Autofill Hint ─── */
+        .prompt-evo__autofill-hint {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: var(--accent-teal-dim);
+            border: 1px solid var(--accent-teal);
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 500;
             color: var(--accent-teal);
-            animation: pulseHint 2s ease-in-out infinite;
         }
 
-        .prompt-flow-hint svg {
-            flex-shrink: 0;
-            animation: bounceDown 1.5s ease-in-out infinite;
+        .prompt-evo__autofill-hint--visible { display: flex; }
+
+        /* ─── Prompt Evo Responsive ─── */
+        @media (max-width: 768px) {
+            .prompt-scenarios {
+                gap: 8px;
+                padding: 20px 20px 0;
+            }
+
+            .prompt-scenario { padding: 16px 10px; }
+            .prompt-scenario__name { font-size: 12px; }
+            .prompt-scenario__sub { font-size: 10px; }
+
+            .prompt-evo__header,
+            .prompt-evo__bar,
+            .prompt-evo__hint {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
         }
 
-        @keyframes bounceDown {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(3px); }
-        }
-
-        @keyframes pulseHint {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+        @media (max-width: 480px) {
+            .prompt-scenarios { grid-template-columns: 1fr; }
         }
 
         /* ═══════════════════════════════════════════
@@ -475,28 +646,7 @@
             cursor: not-allowed;
         }
 
-        @media (max-width: 900px) {
-            .sandbox__scenarios {
-                flex-wrap: wrap;
-            }
-        }
-
         @media (max-width: 600px) {
-            .sandbox__header {
-                flex-direction: column;
-                gap: 12px;
-                align-items: flex-start;
-            }
-
-            .sandbox__scenarios {
-                width: 100%;
-            }
-
-            .scenario-btn {
-                flex: 1;
-                text-align: center;
-            }
-
             .headshot-comparison {
                 flex-direction: column;
                 gap: 12px;
@@ -659,90 +809,68 @@
             </div>
 
             <!-- ═══════════════════════════════════════════
-                 HANDS-ON SANDBOX: PROMPT BUILDER STUDIO
+                 HANDS-ON: PROMPT EVOLUTION
             ═══════════════════════════════════════════ -->
             <div class="sandbox reveal">
                 <div class="sandbox__header">
-                    <span class="sandbox__title">Step 1 &mdash; Build Your Headshot Prompt</span>
-                    <div class="sandbox__scenarios">
-                        <button class="scenario-btn" data-scenario="corporate-classic">Corporate Classic</button>
-                        <button class="scenario-btn" data-scenario="modern-creative">Modern Creative</button>
-                        <button class="scenario-btn" data-scenario="executive-formal">Executive Formal</button>
-                    </div>
+                    <span class="sandbox__title">Step 1 &mdash; Prompt Evolution</span>
                 </div>
+
+                <!-- Scenario Cards -->
+                <div class="prompt-scenarios" id="prompt-scenarios">
+                    <button class="prompt-scenario" data-scenario="linkedin" type="button">
+                        <span class="prompt-scenario__name">LinkedIn Headshot</span>
+                        <span class="prompt-scenario__sub">Professional photo for your LinkedIn profile</span>
+                    </button>
+                    <button class="prompt-scenario" data-scenario="team-page" type="button">
+                        <span class="prompt-scenario__name">Team Page Photo</span>
+                        <span class="prompt-scenario__sub">Company website team page photo</span>
+                    </button>
+                    <button class="prompt-scenario" data-scenario="conference" type="button">
+                        <span class="prompt-scenario__name">Speaker Photo</span>
+                        <span class="prompt-scenario__sub">Conference speaker bio photo</span>
+                    </button>
+                </div>
+
+                <!-- Prompt Evolution Header + Progress Bar -->
+                <div class="prompt-evo__header">
+                    <span class="prompt-evo__label">Prompt Evolution</span>
+                    <span class="prompt-evo__counter" id="prompt-evo-counter">Prompt 1 of 4</span>
+                </div>
+                <div class="prompt-evo__hint">Click progress bars to view pre-written prompts showing evolution from basic to expert</div>
+
+                <div class="prompt-evo__bar" id="prompt-evo-bar">
+                    <div class="prompt-evo__segment prompt-evo__segment--active" data-level="1"></div>
+                    <div class="prompt-evo__segment" data-level="2"></div>
+                    <div class="prompt-evo__segment" data-level="3"></div>
+                    <div class="prompt-evo__segment" data-level="4"></div>
+                </div>
+
+                <!-- Two-Pane Layout -->
                 <div class="sandbox__split">
-                    <!-- Left Pane: Form -->
+                    <!-- Left Pane: Your Prompt -->
                     <div class="sandbox__pane sandbox__pane--left">
-                        <span class="sandbox__pane-label">Prompt Layers</span>
-
-                        <div class="field">
-                            <label class="field__label" for="prompt-subject">Subject</label>
-                            <input type="text" class="field__input" id="prompt-subject" placeholder="e.g., A senior female physician reviewing patient data on a tablet" data-layer="subject">
+                        <span class="sandbox__pane-label">Your Prompt</span>
+                        <div class="prompt-evo__quality" id="prompt-quality" style="display:none;"></div>
+                        <div class="prompt-evo__prompt-area prompt-evo__prompt-area--empty" id="prompt-evo-prompt">
+                            Select a scenario above to begin...
                         </div>
-
-                        <div class="field">
-                            <label class="field__label" for="prompt-environment">Environment</label>
-                            <input type="text" class="field__input" id="prompt-environment" placeholder="e.g., Modern hospital corridor with floor-to-ceiling windows" data-layer="environment">
-                        </div>
-
-                        <div class="field">
-                            <label class="field__label" for="prompt-lighting">Lighting</label>
-                            <select class="field__select" id="prompt-lighting" data-layer="lighting">
-                                <option value="">Select lighting...</option>
-                                <option value="Golden Hour">Golden Hour</option>
-                                <option value="Soft Morning Light">Soft Morning Light</option>
-                                <option value="Studio Lighting">Studio Lighting</option>
-                                <option value="Dramatic Side-Light">Dramatic Side-Light</option>
-                                <option value="Overcast/Diffused">Overcast/Diffused</option>
-                                <option value="Natural Window Light">Natural Window Light</option>
-                            </select>
-                        </div>
-
-                        <div class="field">
-                            <label class="field__label" for="prompt-composition">Composition</label>
-                            <select class="field__select" id="prompt-composition" data-layer="composition">
-                                <option value="">Select composition...</option>
-                                <option value="Eye-Level Shot">Eye-Level Shot</option>
-                                <option value="Bird's Eye View">Bird's Eye View</option>
-                                <option value="Close-Up Portrait">Close-Up Portrait</option>
-                                <option value="Wide Establishing Shot">Wide Establishing Shot</option>
-                                <option value="Over-the-Shoulder">Over-the-Shoulder</option>
-                                <option value="Low Angle">Low Angle</option>
-                            </select>
-                        </div>
-
-                        <div class="field">
-                            <label class="field__label" for="prompt-style">Style</label>
-                            <select class="field__select" id="prompt-style" data-layer="style">
-                                <option value="">Select style...</option>
-                                <option value="Editorial Photography">Editorial Photography</option>
-                                <option value="Cinematic">Cinematic</option>
-                                <option value="Documentary">Documentary</option>
-                                <option value="Minimalist">Minimalist</option>
-                                <option value="Product Photography">Product Photography</option>
-                                <option value="Warm & Inviting">Warm &amp; Inviting</option>
-                            </select>
+                        <button class="btn--send-ai" id="prompt-evo-send" disabled type="button">
+                            &#10022; Send to AI
+                        </button>
+                        <div class="prompt-evo__autofill-hint" id="prompt-evo-autofill">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                            <span>This expert prompt has been loaded into Step 2 below</span>
                         </div>
                     </div>
 
-                    <!-- Right Pane: Preview -->
+                    <!-- Right Pane: AI Output -->
                     <div class="sandbox__pane">
-                        <span class="sandbox__pane-label">Your Headshot Prompt</span>
-
-                        <div class="assembled-prompt assembled-prompt--empty" id="assembled-prompt">
-                            Choose a style above or fill in the layers to build your headshot prompt...
-                        </div>
-
-
-                        <div class="copy-btn-row">
-                            <button class="btn btn--sm" id="copy-prompt">
-                                Copy to Clipboard
-                                <span class="btn__arrow">&rarr;</span>
-                            </button>
-                        </div>
-                        <div class="prompt-flow-hint" id="prompt-flow-hint" style="display:none;">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-                            <span>Now upload your photo below to see this style applied</span>
+                        <span class="sandbox__pane-label">AI Output</span>
+                        <div class="prompt-evo__output-area prompt-evo__output-area--empty" id="prompt-evo-output">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            <span>Output will appear here</span>
+                            <span style="font-size:11px;">Click &ldquo;Send to AI&rdquo; to generate output for this prompt</span>
                         </div>
                     </div>
                 </div>
@@ -974,171 +1102,210 @@
             });
         });
 
-        // ─── Prompt Builder ───
-        var fields = {
-            subject: document.getElementById('prompt-subject'),
-            environment: document.getElementById('prompt-environment'),
-            lighting: document.getElementById('prompt-lighting'),
-            composition: document.getElementById('prompt-composition'),
-            style: document.getElementById('prompt-style')
+        // ─── Prompt Evolution ───
+        var promptEvolutionData = {
+            linkedin: {
+                levels: [
+                    {
+                        quality: 'poor', qualityLabel: 'Vague',
+                        prompt: 'Make me a headshot for LinkedIn.',
+                        output: 'Here is a generic headshot. The lighting is flat, the background is plain white, the framing is slightly off-center. The expression looks stiff because the AI had no direction on mood, style, or context. This could be anyone \u2014 it doesn\u2019t convey leadership or professionalism.'
+                    },
+                    {
+                        quality: 'basic', qualityLabel: 'Better',
+                        prompt: 'Create a professional headshot for LinkedIn with a clean background and good lighting.',
+                        output: 'A more polished headshot. The background is a clean neutral gray, and the lighting is even. However, the composition is a standard center crop with no particular mood or style. The attire is generic business casual. It looks professional but unremarkable \u2014 it will blend in with thousands of similar photos on LinkedIn.'
+                    },
+                    {
+                        quality: 'good', qualityLabel: 'Strong',
+                        prompt: 'Create a professional LinkedIn headshot. Subject: confident executive in a tailored navy blazer, warm approachable smile. Lighting: soft natural window light from the left. Composition: close-up portrait, shoulders up, slight angle.',
+                        output: 'This headshot is noticeably stronger. The navy blazer reads as polished and intentional. The window light from the left creates gentle shadows that add dimension to the face. The close-up framing feels personal and engaging. The warm smile conveys approachability. This photo would stand out in a LinkedIn feed and signal competence and warmth.'
+                    },
+                    {
+                        quality: 'expert', qualityLabel: 'Expert',
+                        prompt: 'Create a professional LinkedIn headshot. Subject: a confident executive in a tailored navy blazer, relaxed posture, warm approachable smile, looking directly at camera. Environment: clean studio backdrop with soft neutral gray, no distractions. Lighting: natural window light, soft and diffused, illuminating from the left with gentle fill from the right. Composition: close-up portrait, shoulders up, slight three-quarter angle, eyes at upper third gridline. Style: editorial photography, shallow depth of field, warm color grading, high resolution.',
+                        output: 'Exceptional result. Every element works together: the tailored navy blazer against the neutral backdrop creates a clean figure-ground relationship. The directional window light sculpts the face beautifully \u2014 soft enough to be flattering, directional enough to add depth. The three-quarter angle and direct eye contact create immediate connection. The shallow depth of field isolates the subject with a cinematic quality. The warm color grading feels premium and approachable. This is a headshot that commands attention and communicates executive presence.'
+                    }
+                ]
+            },
+            'team-page': {
+                levels: [
+                    {
+                        quality: 'poor', qualityLabel: 'Vague',
+                        prompt: 'Make a photo for our company website.',
+                        output: 'The AI generated a generic stock-photo-style image. The person looks posed and artificial. The background is an obvious office stock backdrop. There is no brand consistency, no personality, and no sense of the company culture. This photo would actively harm the team page by looking inauthentic.'
+                    },
+                    {
+                        quality: 'basic', qualityLabel: 'Better',
+                        prompt: 'Create a team page photo with a modern office background and professional look.',
+                        output: 'Better than before \u2014 the office background looks more realistic and the subject appears more natural. However, the styling is still generic. There is no cohesion with other potential team photos (no consistent background, lighting, or framing). The mood is neutral rather than reflecting any particular company culture.'
+                    },
+                    {
+                        quality: 'good', qualityLabel: 'Strong',
+                        prompt: 'Create a team page photo for a tech company website. Subject: relaxed, friendly professional in smart casual attire. Environment: bright open office with blurred greenery in background. Lighting: soft overhead ambient light. Composition: head and shoulders, centered.',
+                        output: 'This feels authentic and intentional. The smart casual attire matches the tech company context. The blurred greenery adds life and warmth to the background without distraction. The soft ambient lighting keeps the mood bright and optimistic. The centered head-and-shoulders crop is consistent enough to work alongside other team photos. This person looks like someone you\u2019d want to work with.'
+                    },
+                    {
+                        quality: 'expert', qualityLabel: 'Expert',
+                        prompt: 'Create a team page photo for a healthcare technology company website. Subject: approachable professional in a fitted charcoal cardigan over a light blue collared shirt, genuine relaxed smile, slight head tilt conveying openness. Environment: modern open-plan office with floor-to-ceiling windows, soft-blurred greenery and natural wood textures in background. Lighting: soft diffused daylight from large windows, no harsh shadows, subtle warm fill light. Composition: head and shoulders, centered, shot at eye level, consistent with a series of team photos. Style: warm and inviting, natural color palette, minimal post-processing, sharp focus on eyes with gentle background blur.',
+                        output: 'This is exactly what a premium team page demands. The healthcare context is subtly conveyed through the approachable, trust-building expression and clean styling. The charcoal-over-blue palette is warm yet professional. The natural daylight creates an honest, un-retouched feel that builds trust. The composition is designed to work as a series \u2014 consistent enough to sit next to other team photos without looking mismatched. The background communicates a modern, design-forward culture. This photo says: \u201CWe are real people, and we care about quality.\u201D'
+                    }
+                ]
+            },
+            conference: {
+                levels: [
+                    {
+                        quality: 'poor', qualityLabel: 'Vague',
+                        prompt: 'Make a speaker photo for a conference.',
+                        output: 'The AI produced a basic headshot that could be for anything \u2014 a yearbook, a passport, a dating profile. There is no sense of authority, stage presence, or gravitas. The flat lighting and dead-center framing make the subject look static rather than dynamic. Conference organizers would likely pass over this photo for promotional materials.'
+                    },
+                    {
+                        quality: 'basic', qualityLabel: 'Better',
+                        prompt: 'Create a speaker bio photo for a conference with dramatic lighting and a dark background.',
+                        output: 'The dark background and dramatic lighting create more visual impact than a plain headshot. The subject looks more serious and authoritative. However, the lighting is too harsh \u2014 it creates unflattering shadows under the nose and chin. The framing is still a standard center crop. It\u2019s trying too hard without the nuance to pull it off.'
+                    },
+                    {
+                        quality: 'good', qualityLabel: 'Strong',
+                        prompt: 'Create a conference speaker bio photo. Subject: confident thought leader in a dark tailored jacket, composed expression with a slight knowing smile. Lighting: dramatic side-light from the right, warm tone. Composition: close-up, slight low angle to convey authority. Background: dark, minimal.',
+                        output: 'Now we\u2019re getting somewhere. The slight low angle is a classic authority technique \u2014 it makes the subject look commanding without being intimidating. The side-light adds drama and dimension. The knowing smile suggests expertise and confidence. The dark background creates a stage-like feel. This photo communicates: \u201CThis person has something important to say.\u201D'
+                    },
+                    {
+                        quality: 'expert', qualityLabel: 'Expert',
+                        prompt: 'Create a conference speaker bio photo for a keynote speaker at a healthcare innovation summit. Subject: a distinguished executive in a charcoal suit and crisp white shirt, composed and confident expression, direct eye contact conveying authority and vision. Environment: minimalist dark backdrop with a subtle gradient from deep charcoal to black, hinting at a stage setting. Lighting: cinematic key light from the right at 45 degrees, soft fill from the left to prevent harsh shadows, subtle rim light on the shoulder creating separation from background. Composition: close-up portrait, slight low angle, subject positioned slightly off-center using rule of thirds, negative space on the left suggesting forward momentum. Style: cinematic, high contrast, desaturated warm tones, sharp focus on the eyes, editorial quality suitable for conference banners and promotional materials.',
+                        output: 'This is keynote-ready. Every technical decision serves the narrative: the low angle and direct eye contact establish authority, while the subtle off-center positioning with negative space creates visual momentum \u2014 this person is going somewhere. The three-point lighting setup is textbook cinema: the key light sculpts the face, the fill softens it, and the rim light lifts the subject from the background. The charcoal suit against the dark gradient creates sophistication without disappearing into the backdrop. The desaturated warm tones feel serious yet approachable. This photo could be printed six feet tall on a conference banner and still command the room.'
+                    }
+                ]
+            }
         };
-        var assembledEl = document.getElementById('assembled-prompt');
-        var copyBtn = document.getElementById('copy-prompt');
 
-        function getLayerValues() {
-            return {
-                subject: fields.subject.value.trim(),
-                environment: fields.environment.value.trim(),
-                lighting: fields.lighting.value,
-                composition: fields.composition.value,
-                style: fields.style.value
-            };
+        var evoCurrentScenario = null;
+        var evoCurrentLevel = 1;
+        var evoOutputCache = {};
+        var evoIsTyping = false;
+        var evoTypingTimeout = null;
+
+        var evoScenarioCards = document.querySelectorAll('.prompt-scenario');
+        var evoSegments = document.querySelectorAll('.prompt-evo__segment');
+        var evoCounter = document.getElementById('prompt-evo-counter');
+        var evoPromptArea = document.getElementById('prompt-evo-prompt');
+        var evoOutputArea = document.getElementById('prompt-evo-output');
+        var evoSendBtn = document.getElementById('prompt-evo-send');
+        var evoQuality = document.getElementById('prompt-quality');
+        var evoAutofill = document.getElementById('prompt-evo-autofill');
+
+        function evoCacheKey(scenario, level) {
+            return scenario + '-' + level;
         }
 
-        function countFilledLayers(vals) {
-            var count = 0;
-            if (vals.subject) count++;
-            if (vals.environment) count++;
-            if (vals.lighting) count++;
-            if (vals.composition) count++;
-            if (vals.style) count++;
-            return count;
+        function evoUpdateBar(level) {
+            evoSegments.forEach(function(seg) {
+                var l = parseInt(seg.getAttribute('data-level'));
+                seg.classList.remove('prompt-evo__segment--active', 'prompt-evo__segment--completed');
+                if (l === level) seg.classList.add('prompt-evo__segment--active');
+                else if (l < level) seg.classList.add('prompt-evo__segment--completed');
+            });
+            evoCounter.textContent = 'Prompt ' + level + ' of 4';
         }
 
-        function updatePromptPreview() {
-            var vals = getLayerValues();
-            var filled = countFilledLayers(vals);
+        function evoShowPrompt(scenario, level) {
+            if (!scenario) return;
+            var data = promptEvolutionData[scenario];
+            if (!data) return;
+            var ld = data.levels[level - 1];
+            evoCurrentLevel = level;
 
-            // Assemble the prompt preview
-            if (filled === 0) {
-                assembledEl.innerHTML = 'Choose a style above or fill in the layers to build your headshot prompt...';
-                assembledEl.classList.add('assembled-prompt--empty');
-                return;
+            evoUpdateBar(level);
+
+            // Quality badge
+            evoQuality.style.display = '';
+            evoQuality.className = 'prompt-evo__quality prompt-evo__quality--' + ld.quality;
+            evoQuality.textContent = ld.qualityLabel + ' Prompt';
+
+            // Prompt text
+            evoPromptArea.textContent = ld.prompt;
+            evoPromptArea.classList.remove('prompt-evo__prompt-area--empty');
+
+            // Check output cache
+            var key = evoCacheKey(scenario, level);
+            if (evoOutputCache[key]) {
+                evoOutputArea.textContent = evoOutputCache[key];
+                evoOutputArea.classList.remove('prompt-evo__output-area--empty');
+                evoSendBtn.disabled = true;
+                evoSendBtn.innerHTML = '&#10003; Output Generated';
+            } else {
+                evoOutputArea.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg><span>Output will appear here</span><span style="font-size:11px;">Click \u201CSend to AI\u201D to generate output for this prompt</span>';
+                evoOutputArea.classList.add('prompt-evo__output-area--empty');
+                evoSendBtn.disabled = false;
+                evoSendBtn.innerHTML = '&#10022; Send to AI';
             }
 
-            assembledEl.classList.remove('assembled-prompt--empty');
-            var parts = [];
-
-            if (vals.subject) {
-                parts.push('<span class="prompt-subject">' + escapeHtml(vals.subject) + '</span>');
+            // Auto-fill Step 2 on Level 4
+            if (level === 4) {
+                var ta = document.getElementById('headshot-prompt');
+                if (ta) {
+                    ta.value = ld.prompt;
+                    ta.dispatchEvent(new Event('input'));
+                }
+                evoAutofill.classList.add('prompt-evo__autofill-hint--visible');
+            } else {
+                evoAutofill.classList.remove('prompt-evo__autofill-hint--visible');
             }
-            if (vals.environment) {
-                parts.push('in a <span class="prompt-environment">' + escapeHtml(vals.environment) + '</span>');
-            }
-            if (vals.lighting) {
-                parts.push('<span class="prompt-lighting">' + escapeHtml(vals.lighting) + ' lighting</span>');
-            }
-            if (vals.composition) {
-                parts.push('shot as a <span class="prompt-composition">' + escapeHtml(vals.composition) + '</span>');
-            }
-            if (vals.style) {
-                parts.push('<span class="prompt-style">' + escapeHtml(vals.style) + ' style</span>');
-            }
-
-            assembledEl.innerHTML = parts.join(', ');
         }
 
-        function escapeHtml(str) {
-            var div = document.createElement('div');
-            div.appendChild(document.createTextNode(str));
-            return div.innerHTML;
+        function evoTypeOutput(text, callback) {
+            evoIsTyping = true;
+            evoSendBtn.disabled = true;
+            evoSendBtn.textContent = 'Generating\u2026';
+            evoOutputArea.classList.remove('prompt-evo__output-area--empty');
+            evoOutputArea.innerHTML = '<span class="cursor-blink"></span>';
+
+            var idx = 0;
+            var chunk = 3;
+            function tick() {
+                if (idx < text.length) {
+                    var end = Math.min(idx + chunk, text.length);
+                    evoOutputArea.innerHTML = text.substring(0, end) + '<span class="cursor-blink"></span>';
+                    idx = end;
+                    evoTypingTimeout = setTimeout(tick, 16);
+                } else {
+                    evoOutputArea.textContent = text;
+                    evoIsTyping = false;
+                    evoSendBtn.innerHTML = '&#10003; Output Generated';
+                    if (callback) callback();
+                }
+            }
+            tick();
         }
 
-        // Listen for changes
-        Object.keys(fields).forEach(function (key) {
-            var el = fields[key];
-            el.addEventListener('input', updatePromptPreview);
-            el.addEventListener('change', updatePromptPreview);
-        });
-
-        // ─── Copy to Clipboard ───
-        copyBtn.addEventListener('click', function () {
-            var vals = getLayerValues();
-            var filled = countFilledLayers(vals);
-            if (filled === 0) return;
-
-            var parts = [];
-            if (vals.subject) parts.push(vals.subject);
-            if (vals.environment) parts.push('in a ' + vals.environment);
-            if (vals.lighting) parts.push(vals.lighting + ' lighting');
-            if (vals.composition) parts.push('shot as a ' + vals.composition);
-            if (vals.style) parts.push(vals.style + ' style');
-
-            var text = parts.join(', ');
-
-            navigator.clipboard.writeText(text).then(function () {
-                copyBtn.classList.add('copied');
-                copyBtn.innerHTML = 'Copied <span class="btn__arrow">&#10003;</span>';
-                setTimeout(function () {
-                    copyBtn.classList.remove('copied');
-                    copyBtn.innerHTML = 'Copy to Clipboard <span class="btn__arrow">&rarr;</span>';
-                }, 2000);
+        // Scenario card click
+        evoScenarioCards.forEach(function(card) {
+            card.addEventListener('click', function() {
+                if (evoIsTyping) return;
+                var key = card.getAttribute('data-scenario');
+                evoCurrentScenario = key;
+                evoScenarioCards.forEach(function(c) { c.classList.remove('prompt-scenario--active'); });
+                card.classList.add('prompt-scenario--active');
+                evoShowPrompt(key, 1);
             });
         });
 
-        // ─── Scenario Presets (LinkedIn Headshot Styles) ───
-        var scenarios = {
-            'corporate-classic': {
-                subject: 'A confident professional in a tailored navy blazer, relaxed posture, warm approachable smile',
-                environment: 'Clean studio backdrop with soft neutral gray, no distractions',
-                lighting: 'Studio Lighting',
-                composition: 'Close-Up Portrait',
-                style: 'Editorial Photography'
-            },
-            'modern-creative': {
-                subject: 'A forward-thinking leader in smart casual attire, slight smile, looking directly at camera',
-                environment: 'Contemporary open office with blurred greenery and natural textures in background',
-                lighting: 'Natural Window Light',
-                composition: 'Eye-Level Shot',
-                style: 'Warm & Inviting'
-            },
-            'executive-formal': {
-                subject: 'A distinguished executive in a charcoal suit and white shirt, composed expression, arms at sides',
-                environment: 'Minimalist corner office with city skyline softly blurred through floor-to-ceiling windows',
-                lighting: 'Dramatic Side-Light',
-                composition: 'Close-Up Portrait',
-                style: 'Cinematic'
-            }
-        };
+        // Progress bar click
+        evoSegments.forEach(function(seg) {
+            seg.addEventListener('click', function() {
+                if (evoIsTyping || !evoCurrentScenario) return;
+                var level = parseInt(seg.getAttribute('data-level'));
+                evoShowPrompt(evoCurrentScenario, level);
+            });
+        });
 
-        var scenarioBtns = document.querySelectorAll('.scenario-btn');
-        var flowHint = document.getElementById('prompt-flow-hint');
-
-        scenarioBtns.forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var key = btn.getAttribute('data-scenario');
-                var preset = scenarios[key];
-                if (!preset) return;
-
-                // Toggle active state
-                scenarioBtns.forEach(function (b) { b.classList.remove('scenario-btn--active'); });
-                btn.classList.add('scenario-btn--active');
-
-                // Fill fields
-                fields.subject.value = preset.subject;
-                fields.environment.value = preset.environment;
-                fields.lighting.value = preset.lighting;
-                fields.composition.value = preset.composition;
-                fields.style.value = preset.style;
-
-                updatePromptPreview();
-
-                // Show flow hint
-                flowHint.style.display = '';
-
-                // Auto-fill the prompt textarea in Headshot Studio
-                var promptTextarea = document.getElementById('headshot-prompt');
-                if (promptTextarea) {
-                    var vals = getLayerValues();
-                    var promptParts = [];
-                    if (vals.subject) promptParts.push(vals.subject);
-                    if (vals.environment) promptParts.push('in a ' + vals.environment);
-                    if (vals.lighting) promptParts.push(vals.lighting + ' lighting');
-                    if (vals.composition) promptParts.push('shot as a ' + vals.composition);
-                    if (vals.style) promptParts.push(vals.style + ' style');
-                    promptTextarea.value = promptParts.join(', ');
-                    promptTextarea.dispatchEvent(new Event('input'));
-                }
+        // Send to AI button
+        evoSendBtn.addEventListener('click', function() {
+            if (!evoCurrentScenario || evoIsTyping) return;
+            var data = promptEvolutionData[evoCurrentScenario];
+            var ld = data.levels[evoCurrentLevel - 1];
+            var key = evoCacheKey(evoCurrentScenario, evoCurrentLevel);
+            evoTypeOutput(ld.output, function() {
+                evoOutputCache[key] = ld.output;
             });
         });
 
