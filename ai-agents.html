@@ -983,9 +983,27 @@
 
         .plugin-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin-top: 32px;
+        }
+
+        .plugin-preview {
+            display: none;
+            margin-top: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .plugin-preview--visible {
+            display: block;
+        }
+
+        .plugin-preview img {
+            width: 100%;
+            display: block;
         }
 
         .plugin-card {
@@ -1156,7 +1174,7 @@
 
         @media (max-width: 768px) {
             .plugin-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
             }
 
             .plugin-commands {
@@ -1172,11 +1190,6 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .plugin-grid {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 <body>
@@ -1528,6 +1541,10 @@
                         <span class="plugin-card__name">Operations</span>
                         <span class="plugin-card__sub">Workflows, capacity, logistics</span>
                     </button>
+                </div>
+
+                <div class="plugin-preview" id="plugin-preview">
+                    <img id="plugin-preview-img" src="" alt="">
                 </div>
 
                 <div class="plugin-commands" id="plugin-commands">
@@ -2614,6 +2631,15 @@
         var pluginStatus = document.getElementById('plugin-status');
         var pluginFeed = document.getElementById('plugin-feed');
 
+        var pluginPreview = document.getElementById('plugin-preview');
+        var pluginPreviewImg = document.getElementById('plugin-preview-img');
+        var pluginImageMap = {
+            legal: 'images/Legal.png',
+            data: 'images/Data.png',
+            hr: 'images/Human Resources.png',
+            operations: 'images/Operations.png'
+        };
+
         var pluginTimeouts = [];
         var activeDept = null;
         var activeCmd = null;
@@ -2682,6 +2708,15 @@
                 c.classList.remove('plugin-card--active');
             });
             card.classList.add('plugin-card--active');
+
+            // Show preview image
+            if (pluginImageMap[dept]) {
+                pluginPreviewImg.src = pluginImageMap[dept];
+                pluginPreviewImg.alt = pluginData[dept].name + ' Agent';
+                pluginPreview.classList.add('plugin-preview--visible');
+            } else {
+                pluginPreview.classList.remove('plugin-preview--visible');
+            }
 
             activeDept = dept;
             activeCmd = null;
