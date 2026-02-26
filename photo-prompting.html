@@ -12,189 +12,224 @@
         /* ═══════════════════════════════════════════
            PROMPT EVOLUTION
         ═══════════════════════════════════════════ */
-        .prompt-scenarios {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            padding: 28px 28px 0;
-        }
 
-        .prompt-scenario {
+        /* ── Scenario Buttons ── */
+        .sandbox__scenarios {
             display: flex;
-            flex-direction: column;
-            align-items: center;
             gap: 8px;
-            padding: 24px 16px;
-            background: var(--bg-card);
-            border: 1.5px solid var(--border-subtle);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.25s var(--ease-out-expo);
-            text-align: center;
-            font-family: inherit;
-            color: inherit;
+            flex-wrap: wrap;
         }
 
-        .prompt-scenario:hover {
-            border-color: var(--accent-warm);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-        }
-
-        .prompt-scenario--active {
-            border-color: var(--accent-warm);
-            background: var(--accent-warm-dim);
-        }
-
-        .prompt-scenario__name {
-            font-family: var(--font-body);
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .prompt-scenario__sub {
-            font-family: var(--font-body);
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 300;
-            line-height: 1.4;
-        }
-
-        /* ─── Prompt Evolution Header + Progress ─── */
-        .prompt-evo__header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 28px 28px 0;
-        }
-
-        .prompt-evo__label {
-            font-family: var(--font-mono);
-            font-size: 12px;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .prompt-evo__hint {
-            font-family: var(--font-body);
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 300;
-            padding: 6px 28px 0;
-        }
-
-        .prompt-evo__counter {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            color: var(--text-muted);
-            letter-spacing: 0.04em;
-        }
-
-        .prompt-evo__bar {
-            display: flex;
-            gap: 6px;
-            padding: 12px 28px 0;
-        }
-
-        .prompt-evo__segment {
-            flex: 1;
-            height: 6px;
-            border-radius: 3px;
-            background: var(--bg-secondary);
+        .scenario-btn {
+            padding: 8px 18px;
             border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s var(--ease-out-expo);
         }
 
-        .prompt-evo__segment:hover {
-            background: var(--border-active);
-        }
-
-        .prompt-evo__segment--active {
-            background: var(--accent-warm);
-            border-color: var(--accent-warm);
-        }
-
-        .prompt-evo__segment--completed {
-            background: var(--accent-warm);
-            border-color: var(--accent-warm);
-            opacity: 0.45;
-        }
-
-        /* ─── Two-Pane Content ─── */
-        .prompt-evo__prompt-area {
-            font-family: var(--font-mono);
-            font-size: 13px;
-            line-height: 1.8;
-            padding: 20px;
+        .scenario-btn:hover {
+            color: var(--text-secondary);
+            border-color: var(--border-active);
             background: var(--bg-secondary);
-            border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            min-height: 200px;
-            color: var(--text-primary);
-            font-weight: 300;
-            white-space: pre-wrap;
-            word-wrap: break-word;
         }
 
-        .prompt-evo__prompt-area--empty {
-            color: var(--text-muted);
-            font-style: italic;
+        .scenario-btn--active {
+            background: var(--text-primary);
+            color: #FFFFFF;
+            border-color: var(--text-primary);
+        }
+
+        .scenario-btn--active:hover {
+            background: #333;
+            border-color: #333;
+            color: #FFFFFF;
+        }
+
+        /* ── Step Indicator ── */
+        .step-indicator {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
-        .prompt-evo__output-area {
-            font-family: var(--font-body);
-            font-size: 13px;
-            line-height: 1.8;
-            padding: 20px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-subtle);
-            border-radius: 8px;
+        .step-indicator__dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .step-indicator__dot {
+            width: 28px;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.4s var(--ease-out-expo);
+        }
+
+        .step-indicator__dot--active {
+            background: var(--accent-warm);
+            width: 36px;
+        }
+
+        .step-indicator__dot--done {
+            background: var(--accent-teal);
+        }
+
+        .step-indicator__label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+        }
+
+        /* ── Sandbox Textarea Override ── */
+        .sandbox .field__textarea {
             min-height: 200px;
-            color: var(--text-secondary);
-            font-weight: 300;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.7;
+            resize: vertical;
         }
 
-        .prompt-evo__output-area--empty {
+        /* ── Sandbox Action Buttons ── */
+        .sandbox__actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn--build {
+            background: var(--accent-warm);
+            color: #FFFFFF;
+            border-color: var(--accent-warm);
+        }
+
+        .btn--build:hover {
+            background: #A06A3E;
+            border-color: #A06A3E;
+        }
+
+        .btn--build:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .btn--iterate {
+            background: transparent;
+            color: var(--accent-warm);
+            border-color: var(--accent-warm);
+        }
+
+        .btn--iterate:hover {
+            background: var(--accent-warm);
+            color: #FFFFFF;
+        }
+
+        .btn--iterate:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ── Preview Area ── */
+        .preview {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            min-height: 380px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview__empty {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            min-height: 380px;
             color: var(--text-muted);
-            font-style: italic;
-            text-align: center;
+            gap: 12px;
         }
 
-        .prompt-evo__output-area--empty svg {
-            opacity: 0.25;
+        .preview__empty-icon {
+            font-size: 36px;
+            opacity: 0.3;
         }
 
-        .cursor-blink {
-            display: inline-block;
-            width: 2px;
-            height: 14px;
-            background: var(--accent-warm);
-            margin-left: 2px;
-            vertical-align: middle;
-            animation: cursorBlink 0.8s step-end infinite;
+        .preview__empty-text {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 0.1em;
         }
 
-        @keyframes cursorBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+        .preview__content {
+            padding: 24px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all 0.6s var(--ease-out-expo);
         }
 
-        /* ─── Quality Badge ─── */
-        .prompt-evo__quality {
+        .preview__content--visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── Loading Shimmer ── */
+        .preview__loading {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .preview__loading--active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .shimmer-bar {
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--border-subtle) 25%, var(--bg-secondary) 50%, var(--border-subtle) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+
+        .shimmer-bar--wide { width: 80%; }
+        .shimmer-bar--medium { width: 60%; }
+        .shimmer-bar--narrow { width: 40%; }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .preview__loading-text {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-top: 8px;
+        }
+
+        /* ── Quality Badge ── */
+        .quality-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -208,40 +243,18 @@
             font-weight: 500;
         }
 
-        .prompt-evo__quality--poor { background: rgba(176, 86, 86, 0.1); color: var(--accent-rose); }
-        .prompt-evo__quality--basic { background: rgba(154, 138, 47, 0.1); color: var(--accent-gold); }
-        .prompt-evo__quality--good { background: rgba(58, 143, 126, 0.1); color: var(--accent-teal); }
-        .prompt-evo__quality--expert { background: rgba(123, 107, 168, 0.1); color: var(--accent-lavender); }
+        .quality-badge--poor { background: rgba(176, 86, 86, 0.1); color: var(--accent-rose); }
+        .quality-badge--basic { background: rgba(154, 138, 47, 0.1); color: var(--accent-gold); }
+        .quality-badge--good { background: rgba(58, 143, 126, 0.1); color: var(--accent-teal); }
+        .quality-badge--expert { background: rgba(123, 107, 168, 0.1); color: var(--accent-lavender); }
 
-        /* ─── Send Button ─── */
-        .btn--send-ai {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 12px 20px;
-            margin-top: 16px;
-            background: var(--accent-warm);
-            color: #FFFFFF;
-            border: none;
-            border-radius: 8px;
+        /* ── Preview Output Text ── */
+        .preview__output-text {
             font-family: var(--font-body);
             font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s var(--ease-out-expo);
-        }
-
-        .btn--send-ai:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-            filter: brightness(1.05);
-        }
-
-        .btn--send-ai:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            font-weight: 300;
         }
 
         /* ─── Autofill Hint ─── */
@@ -263,26 +276,23 @@
         .prompt-evo__autofill-hint--visible { display: flex; }
 
         /* ─── Prompt Evo Responsive ─── */
-        @media (max-width: 768px) {
-            .prompt-scenarios {
-                gap: 8px;
-                padding: 20px 20px 0;
-            }
-
-            .prompt-scenario { padding: 16px 10px; }
-            .prompt-scenario__name { font-size: 12px; }
-            .prompt-scenario__sub { font-size: 10px; }
-
-            .prompt-evo__header,
-            .prompt-evo__bar,
-            .prompt-evo__hint {
-                padding-left: 20px;
-                padding-right: 20px;
+        @media (max-width: 900px) {
+            .sandbox__header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
             }
         }
 
-        @media (max-width: 480px) {
-            .prompt-scenarios { grid-template-columns: 1fr; }
+        @media (max-width: 600px) {
+            .sandbox__scenarios {
+                gap: 6px;
+            }
+
+            .scenario-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
         }
 
         /* ═══════════════════════════════════════════
@@ -768,68 +778,64 @@
             <!-- ═══════════════════════════════════════════
                  HANDS-ON: PROMPT EVOLUTION
             ═══════════════════════════════════════════ -->
-            <div class="sandbox reveal">
+            <div class="sandbox reveal" id="sandbox-evo">
                 <div class="sandbox__header">
-                    <span class="sandbox__title">Step 1 &mdash; Prompt Evolution</span>
+                    <div class="sandbox__title">Step 1 &mdash; Prompt Evolution</div>
+                    <div class="sandbox__scenarios">
+                        <button class="scenario-btn scenario-btn--active" data-scenario="linkedin">LinkedIn Headshot</button>
+                        <button class="scenario-btn" data-scenario="team-page">Team Page Photo</button>
+                        <button class="scenario-btn" data-scenario="conference">Speaker Photo</button>
+                    </div>
                 </div>
-
-                <!-- Scenario Cards -->
-                <div class="prompt-scenarios" id="prompt-scenarios">
-                    <button class="prompt-scenario" data-scenario="linkedin" type="button">
-                        <span class="prompt-scenario__name">LinkedIn Headshot</span>
-                        <span class="prompt-scenario__sub">Professional photo for your LinkedIn profile</span>
-                    </button>
-                    <button class="prompt-scenario" data-scenario="team-page" type="button">
-                        <span class="prompt-scenario__name">Team Page Photo</span>
-                        <span class="prompt-scenario__sub">Company website team page photo</span>
-                    </button>
-                    <button class="prompt-scenario" data-scenario="conference" type="button">
-                        <span class="prompt-scenario__name">Speaker Photo</span>
-                        <span class="prompt-scenario__sub">Conference speaker bio photo</span>
-                    </button>
-                </div>
-
-                <!-- Prompt Evolution Header + Progress Bar -->
-                <div class="prompt-evo__header">
-                    <span class="prompt-evo__label">Prompt Evolution</span>
-                    <span class="prompt-evo__counter" id="prompt-evo-counter">Prompt 1 of 4</span>
-                </div>
-                <div class="prompt-evo__hint">Click progress bars to view pre-written prompts showing evolution from basic to expert</div>
-
-                <div class="prompt-evo__bar" id="prompt-evo-bar">
-                    <div class="prompt-evo__segment prompt-evo__segment--active" data-level="1"></div>
-                    <div class="prompt-evo__segment" data-level="2"></div>
-                    <div class="prompt-evo__segment" data-level="3"></div>
-                    <div class="prompt-evo__segment" data-level="4"></div>
-                </div>
-
-                <!-- Two-Pane Layout -->
                 <div class="sandbox__split">
-                    <!-- Left Pane: Your Prompt -->
+
+                    <!-- Left Pane: Prompt -->
                     <div class="sandbox__pane sandbox__pane--left">
                         <span class="sandbox__pane-label">Your Prompt</span>
-                        <div class="prompt-evo__quality" id="prompt-quality" style="display:none;"></div>
-                        <div class="prompt-evo__prompt-area prompt-evo__prompt-area--empty" id="prompt-evo-prompt">
-                            Select a scenario above to begin...
+                        <div class="step-indicator">
+                            <div class="step-indicator__dots">
+                                <div class="step-indicator__dot step-indicator__dot--active" data-step-dot="1"></div>
+                                <div class="step-indicator__dot" data-step-dot="2"></div>
+                                <div class="step-indicator__dot" data-step-dot="3"></div>
+                                <div class="step-indicator__dot" data-step-dot="4"></div>
+                            </div>
+                            <span class="step-indicator__label" id="stepLabel">Prompt 1 of 4</span>
                         </div>
-                        <button class="btn--send-ai" id="prompt-evo-send" disabled type="button">
-                            &#10022; Send to AI
-                        </button>
+                        <div class="field">
+                            <textarea class="field__textarea" id="promptArea" placeholder="Select a scenario to see prompt evolution..." readonly></textarea>
+                        </div>
+                        <div class="sandbox__actions">
+                            <button class="btn btn--build" id="buildBtn">Send to AI &rarr;</button>
+                            <button class="btn btn--iterate" id="iterateBtn" disabled>Next Level &rarr;</button>
+                        </div>
                         <div class="prompt-evo__autofill-hint" id="prompt-evo-autofill">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
                             <span>This expert prompt has been loaded into Step 2 below</span>
                         </div>
                     </div>
 
-                    <!-- Right Pane: AI Output -->
+                    <!-- Right Pane: Preview -->
                     <div class="sandbox__pane">
                         <span class="sandbox__pane-label">AI Output</span>
-                        <div class="prompt-evo__output-area prompt-evo__output-area--empty" id="prompt-evo-output">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                            <span>Output will appear here</span>
-                            <span style="font-size:11px;">Click &ldquo;Send to AI&rdquo; to generate output for this prompt</span>
+                        <div class="preview" id="previewArea">
+                            <!-- Loading overlay -->
+                            <div class="preview__loading" id="previewLoading">
+                                <div class="shimmer-bar shimmer-bar--wide"></div>
+                                <div class="shimmer-bar shimmer-bar--medium"></div>
+                                <div class="shimmer-bar shimmer-bar--narrow"></div>
+                                <div class="shimmer-bar shimmer-bar--medium"></div>
+                                <div class="preview__loading-text">Generating output...</div>
+                            </div>
+                            <!-- Empty state -->
+                            <div class="preview__empty" id="previewEmpty">
+                                <div class="preview__empty-icon">&#9671;</div>
+                                <div class="preview__empty-text">Click "Send to AI" to generate</div>
+                            </div>
+                            <!-- Preview content -->
+                            <div class="preview__content" id="previewContent"></div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -1062,145 +1068,126 @@
         // ─── Prompt Evolution ───
         var promptEvolutionData = {
             linkedin: {
-                levels: [
-                    {
-                        quality: 'poor', qualityLabel: 'Vague',
-                        prompt: 'Make me a headshot for LinkedIn.',
-                        output: 'Here is a generic headshot. The lighting is flat, the background is plain white, the framing is slightly off-center. The expression looks stiff because the AI had no direction on mood, style, or context. This could be anyone \u2014 it doesn\u2019t convey leadership or professionalism.'
-                    },
-                    {
-                        quality: 'basic', qualityLabel: 'Better',
-                        prompt: 'Create a professional headshot for LinkedIn with a clean background and good lighting.',
-                        output: 'A more polished headshot. The background is a clean neutral gray, and the lighting is even. However, the composition is a standard center crop with no particular mood or style. The attire is generic business casual. It looks professional but unremarkable \u2014 it will blend in with thousands of similar photos on LinkedIn.'
-                    },
-                    {
-                        quality: 'good', qualityLabel: 'Strong',
-                        prompt: 'Create a professional LinkedIn headshot. Subject: confident executive in a tailored navy blazer, warm approachable smile. Lighting: soft natural window light from the left. Composition: close-up portrait, shoulders up, slight angle.',
-                        output: 'This headshot is noticeably stronger. The navy blazer reads as polished and intentional. The window light from the left creates gentle shadows that add dimension to the face. The close-up framing feels personal and engaging. The warm smile conveys approachability. This photo would stand out in a LinkedIn feed and signal competence and warmth.'
-                    },
-                    {
-                        quality: 'expert', qualityLabel: 'Expert',
-                        prompt: 'Create a professional LinkedIn headshot. Subject: a confident executive in a tailored navy blazer, relaxed posture, warm approachable smile, looking directly at camera. Environment: clean studio backdrop with soft neutral gray, no distractions. Lighting: natural window light, soft and diffused, illuminating from the left with gentle fill from the right. Composition: close-up portrait, shoulders up, slight three-quarter angle, eyes at upper third gridline. Style: editorial photography, shallow depth of field, warm color grading, high resolution.',
-                        output: 'Exceptional result. Every element works together: the tailored navy blazer against the neutral backdrop creates a clean figure-ground relationship. The directional window light sculpts the face beautifully \u2014 soft enough to be flattering, directional enough to add depth. The three-quarter angle and direct eye contact create immediate connection. The shallow depth of field isolates the subject with a cinematic quality. The warm color grading feels premium and approachable. This is a headshot that commands attention and communicates executive presence.'
-                    }
+                prompts: [
+                    'Make me a professional headshot.',
+                    'Create a professional LinkedIn headshot with a clean background and good lighting.',
+                    'Create a professional LinkedIn headshot. Subject: confident executive in a navy blazer. Environment: clean studio backdrop, neutral gray. Lighting: soft window light from the left. Composition: close-up, shoulders up, slight three-quarter angle.',
+                    'Create a professional LinkedIn headshot. Subject: a confident executive in a tailored navy blazer, relaxed posture, warm approachable smile, looking directly at camera. Environment: clean studio backdrop with soft neutral gray, no distractions. Lighting: natural window light, soft and diffused, illuminating from the left with gentle fill from the right. Composition: close-up portrait, shoulders up, slight three-quarter angle, eyes at upper third gridline. Style: editorial photography, shallow depth of field, warm color grading, high resolution.'
+                ],
+                qualities: ['poor', 'basic', 'good', 'expert'],
+                qualityLabels: ['Vague', 'Better', 'Strong', 'Expert'],
+                outputs: [
+                    'The AI generated a generic, stiff-looking portrait. The lighting is flat, the background is a blurred mess of colors, and the subject looks uncomfortable. This could be anyone, anywhere. It communicates nothing about professionalism, warmth, or competence. A recruiter scrolling LinkedIn would not stop for this photo.',
+                    'Better \u2014 the background is cleaner and the lighting is more even. The subject looks more polished. However, the photo is still generic. There is no sense of personality, no intentional composition, and the lighting, while adequate, lacks the directional quality that makes faces look three-dimensional and compelling.',
+                    'Now we\u2019re getting somewhere. The navy blazer against neutral gray creates a clean, authoritative look. The directional window light adds depth and dimension to the face. The three-quarter angle is more dynamic than a straight-on shot. The close-up framing keeps the focus on the subject. This is a headshot that would stand out on LinkedIn \u2014 professional, intentional, and polished.',
+                    'Exceptional result. Every element works together: the tailored navy blazer against the neutral backdrop creates a clean figure-ground relationship. The directional window light sculpts the face beautifully \u2014 soft enough to be flattering, directional enough to add depth. The three-quarter angle and direct eye contact create immediate connection. The shallow depth of field isolates the subject with a cinematic quality. The warm color grading feels premium and approachable. This is a headshot that commands attention and communicates executive presence.'
                 ]
             },
             'team-page': {
-                levels: [
-                    {
-                        quality: 'poor', qualityLabel: 'Vague',
-                        prompt: 'Make a photo for our company website.',
-                        output: 'The AI generated a generic stock-photo-style image. The person looks posed and artificial. The background is an obvious office stock backdrop. There is no brand consistency, no personality, and no sense of the company culture. This photo would actively harm the team page by looking inauthentic.'
-                    },
-                    {
-                        quality: 'basic', qualityLabel: 'Better',
-                        prompt: 'Create a team page photo with a modern office background and professional look.',
-                        output: 'Better than before \u2014 the office background looks more realistic and the subject appears more natural. However, the styling is still generic. There is no cohesion with other potential team photos (no consistent background, lighting, or framing). The mood is neutral rather than reflecting any particular company culture.'
-                    },
-                    {
-                        quality: 'good', qualityLabel: 'Strong',
-                        prompt: 'Create a team page photo for a tech company website. Subject: relaxed, friendly professional in smart casual attire. Environment: bright open office with blurred greenery in background. Lighting: soft overhead ambient light. Composition: head and shoulders, centered.',
-                        output: 'This feels authentic and intentional. The smart casual attire matches the tech company context. The blurred greenery adds life and warmth to the background without distraction. The soft ambient lighting keeps the mood bright and optimistic. The centered head-and-shoulders crop is consistent enough to work alongside other team photos. This person looks like someone you\u2019d want to work with.'
-                    },
-                    {
-                        quality: 'expert', qualityLabel: 'Expert',
-                        prompt: 'Create a team page photo for a healthcare technology company website. Subject: approachable professional in a fitted charcoal cardigan over a light blue collared shirt, genuine relaxed smile, slight head tilt conveying openness. Environment: modern open-plan office with floor-to-ceiling windows, soft-blurred greenery and natural wood textures in background. Lighting: soft diffused daylight from large windows, no harsh shadows, subtle warm fill light. Composition: head and shoulders, centered, shot at eye level, consistent with a series of team photos. Style: warm and inviting, natural color palette, minimal post-processing, sharp focus on eyes with gentle background blur.',
-                        output: 'This is exactly what a premium team page demands. The healthcare context is subtly conveyed through the approachable, trust-building expression and clean styling. The charcoal-over-blue palette is warm yet professional. The natural daylight creates an honest, un-retouched feel that builds trust. The composition is designed to work as a series \u2014 consistent enough to sit next to other team photos without looking mismatched. The background communicates a modern, design-forward culture. This photo says: \u201CWe are real people, and we care about quality.\u201D'
-                    }
+                prompts: [
+                    'Make a photo for our company website.',
+                    'Create a team page photo with a modern office background and professional look.',
+                    'Create a team page photo for a tech company website. Subject: relaxed, friendly professional in smart casual attire. Environment: bright open office with blurred greenery in background. Lighting: soft overhead ambient light. Composition: head and shoulders, centered.',
+                    'Create a team page photo for a healthcare technology company website. Subject: approachable professional in a fitted charcoal cardigan over a light blue collared shirt, genuine relaxed smile, slight head tilt conveying openness. Environment: modern open-plan office with floor-to-ceiling windows, soft-blurred greenery and natural wood textures in background. Lighting: soft diffused daylight from large windows, no harsh shadows, subtle warm fill light. Composition: head and shoulders, centered, shot at eye level, consistent with a series of team photos. Style: warm and inviting, natural color palette, minimal post-processing, sharp focus on eyes with gentle background blur.'
+                ],
+                qualities: ['poor', 'basic', 'good', 'expert'],
+                qualityLabels: ['Vague', 'Better', 'Strong', 'Expert'],
+                outputs: [
+                    'The AI generated a generic stock-photo-style image. The person looks posed and artificial. The background is an obvious office stock backdrop. There is no brand consistency, no personality, and no sense of the company culture. This photo would actively harm the team page by looking inauthentic.',
+                    'Better than before \u2014 the office background looks more realistic and the subject appears more natural. However, the styling is still generic. There is no cohesion with other potential team photos (no consistent background, lighting, or framing). The mood is neutral rather than reflecting any particular company culture.',
+                    'This feels authentic and intentional. The smart casual attire matches the tech company context. The blurred greenery adds life and warmth to the background without distraction. The soft ambient lighting keeps the mood bright and optimistic. The centered head-and-shoulders crop is consistent enough to work alongside other team photos. This person looks like someone you\u2019d want to work with.',
+                    'This is exactly what a premium team page demands. The healthcare context is subtly conveyed through the approachable, trust-building expression and clean styling. The charcoal-over-blue palette is warm yet professional. The natural daylight creates an honest, un-retouched feel that builds trust. The composition is designed to work as a series \u2014 consistent enough to sit next to other team photos without looking mismatched. The background communicates a modern, design-forward culture. This photo says: \u201CWe are real people, and we care about quality.\u201D'
                 ]
             },
             conference: {
-                levels: [
-                    {
-                        quality: 'poor', qualityLabel: 'Vague',
-                        prompt: 'Make a speaker photo for a conference.',
-                        output: 'The AI produced a basic headshot that could be for anything \u2014 a yearbook, a passport, a dating profile. There is no sense of authority, stage presence, or gravitas. The flat lighting and dead-center framing make the subject look static rather than dynamic. Conference organizers would likely pass over this photo for promotional materials.'
-                    },
-                    {
-                        quality: 'basic', qualityLabel: 'Better',
-                        prompt: 'Create a speaker bio photo for a conference with dramatic lighting and a dark background.',
-                        output: 'The dark background and dramatic lighting create more visual impact than a plain headshot. The subject looks more serious and authoritative. However, the lighting is too harsh \u2014 it creates unflattering shadows under the nose and chin. The framing is still a standard center crop. It\u2019s trying too hard without the nuance to pull it off.'
-                    },
-                    {
-                        quality: 'good', qualityLabel: 'Strong',
-                        prompt: 'Create a conference speaker bio photo. Subject: confident thought leader in a dark tailored jacket, composed expression with a slight knowing smile. Lighting: dramatic side-light from the right, warm tone. Composition: close-up, slight low angle to convey authority. Background: dark, minimal.',
-                        output: 'Now we\u2019re getting somewhere. The slight low angle is a classic authority technique \u2014 it makes the subject look commanding without being intimidating. The side-light adds drama and dimension. The knowing smile suggests expertise and confidence. The dark background creates a stage-like feel. This photo communicates: \u201CThis person has something important to say.\u201D'
-                    },
-                    {
-                        quality: 'expert', qualityLabel: 'Expert',
-                        prompt: 'Create a conference speaker bio photo for a keynote speaker at a healthcare innovation summit. Subject: a distinguished executive in a charcoal suit and crisp white shirt, composed and confident expression, direct eye contact conveying authority and vision. Environment: minimalist dark backdrop with a subtle gradient from deep charcoal to black, hinting at a stage setting. Lighting: cinematic key light from the right at 45 degrees, soft fill from the left to prevent harsh shadows, subtle rim light on the shoulder creating separation from background. Composition: close-up portrait, slight low angle, subject positioned slightly off-center using rule of thirds, negative space on the left suggesting forward momentum. Style: cinematic, high contrast, desaturated warm tones, sharp focus on the eyes, editorial quality suitable for conference banners and promotional materials.',
-                        output: 'This is keynote-ready. Every technical decision serves the narrative: the low angle and direct eye contact establish authority, while the subtle off-center positioning with negative space creates visual momentum \u2014 this person is going somewhere. The three-point lighting setup is textbook cinema: the key light sculpts the face, the fill softens it, and the rim light lifts the subject from the background. The charcoal suit against the dark gradient creates sophistication without disappearing into the backdrop. The desaturated warm tones feel serious yet approachable. This photo could be printed six feet tall on a conference banner and still command the room.'
-                    }
+                prompts: [
+                    'Make a speaker photo for a conference.',
+                    'Create a speaker bio photo for a conference with dramatic lighting and a dark background.',
+                    'Create a conference speaker bio photo. Subject: confident thought leader in a dark tailored jacket, composed expression with a slight knowing smile. Lighting: dramatic side-light from the right, warm tone. Composition: close-up, slight low angle to convey authority. Background: dark, minimal.',
+                    'Create a conference speaker bio photo for a keynote speaker at a healthcare innovation summit. Subject: a distinguished executive in a charcoal suit and crisp white shirt, composed and confident expression, direct eye contact conveying authority and vision. Environment: minimalist dark backdrop with a subtle gradient from deep charcoal to black, hinting at a stage setting. Lighting: cinematic key light from the right at 45 degrees, soft fill from the left to prevent harsh shadows, subtle rim light on the shoulder creating separation from background. Composition: close-up portrait, slight low angle, subject positioned slightly off-center using rule of thirds, negative space on the left suggesting forward momentum. Style: cinematic, high contrast, desaturated warm tones, sharp focus on the eyes, editorial quality suitable for conference banners and promotional materials.'
+                ],
+                qualities: ['poor', 'basic', 'good', 'expert'],
+                qualityLabels: ['Vague', 'Better', 'Strong', 'Expert'],
+                outputs: [
+                    'The AI produced a basic headshot that could be for anything \u2014 a yearbook, a passport, a dating profile. There is no sense of authority, stage presence, or gravitas. The flat lighting and dead-center framing make the subject look static rather than dynamic. Conference organizers would likely pass over this photo for promotional materials.',
+                    'The dark background and dramatic lighting create more visual impact than a plain headshot. The subject looks more serious and authoritative. However, the lighting is too harsh \u2014 it creates unflattering shadows under the nose and chin. The framing is still a standard center crop. It\u2019s trying too hard without the nuance to pull it off.',
+                    'Now we\u2019re getting somewhere. The slight low angle is a classic authority technique \u2014 it makes the subject look commanding without being intimidating. The side-light adds drama and dimension. The knowing smile suggests expertise and confidence. The dark background creates a stage-like feel. This photo communicates: \u201CThis person has something important to say.\u201D',
+                    'This is keynote-ready. Every technical decision serves the narrative: the low angle and direct eye contact establish authority, while the subtle off-center positioning with negative space creates visual momentum \u2014 this person is going somewhere. The three-point lighting setup is textbook cinema: the key light sculpts the face, the fill softens it, and the rim light lifts the subject from the background. The charcoal suit against the dark gradient creates sophistication without disappearing into the backdrop. The desaturated warm tones feel serious yet approachable. This photo could be printed six feet tall on a conference banner and still command the room.'
                 ]
             }
         };
 
-        var evoCurrentScenario = null;
-        var evoCurrentLevel = 1;
-        var evoOutputCache = {};
-        var evoIsTyping = false;
-        var evoTypingTimeout = null;
-
-        var evoScenarioCards = document.querySelectorAll('.prompt-scenario');
-        var evoSegments = document.querySelectorAll('.prompt-evo__segment');
-        var evoCounter = document.getElementById('prompt-evo-counter');
-        var evoPromptArea = document.getElementById('prompt-evo-prompt');
-        var evoOutputArea = document.getElementById('prompt-evo-output');
-        var evoSendBtn = document.getElementById('prompt-evo-send');
-        var evoQuality = document.getElementById('prompt-quality');
+        /* ─── DOM References ─── */
+        var promptArea = document.getElementById('promptArea');
+        var buildBtn = document.getElementById('buildBtn');
+        var iterateBtn = document.getElementById('iterateBtn');
+        var previewContent = document.getElementById('previewContent');
+        var previewEmpty = document.getElementById('previewEmpty');
+        var previewLoading = document.getElementById('previewLoading');
+        var stepLabel = document.getElementById('stepLabel');
+        var stepDots = document.querySelectorAll('[data-step-dot]');
+        var scenarioBtns = document.querySelectorAll('.scenario-btn');
         var evoAutofill = document.getElementById('prompt-evo-autofill');
 
-        function evoCacheKey(scenario, level) {
-            return scenario + '-' + level;
-        }
+        var currentScenario = 'linkedin';
+        var currentStep = 0;
+        var built = false;
 
-        function evoUpdateBar(level) {
-            evoSegments.forEach(function(seg) {
-                var l = parseInt(seg.getAttribute('data-level'));
-                seg.classList.remove('prompt-evo__segment--active', 'prompt-evo__segment--completed');
-                if (l === level) seg.classList.add('prompt-evo__segment--active');
-                else if (l < level) seg.classList.add('prompt-evo__segment--completed');
+        /* ─── Scenario Selection ─── */
+        function selectScenario(key) {
+            currentScenario = key;
+            currentStep = 0;
+            built = false;
+
+            scenarioBtns.forEach(function(btn) {
+                btn.classList.toggle('scenario-btn--active', btn.dataset.scenario === key);
             });
-            evoCounter.textContent = 'Prompt ' + level + ' of 4';
+
+            loadStep(1);
         }
 
-        function evoShowPrompt(scenario, level) {
-            if (!scenario) return;
-            var data = promptEvolutionData[scenario];
-            if (!data) return;
-            var ld = data.levels[level - 1];
-            evoCurrentLevel = level;
+        scenarioBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() { selectScenario(btn.dataset.scenario); });
+        });
 
-            evoUpdateBar(level);
+        /* ─── Step Loading ─── */
+        function loadStep(step) {
+            currentStep = step;
+            built = false;
 
-            // Quality badge
-            evoQuality.style.display = '';
-            evoQuality.className = 'prompt-evo__quality prompt-evo__quality--' + ld.quality;
-            evoQuality.textContent = ld.qualityLabel + ' Prompt';
+            var data = promptEvolutionData[currentScenario];
+            promptArea.value = data.prompts[step - 1];
 
-            // Prompt text
-            evoPromptArea.textContent = ld.prompt;
-            evoPromptArea.classList.remove('prompt-evo__prompt-area--empty');
+            // Update step indicator
+            stepLabel.textContent = 'Prompt ' + step + ' of 4';
+            stepDots.forEach(function(dot) {
+                var dotStep = parseInt(dot.dataset.stepDot);
+                dot.classList.remove('step-indicator__dot--active', 'step-indicator__dot--done');
+                if (dotStep === step) {
+                    dot.classList.add('step-indicator__dot--active');
+                } else if (dotStep < step) {
+                    dot.classList.add('step-indicator__dot--done');
+                }
+            });
 
-            // Check output cache
-            var key = evoCacheKey(scenario, level);
-            if (evoOutputCache[key]) {
-                evoOutputArea.textContent = evoOutputCache[key];
-                evoOutputArea.classList.remove('prompt-evo__output-area--empty');
-                evoSendBtn.disabled = true;
-                evoSendBtn.innerHTML = '&#10003; Output Generated';
-            } else {
-                evoOutputArea.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg><span>Output will appear here</span><span style="font-size:11px;">Click \u201CSend to AI\u201D to generate output for this prompt</span>';
-                evoOutputArea.classList.add('prompt-evo__output-area--empty');
-                evoSendBtn.disabled = false;
-                evoSendBtn.innerHTML = '&#10022; Send to AI';
+            // Reset preview for step 1
+            if (step === 1) {
+                previewContent.classList.remove('preview__content--visible');
+                previewContent.innerHTML = '';
+                previewEmpty.style.display = 'flex';
             }
 
-            // Auto-fill Step 2 on Level 4
-            if (level === 4) {
+            // Button states
+            buildBtn.disabled = false;
+            buildBtn.textContent = 'Send to AI \u2192';
+            iterateBtn.disabled = true;
+            iterateBtn.style.opacity = '0';
+
+            // Autofill hint for step 4
+            if (step === 4) {
                 var ta = document.getElementById('headshot-prompt');
                 if (ta) {
-                    ta.value = ld.prompt;
+                    ta.value = data.prompts[step - 1];
                     ta.dispatchEvent(new Event('input'));
                 }
                 evoAutofill.classList.add('prompt-evo__autofill-hint--visible');
@@ -1209,62 +1196,63 @@
             }
         }
 
-        function evoTypeOutput(text, callback) {
-            evoIsTyping = true;
-            evoSendBtn.disabled = true;
-            evoSendBtn.textContent = 'Generating\u2026';
-            evoOutputArea.classList.remove('prompt-evo__output-area--empty');
-            evoOutputArea.innerHTML = '<span class="cursor-blink"></span>';
+        /* ─── Step dot click ─── */
+        stepDots.forEach(function(dot) {
+            dot.addEventListener('click', function() {
+                var step = parseInt(dot.dataset.stepDot);
+                loadStep(step);
+            });
+        });
 
-            var idx = 0;
-            var chunk = 3;
-            function tick() {
-                if (idx < text.length) {
-                    var end = Math.min(idx + chunk, text.length);
-                    evoOutputArea.innerHTML = text.substring(0, end) + '<span class="cursor-blink"></span>';
-                    idx = end;
-                    evoTypingTimeout = setTimeout(tick, 16);
-                } else {
-                    evoOutputArea.textContent = text;
-                    evoIsTyping = false;
-                    evoSendBtn.innerHTML = '&#10003; Output Generated';
-                    if (callback) callback();
+        /* ─── Build Action ─── */
+        function triggerBuild() {
+            if (built) return;
+            built = true;
+            buildBtn.disabled = true;
+
+            // Show loading
+            previewEmpty.style.display = 'none';
+            previewLoading.classList.add('preview__loading--active');
+            previewContent.classList.remove('preview__content--visible');
+
+            // Simulate build time
+            setTimeout(function() {
+                var data = promptEvolutionData[currentScenario];
+                var quality = data.qualities[currentStep - 1];
+                var qualityLabel = data.qualityLabels[currentStep - 1];
+                var output = data.outputs[currentStep - 1];
+
+                var html = '<div class="quality-badge quality-badge--' + quality + '">' + qualityLabel + ' Prompt</div>';
+                html += '<div class="preview__output-text">' + output + '</div>';
+                previewContent.innerHTML = html;
+
+                previewLoading.classList.remove('preview__loading--active');
+
+                // Animate in
+                requestAnimationFrame(function() {
+                    previewContent.classList.add('preview__content--visible');
+                });
+
+                // Show iterate button if not on last step
+                if (currentStep < 4) {
+                    iterateBtn.disabled = false;
+                    iterateBtn.style.opacity = '1';
                 }
-            }
-            tick();
+            }, 1200);
         }
 
-        // Scenario card click
-        evoScenarioCards.forEach(function(card) {
-            card.addEventListener('click', function() {
-                if (evoIsTyping) return;
-                var key = card.getAttribute('data-scenario');
-                evoCurrentScenario = key;
-                evoScenarioCards.forEach(function(c) { c.classList.remove('prompt-scenario--active'); });
-                card.classList.add('prompt-scenario--active');
-                evoShowPrompt(key, 1);
-            });
+        buildBtn.addEventListener('click', triggerBuild);
+
+        iterateBtn.addEventListener('click', function() {
+            if (currentStep < 4) {
+                loadStep(currentStep + 1);
+                setTimeout(triggerBuild, 200);
+            }
         });
 
-        // Progress bar click
-        evoSegments.forEach(function(seg) {
-            seg.addEventListener('click', function() {
-                if (evoIsTyping || !evoCurrentScenario) return;
-                var level = parseInt(seg.getAttribute('data-level'));
-                evoShowPrompt(evoCurrentScenario, level);
-            });
-        });
+        // Initialize with linkedin scenario, step 1
+        loadStep(1);
 
-        // Send to AI button
-        evoSendBtn.addEventListener('click', function() {
-            if (!evoCurrentScenario || evoIsTyping) return;
-            var data = promptEvolutionData[evoCurrentScenario];
-            var ld = data.levels[evoCurrentLevel - 1];
-            var key = evoCacheKey(evoCurrentScenario, evoCurrentLevel);
-            evoTypeOutput(ld.output, function() {
-                evoOutputCache[key] = ld.output;
-            });
-        });
 
         // ═══════════════════════════════════════════
         // LINKEDIN HEADSHOT STUDIO
