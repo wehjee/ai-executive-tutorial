@@ -257,23 +257,6 @@
             font-weight: 300;
         }
 
-        /* ─── Autofill Hint ─── */
-        .prompt-evo__autofill-hint {
-            display: none;
-            align-items: center;
-            gap: 8px;
-            margin-top: 12px;
-            padding: 10px 14px;
-            background: var(--accent-teal-dim);
-            border: 1px solid var(--accent-teal);
-            border-radius: 8px;
-            font-family: var(--font-body);
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--accent-teal);
-        }
-
-        .prompt-evo__autofill-hint--visible { display: flex; }
 
         /* ─── Prompt Evo Responsive ─── */
         @media (max-width: 900px) {
@@ -808,10 +791,6 @@
                             <button class="btn btn--build" id="buildBtn">Send to AI &rarr;</button>
                             <button class="btn btn--iterate" id="iterateBtn" disabled>Next Level &rarr;</button>
                         </div>
-                        <div class="prompt-evo__autofill-hint" id="prompt-evo-autofill">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-                            <span>This expert prompt has been loaded into Step 2 below</span>
-                        </div>
                     </div>
 
                     <!-- Right Pane: Preview -->
@@ -1077,10 +1056,10 @@
                 qualities: ['poor', 'basic', 'good', 'expert'],
                 qualityLabels: ['Vague', 'Better', 'Strong', 'Expert'],
                 outputs: [
-                    'The AI returned a generic list of goals like "be a better leader" and "improve communication." These are vague aspirations, not actionable goals. There are no metrics, no timelines, and no connection to any specific role or industry. A manager could not present these in a performance review without embarrassment.',
-                    'Improved \u2014 the goals are now tied to a healthcare context and sound more professional. However, they still lack specificity. "Improve team performance" is a direction, not a destination. Without measurable targets or deadlines, these goals give the AI too much room to guess, and the output reflects that ambiguity.',
-                    'Now we\u2019re getting results. Each goal has a clear metric (reduce wait times by X%, increase engagement score to Y) and a defined timeline. The SMART framework forces precision. A manager could take these directly into a quarterly review. The AI had enough constraints to produce something genuinely useful.',
-                    'This is executive-ready output. Each goal is structured with Objective, Key Results, Timeline, Success Metrics, and Dependencies \u2014 a format that maps directly to how leadership teams actually track progress. The context about team growth, satisfaction drops, and turnover gave the AI the specificity it needed to produce goals that feel tailored rather than templated. The strategic tone makes these ready for board-level review without editing.'
+                    '<strong>AI Output:</strong><br><em>\u201c1. Be a better leader. 2. Improve communication skills. 3. Work on time management. 4. Be more organized. 5. Learn new things.\u201d</em><br><br><strong>Why this is a <span class=\'quality-badge quality-badge--poor\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Vague</span> result:</strong> The AI returned a generic list that could apply to anyone in any role. No metrics, no timelines, no connection to healthcare. A manager could not present these in a performance review.',
+                    '<strong>AI Output:</strong><br><em>\u201c1. Improve team performance by implementing regular check-ins and performance reviews. 2. Enhance patient care coordination by developing better communication protocols. 3. Increase department efficiency through process improvement initiatives.\u201d</em><br><br><strong>Why this is a <span class=\'quality-badge quality-badge--basic\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Better</span> result:</strong> The goals are now tied to healthcare, but still lack specificity. \u201cImprove team performance\u201d is a direction, not a destination. Without measurable targets or deadlines, these remain vague aspirations.',
+                    '<strong>AI Output:</strong><br><em>\u201c1. Reduce average patient wait times from 34 minutes to 22 minutes within 6 months by redesigning the intake workflow. Success Metric: Weekly wait-time tracking dashboard. 2. Increase employee engagement survey scores from 67% to 80% by Q3 through monthly skip-level meetings and a peer recognition program. 3. Reduce team turnover from 18% to under 12% within 6 months by launching a mentorship program and quarterly career development plans.\u201d</em><br><br><strong>Why this is a <span class=\'quality-badge quality-badge--good\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Strong</span> result:</strong> Each goal has a clear metric and defined timeline. The SMART framework forces precision. A manager could take these directly into a quarterly review.',
+                    '<strong>AI Output:</strong><br><em>\u201cGoal 1: Rebuild Team Cohesion<br>\u2022 Objective: Reduce turnover from 18% to under 12%<br>\u2022 Key Results: Launch mentorship program by Month 2; implement stay interviews for all direct reports by Month 3<br>\u2022 Timeline: 6 months<br>\u2022 Success Metrics: Monthly attrition rate, eNPS score, 90-day retention rate<br>\u2022 Dependencies: HR partnership for exit interview data analysis<br><br>Goal 2: Improve Patient Satisfaction<br>\u2022 Objective: Increase satisfaction scores by 15% through process redesign<br>\u2022 Key Results: Map top 5 friction points by Month 1; pilot redesigned intake flow by Month 3<br>\u2022 Timeline: 6 months<br>\u2022 Success Metrics: NPS, average resolution time, complaint volume<br>\u2022 Dependencies: Clinical ops team capacity for process mapping\u201d</em><br><br><strong>Why this is an <span class=\'quality-badge quality-badge--expert\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Expert</span> result:</strong> Each goal is structured with Objective, Key Results, Timeline, Success Metrics, and Dependencies. The context about team growth and satisfaction drops produced goals that feel tailored, not templated. Ready for board-level review.'
                 ]
             },
             'job-description': {
@@ -1093,10 +1072,10 @@
                 qualities: ['poor', 'basic', 'good', 'expert'],
                 qualityLabels: ['Vague', 'Better', 'Strong', 'Expert'],
                 outputs: [
-                    'The AI produced a generic job description that could apply to any company in any industry. The responsibilities are boilerplate ("analyze data and create reports"), the qualifications are a random wish list, and there is nothing that would make a talented analyst choose this role over a hundred others. This would get lost on any job board.',
-                    'Better \u2014 the healthcare context adds relevance, and the structure is more complete. But it still reads like a template. The responsibilities are functional but uninspiring. There is no sense of mission, no indication of the team or projects, and no reason for a top candidate to feel excited. The qualifications list is reasonable but undifferentiated.',
-                    'This is competitive. The role is clearly defined with specific technical requirements and a reporting structure that signals seniority. The focus on claims data and member insights tells candidates exactly what they\u2019d be working on. The tone strikes a balance between professional and engaging. A strong candidate would understand the role and feel drawn to apply.',
-                    'This would stand out on LinkedIn. The opening hook immediately communicates impact \u2014 a $50M investment in predictive analytics for member health outcomes. That\u2019s a story, not a job listing. The responsibilities are specific enough to attract the right expertise (claims modeling, clinical collaboration) while the mission framing (reducing avoidable hospitalizations) gives purpose-driven candidates a reason to care. The preferred qualifications signal technical sophistication without being exclusionary. The benefits section reinforces culture, not just compensation. This reads like an invitation to do meaningful work.'
+                    '<strong>AI Output:</strong><br><em>\u201cJob Title: Data Analyst. Responsibilities: Analyze data and create reports. Work with stakeholders. Use Excel and SQL. Qualifications: Bachelor\u2019s degree. 2+ years of experience. Strong communication skills.\u201d</em><br><br><strong>Why this is a <span class=\'quality-badge quality-badge--poor\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Vague</span> result:</strong> This could be for any company in any industry. The responsibilities are boilerplate, the qualifications are a random wish list, and nothing would make a talented analyst choose this role over hundreds of others.',
+                    '<strong>AI Output:</strong><br><em>\u201cSenior Data Analyst \u2014 Healthcare. We are looking for a Senior Data Analyst to join our growing team. You will analyze healthcare data to support business decisions. Responsibilities: Analyze claims and member data. Build dashboards and reports. Collaborate with cross-functional teams. Qualifications: 3+ years in analytics. Proficiency in SQL and Tableau. Healthcare experience preferred.\u201d</em><br><br><strong>Why this is a <span class=\'quality-badge quality-badge--basic\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Better</span> result:</strong> The healthcare context adds relevance and the structure is more complete. But it reads like a template \u2014 no sense of mission, no indication of the team, and no reason for a top candidate to feel excited.',
+                    '<strong>AI Output:</strong><br><em>\u201cSenior Data Analyst \u2014 Claims & Member Insights. Reports to: VP of Analytics. Join our analytics team to transform claims data into strategic insights that drive better health outcomes. Responsibilities: \u2022 Build predictive models on claims adjudication data \u2022 Design executive dashboards tracking member engagement KPIs \u2022 Partner with clinical teams to identify cost-saving opportunities. Requirements: 5+ years in healthcare analytics, advanced SQL, Python, Tableau. Experience with Medicare/Medicaid datasets.\u201d</em><br><br><strong>Why this is a <span class=\'quality-badge quality-badge--good\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Strong</span> result:</strong> The role is clearly defined with specific technical requirements and a reporting structure. The focus on claims data and member insights tells candidates exactly what they\u2019d work on. A strong candidate would understand the role and want to apply.',
+                    '<strong>AI Output:</strong><br><em>\u201cHelp us prevent hospitalizations before they happen.<br><br>Our Population Health Analytics division is investing $50M in predictive models that identify at-risk members and intervene early. We need a Senior Data Analyst who can turn claims data into lifesaving insights.<br><br>What You\u2019ll Do:<br>\u2022 Build ML models on 10M+ claims records to predict hospitalization risk<br>\u2022 Partner with clinical teams to design intervention programs<br>\u2022 Create executive dashboards that drive $200M in care management decisions<br><br>What You Bring: 5+ years healthcare analytics, advanced SQL, Python/R, Medicare/Medicaid data expertise<br>Nice to Have: Machine learning, Databricks, HL7/FHIR<br><br>Why Join Us: Remote flexibility, tuition reimbursement, and the chance to advance health equity for 25M members.\u201d</em><br><br><strong>Why this is an <span class=\'quality-badge quality-badge--expert\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Expert</span> result:</strong> The opening hook communicates impact immediately. The responsibilities attract the right expertise while the mission framing gives purpose-driven candidates a reason to care. This reads like an invitation to do meaningful work.'
                 ]
             },
             'project-update': {
@@ -1109,10 +1088,10 @@
                 qualities: ['poor', 'basic', 'good', 'expert'],
                 qualityLabels: ['Vague', 'Better', 'Strong', 'Expert'],
                 outputs: [
-                    'The AI returned a vague paragraph saying the project is "going well with some challenges." There are no metrics, no timeline references, no risk assessment, and no action items. A leadership team reading this would have more questions than answers. This update communicates nothing and wastes everyone\u2019s time.',
-                    'Improved \u2014 there is now a recognizable structure with sections for progress, risks, and next steps. But the content is generic. "Integration testing delays" without quantifying the impact or explaining the root cause leaves leaders guessing. The risks are listed but without mitigation plans, they\u2019re just a worry list. It\u2019s better than nothing, but it doesn\u2019t build confidence.',
-                    'This is what a competent project update looks like. The executive summary gives leaders the headline in 10 seconds. The milestone tracker provides visual progress. Risks are paired with mitigation plans, which shows the team is managing proactively rather than reactively. The 2-week next steps create clear accountability. A VP could forward this to their leadership chain without editing.',
-                    'This is a masterclass in executive communication. The RAG status immediately signals urgency without panic. The metrics dashboard (budget, automation rate, defect rate) gives leaders the numbers they need to assess health at a glance. The root cause analysis shows transparency \u2014 the team understands why they\u2019re behind, not just that they are. The resource request is specific (2 engineers, 6 weeks) with clear justification. Every section has owners and deadlines, which means this update drives action rather than just reporting status. A CTO reading this would feel informed, confident in the team, and ready to approve the resource ask.'
+                    '<strong>AI Output:</strong><br><em>\u201cProject Update: The project is going well overall. We have made good progress and are working through some challenges. The team is focused on delivering results. There are a few risks we are monitoring. Next steps include continuing the work and addressing issues as they arise.\u201d</em><br><br><strong>Why this is a <span class=\'quality-badge quality-badge--poor\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Vague</span> result:</strong> No metrics, no timeline references, no risk assessment, and no action items. A leadership team reading this would have more questions than answers. This update communicates nothing.',
+                    '<strong>AI Output:</strong><br><em>\u201cProject Status: Claims Automation<br><br>Progress: The project is approximately 60% complete. We are currently in the integration testing phase. There have been some delays due to technical challenges.<br><br>Risks: 1. Integration testing taking longer than expected. 2. Resource constraints. 3. Scope changes.<br><br>Next Steps: Continue testing. Address technical issues. Provide update next month.\u201d</em><br><br><strong>Why this is a <span class=\'quality-badge quality-badge--basic\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Better</span> result:</strong> There is now a recognizable structure with sections. But \u201cintegration testing delays\u201d without quantifying impact or root cause leaves leaders guessing. Risks without mitigation plans are just a worry list.',
+                    '<strong>AI Output:</strong><br><em>\u201cExecutive Summary: Claims Processing Automation is 60% complete, currently 2 weeks behind schedule due to integration testing delays with the legacy system.<br><br>Milestones:<br>\u2705 Requirements & vendor selection (Complete)<br>\u2705 Phase 1: Core rules engine (Complete)<br>\ud83d\udfe1 Phase 2: Integration testing (In Progress \u2014 2 weeks behind)<br>\u26aa Phase 3: Production rollout (Upcoming)<br><br>Top Risks:<br>1. Legacy data mapping issues \u2014 Mitigation: Dedicated sprint for mapping resolution<br>2. Staff training timeline \u2014 Mitigation: Parallel training track starting Month 4<br>3. Vendor API stability \u2014 Mitigation: Fallback manual processing workflow<br><br>Next 2 Weeks: Complete remaining mapping fixes, begin UAT with claims team.\u201d</em><br><br><strong>Why this is a <span class=\'quality-badge quality-badge--good\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Strong</span> result:</strong> The executive summary gives leaders the headline in 10 seconds. Risks are paired with mitigation plans. The 2-week next steps create clear accountability. A VP could forward this without editing.',
+                    '<strong>AI Output:</strong><br><em>\u201cProject Atlas \u2014 Claims Processing Automation | Status: \ud83d\udfe1 YELLOW<br><br>Executive Summary: $12M initiative to automate 70% of claims adjudication. Phase 2 of 3, 60% complete, 2 weeks behind due to legacy mainframe data mapping issues affecting 15% of claim types. Team resolved 80% of issues last sprint. Path to recovery is clear.<br><br>Key Metrics: Budget: 58% utilized ($6.96M of $12M) | Automation Rate: 42% achieved (target: 70%) | Defect Rate: 2.3%<br><br>Top Risks:<br>1. [HIGH] Legacy data mapping \u2014 Owner: J. Chen \u2014 Mitigation: Dedicated integration team, 85% resolved<br>2. [MED] UAT timeline compression \u2014 Owner: S. Patel \u2014 Mitigation: Parallel testing tracks<br>3. [LOW] Change management adoption \u2014 Owner: L. Williams \u2014 Mitigation: Champions network in each region<br><br>Resource Request: 2 additional integration engineers for 6 weeks ($84K) to accelerate remaining mapping work and maintain go-live date.<br><br>Next Steps: Complete data mapping fixes (J. Chen, Mar 15) | Begin UAT cycle (S. Patel, Mar 18) | CTO review for resource approval (Mar 10)\u201d</em><br><br><strong>Why this is an <span class=\'quality-badge quality-badge--expert\' style=\'display:inline;padding:2px 8px;font-size:11px\'>Expert</span> result:</strong> RAG status signals urgency without panic. The metrics dashboard gives leaders numbers at a glance. Every section has owners and deadlines, driving action rather than just reporting status. A CTO would feel informed and ready to approve the resource ask.'
                 ]
             }
         };
@@ -1127,7 +1106,6 @@
         var stepLabel = document.getElementById('stepLabel');
         var stepDots = document.querySelectorAll('[data-step-dot]');
         var scenarioBtns = document.querySelectorAll('.scenario-btn');
-        var evoAutofill = document.getElementById('prompt-evo-autofill');
 
         var currentScenario = 'goal-setting';
         var currentStep = 0;
@@ -1183,17 +1161,6 @@
             iterateBtn.disabled = true;
             iterateBtn.style.opacity = '0';
 
-            // Autofill hint for step 4
-            if (step === 4) {
-                var ta = document.getElementById('headshot-prompt');
-                if (ta) {
-                    ta.value = data.prompts[step - 1];
-                    ta.dispatchEvent(new Event('input'));
-                }
-                evoAutofill.classList.add('prompt-evo__autofill-hint--visible');
-            } else {
-                evoAutofill.classList.remove('prompt-evo__autofill-hint--visible');
-            }
         }
 
         /* ─── Step dot click ─── */
