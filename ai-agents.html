@@ -1508,35 +1508,25 @@
                 <p class="section-intro">Select a department to see how AI agents handle real tasks. Click any command to watch the agent work.</p>
 
                 <div class="plugin-grid" id="plugin-grid">
-                    <button class="plugin-card" data-dept="productivity" type="button">
-                        <span class="plugin-card__emoji">&#9889;</span>
-                        <span class="plugin-card__name">Productivity</span>
-                        <span class="plugin-card__sub">Meetings, follow-ups, reports</span>
-                    </button>
-                    <button class="plugin-card" data-dept="sales" type="button">
-                        <span class="plugin-card__emoji">&#128200;</span>
-                        <span class="plugin-card__name">Sales</span>
-                        <span class="plugin-card__sub">Leads, calls, pipeline</span>
-                    </button>
-                    <button class="plugin-card" data-dept="finance" type="button">
-                        <span class="plugin-card__emoji">&#128176;</span>
-                        <span class="plugin-card__name">Finance</span>
-                        <span class="plugin-card__sub">Expenses, budgets, cash flow</span>
-                    </button>
                     <button class="plugin-card" data-dept="legal" type="button">
                         <span class="plugin-card__emoji">&#9878;&#65039;</span>
                         <span class="plugin-card__name">Legal</span>
                         <span class="plugin-card__sub">Contracts, compliance, clauses</span>
                     </button>
-                    <button class="plugin-card" data-dept="marketing" type="button">
-                        <span class="plugin-card__emoji">&#127919;</span>
-                        <span class="plugin-card__name">Marketing</span>
-                        <span class="plugin-card__sub">Campaigns, sentiment, competitors</span>
+                    <button class="plugin-card" data-dept="data" type="button">
+                        <span class="plugin-card__emoji">&#128202;</span>
+                        <span class="plugin-card__name">Data</span>
+                        <span class="plugin-card__sub">Analytics, reports, insights</span>
                     </button>
                     <button class="plugin-card" data-dept="hr" type="button">
                         <span class="plugin-card__emoji">&#128101;</span>
-                        <span class="plugin-card__name">HR</span>
+                        <span class="plugin-card__name">Human Resources</span>
                         <span class="plugin-card__sub">Resumes, onboarding, surveys</span>
+                    </button>
+                    <button class="plugin-card" data-dept="operations" type="button">
+                        <span class="plugin-card__emoji">&#9881;&#65039;</span>
+                        <span class="plugin-card__name">Operations</span>
+                        <span class="plugin-card__sub">Workflows, capacity, logistics</span>
                     </button>
                 </div>
 
@@ -2484,101 +2474,6 @@
         };
 
         var pluginData = {
-            productivity: {
-                name: 'Productivity',
-                desc: 'Automate meetings, follow-ups, and reporting workflows.',
-                commands: [
-                    {
-                        name: '/summarize-meeting',
-                        steps: [
-                            { type: 'think', body: 'Analyzing meeting transcript from the 10:00 AM strategy session (47 minutes, 6 participants)...' },
-                            { type: 'tool', tool: 'calendar', body: 'Pulling transcript, attendee list, and agenda items from calendar event.' },
-                            { type: 'output', body: 'Meeting summary generated.', outputTitle: 'Strategy Session Summary', outputBody: '<strong>Key Decisions:</strong> Approved Q3 budget reallocation (+15% to digital). <strong>Action Items:</strong> Sarah to finalize vendor shortlist by Friday. Mark to schedule follow-up with legal. <strong>Open Questions:</strong> Timeline for Phase 2 rollout still TBD.' }
-                        ]
-                    },
-                    {
-                        name: '/draft-followup',
-                        steps: [
-                            { type: 'think', body: 'Reviewing meeting context and action items to draft personalized follow-up emails...' },
-                            { type: 'tool', tool: 'email', body: 'Generating 3 follow-up drafts tailored to each action item owner.' },
-                            { type: 'output', body: 'Follow-up emails drafted.', outputTitle: '3 Emails Ready for Review', outputBody: '<strong>To Sarah:</strong> Vendor shortlist reminder with evaluation criteria attached. <strong>To Mark:</strong> Legal meeting scheduling with 3 proposed time slots. <strong>To All:</strong> Summary with decisions and next steps.' }
-                        ]
-                    },
-                    {
-                        name: '/weekly-report',
-                        steps: [
-                            { type: 'think', body: 'Aggregating activity across 12 meetings, 47 emails, and 8 completed tasks from this week...' },
-                            { type: 'tool', tool: 'analytics', body: 'Pulling project milestone status, blockers, and team capacity metrics.' },
-                            { type: 'guardrail', body: 'Flagging 2 overdue items for escalation before including in report.' },
-                            { type: 'output', body: 'Weekly report compiled.', outputTitle: 'Week of Feb 24 — Executive Summary', outputBody: '<strong>Completed:</strong> 8 of 11 planned tasks (73%). <strong>Blockers:</strong> Vendor contract review pending legal sign-off. <strong>Next Week:</strong> Q3 planning kickoff, 2 client reviews scheduled.' }
-                        ]
-                    }
-                ]
-            },
-            sales: {
-                name: 'Sales',
-                desc: 'Qualify leads, prepare for calls, and track your pipeline.',
-                commands: [
-                    {
-                        name: '/qualify-lead',
-                        steps: [
-                            { type: 'think', body: 'Evaluating inbound lead: Acme Corp, 500 employees, submitted demo request via website...' },
-                            { type: 'tool', tool: 'crm', body: 'Cross-referencing company data, previous interactions, and ideal customer profile.' },
-                            { type: 'output', body: 'Lead qualification complete.', outputTitle: 'Lead Score: 82/100 — High Priority', outputBody: '<strong>Match:</strong> Industry fit (healthcare), company size (ideal range), budget authority confirmed. <strong>Signals:</strong> Visited pricing page 4x this week, downloaded whitepaper. <strong>Recommendation:</strong> Route to enterprise team, schedule discovery call within 48 hours.' }
-                        ]
-                    },
-                    {
-                        name: '/prep-call',
-                        steps: [
-                            { type: 'think', body: 'Building call prep brief for tomorrow\'s discovery call with Acme Corp...' },
-                            { type: 'tool', tool: 'crm', body: 'Pulling account history, stakeholder map, and competitive intelligence.' },
-                            { type: 'tool', tool: 'market-data', body: 'Checking recent news, earnings reports, and industry trends for Acme Corp.' },
-                            { type: 'output', body: 'Call prep ready.', outputTitle: 'Discovery Call Brief — Acme Corp', outputBody: '<strong>Decision Maker:</strong> VP of Operations (reports to COO). <strong>Pain Points:</strong> Manual reporting consuming 20+ hours/week. <strong>Competitors:</strong> Currently evaluating 2 other vendors. <strong>Talking Points:</strong> ROI case study from similar healthcare org (saved 35% on reporting costs).' }
-                        ]
-                    },
-                    {
-                        name: '/forecast-pipeline',
-                        steps: [
-                            { type: 'think', body: 'Analyzing 34 active opportunities across the sales pipeline...' },
-                            { type: 'tool', tool: 'crm', body: 'Calculating weighted pipeline value and win probability for each stage.' },
-                            { type: 'guardrail', body: 'Flagging 3 deals with stale activity (no update in 14+ days) for review.' },
-                            { type: 'output', body: 'Pipeline forecast generated.', outputTitle: 'Q1 Pipeline Forecast', outputBody: '<strong>Weighted Pipeline:</strong> $2.4M (34 deals). <strong>Expected Close This Month:</strong> $680K (8 deals, 85%+ probability). <strong>At Risk:</strong> 3 deals ($340K) with no recent activity. <strong>Trend:</strong> Pipeline velocity up 12% vs. last quarter.' }
-                        ]
-                    }
-                ]
-            },
-            finance: {
-                name: 'Finance',
-                desc: 'Monitor expenses, track budgets, and flag cash flow issues.',
-                commands: [
-                    {
-                        name: '/expense-audit',
-                        steps: [
-                            { type: 'think', body: 'Scanning 247 expense submissions from the past 30 days for policy violations...' },
-                            { type: 'tool', tool: 'finance', body: 'Cross-referencing receipts against expense policy thresholds and approved categories.' },
-                            { type: 'guardrail', body: 'Flagged 4 entries exceeding per-diem limits. Routing to manager for manual approval.' },
-                            { type: 'output', body: 'Audit complete.', outputTitle: 'Expense Audit — February', outputBody: '<strong>Reviewed:</strong> 247 submissions ($89,400 total). <strong>Auto-Approved:</strong> 231 entries (94%). <strong>Flagged:</strong> 4 over-limit items ($2,100), 8 missing receipts ($890), 4 duplicate submissions ($560). <strong>Savings Found:</strong> $1,450 in duplicate/incorrect charges.' }
-                        ]
-                    },
-                    {
-                        name: '/budget-variance',
-                        steps: [
-                            { type: 'think', body: 'Comparing actual spend vs. budget across 8 department cost centers for February...' },
-                            { type: 'tool', tool: 'finance', body: 'Pulling GL actuals, purchase orders, and accruals from the finance system.' },
-                            { type: 'output', body: 'Variance report ready.', outputTitle: 'Budget Variance — February YTD', outputBody: '<strong>Overall:</strong> 4.2% under budget ($38K favorable). <strong>Over Budget:</strong> Marketing (+12%, driven by unplanned campaign spend). <strong>Under Budget:</strong> IT (-8%, delayed cloud migration), HR (-6%, open headcount). <strong>Watch:</strong> Travel trending 18% above forecast for Q1.' }
-                        ]
-                    },
-                    {
-                        name: '/cash-flow-alert',
-                        steps: [
-                            { type: 'think', body: 'Projecting cash position for the next 90 days based on receivables, payables, and commitments...' },
-                            { type: 'tool', tool: 'finance', body: 'Modeling inflows from AR aging schedule and outflows from AP and payroll commitments.' },
-                            { type: 'guardrail', body: 'Alert threshold triggered: projected dip below minimum reserve in Week 6.' },
-                            { type: 'output', body: 'Cash flow projection complete.', outputTitle: '90-Day Cash Flow Alert', outputBody: '<strong>Current Position:</strong> $4.2M. <strong>Projected Low Point:</strong> $1.8M (Week 6 — large vendor payment + payroll overlap). <strong>Minimum Reserve:</strong> $2.0M. <strong>Recommendation:</strong> Accelerate 3 outstanding invoices ($420K) or defer non-critical vendor payment by 1 week.' }
-                        ]
-                    }
-                ]
-            },
             legal: {
                 name: 'Legal',
                 desc: 'Review contracts, check compliance, and analyze clauses.',
@@ -2597,7 +2492,7 @@
                             { type: 'think', body: 'Running compliance check against data processing requirements for new SaaS vendor...' },
                             { type: 'tool', tool: 'compliance', body: 'Evaluating vendor against SOC 2, HIPAA, and internal data handling requirements.' },
                             { type: 'guardrail', body: 'Missing documentation: BAA (Business Associate Agreement) not on file. Blocking approval until resolved.' },
-                            { type: 'output', body: 'Compliance check complete.', outputTitle: 'Vendor Compliance Status', outputBody: '<strong>SOC 2 Type II:</strong> Valid (expires Aug 2026). <strong>HIPAA:</strong> Incomplete — BAA required before processing PHI. <strong>Data Residency:</strong> US-only (compliant). <strong>Action Required:</strong> Request executed BAA from vendor before proceeding with integration.' }
+                            { type: 'output', body: 'Compliance check complete.', outputTitle: 'Vendor Compliance Status', outputBody: '<strong>SOC 2 Type II:</strong> Valid (expires Aug 2026). <strong>HIPAA:</strong> Incomplete \u2014 BAA required before processing PHI. <strong>Data Residency:</strong> US-only (compliant). <strong>Action Required:</strong> Request executed BAA from vendor before proceeding with integration.' }
                         ]
                     },
                     {
@@ -2605,44 +2500,45 @@
                         steps: [
                             { type: 'think', body: 'Extracting and interpreting the indemnification clause from Section 8.2...' },
                             { type: 'tool', tool: 'contracts', body: 'Comparing clause language against industry benchmarks and precedent database.' },
-                            { type: 'output', body: 'Clause analysis ready.', outputTitle: 'Section 8.2 — Indemnification', outputBody: '<strong>Plain Language:</strong> The vendor will cover legal costs if their product causes a data breach, but only up to the amount you\'ve paid them in the last 12 months. <strong>Risk:</strong> Cap is low relative to potential exposure. <strong>Benchmark:</strong> 68% of comparable agreements use a 2x annual fee cap. <strong>Suggestion:</strong> Negotiate to 2x cap with carve-out for gross negligence.' }
+                            { type: 'output', body: 'Clause analysis ready.', outputTitle: 'Section 8.2 \u2014 Indemnification', outputBody: '<strong>Plain Language:</strong> The vendor will cover legal costs if their product causes a data breach, but only up to the amount you\u2019ve paid them in the last 12 months. <strong>Risk:</strong> Cap is low relative to potential exposure. <strong>Benchmark:</strong> 68% of comparable agreements use a 2x annual fee cap. <strong>Suggestion:</strong> Negotiate to 2x cap with carve-out for gross negligence.' }
                         ]
                     }
                 ]
             },
-            marketing: {
-                name: 'Marketing',
-                desc: 'Build campaigns, analyze sentiment, and track competitors.',
+            data: {
+                name: 'Data',
+                desc: 'Analyze datasets, generate reports, and surface actionable insights.',
                 commands: [
                     {
-                        name: '/campaign-brief',
+                        name: '/analyze-trends',
                         steps: [
-                            { type: 'think', body: 'Generating campaign brief for Q2 product launch based on target audience and positioning...' },
-                            { type: 'tool', tool: 'analytics', body: 'Pulling engagement data from previous launches and audience segmentation profiles.' },
-                            { type: 'output', body: 'Campaign brief generated.', outputTitle: 'Q2 Product Launch — Campaign Brief', outputBody: '<strong>Objective:</strong> Drive 500 qualified demo requests in 6 weeks. <strong>Audience:</strong> VP+ decision-makers in healthcare (enterprise segment). <strong>Channels:</strong> LinkedIn (primary), email nurture (existing leads), webinar series (2 sessions). <strong>Key Message:</strong> "Cut reporting time by 35% — see it in action." <strong>Budget:</strong> $45K recommended based on historical CPL.' }
+                            { type: 'think', body: 'Analyzing 18 months of claims data across 6 regions to identify emerging patterns...' },
+                            { type: 'tool', tool: 'analytics', body: 'Running trend analysis on claim volume, approval rates, and average processing time.' },
+                            { type: 'output', body: 'Trend analysis complete.', outputTitle: 'Claims Trend Report \u2014 18 Month View', outputBody: '<strong>Volume:</strong> Claims up 14% YoY, driven by telehealth (+38%) and behavioral health (+22%). <strong>Approval Rate:</strong> Stable at 87%, but auto-adjudication rate dropped from 64% to 58%. <strong>Processing Time:</strong> Average increased from 4.2 to 5.1 days. <strong>Root Cause:</strong> New coding requirements for 3 claim types causing manual review bottleneck.' }
                         ]
                     },
                     {
-                        name: '/analyze-sentiment',
+                        name: '/build-dashboard',
                         steps: [
-                            { type: 'think', body: 'Scanning social mentions, reviews, and support tickets from the last 30 days...' },
-                            { type: 'tool', tool: 'social', body: 'Aggregating sentiment signals across LinkedIn, G2 reviews, and support channels.' },
-                            { type: 'output', body: 'Sentiment analysis complete.', outputTitle: 'Brand Sentiment — Last 30 Days', outputBody: '<strong>Overall:</strong> 78% positive (up from 71% last month). <strong>Top Praise:</strong> Ease of onboarding, customer support responsiveness. <strong>Top Concern:</strong> Mobile app performance (mentioned in 12% of negative feedback). <strong>Trending Topic:</strong> AI features generating 3x more social engagement than product updates.' }
+                            { type: 'think', body: 'Designing executive dashboard for member engagement metrics across Q4...' },
+                            { type: 'tool', tool: 'analytics', body: 'Pulling member activity, program enrollment, and satisfaction scores from 4 data sources.' },
+                            { type: 'guardrail', body: 'Aggregating all data to cohort level. No individual member data included in output.' },
+                            { type: 'output', body: 'Dashboard generated.', outputTitle: 'Member Engagement Dashboard \u2014 Q4', outputBody: '<strong>Active Members:</strong> 1.2M (+6% QoQ). <strong>Program Enrollment:</strong> Wellness: 34%, Chronic Care: 28%, Preventive: 41%. <strong>Satisfaction (NPS):</strong> 62 (up from 57). <strong>At-Risk Cohort:</strong> 18,400 members with zero engagement in 90+ days. <strong>Recommendation:</strong> Targeted re-engagement campaign for at-risk cohort could recover $2.4M in retention value.' }
                         ]
                     },
                     {
-                        name: '/competitor-scan',
+                        name: '/anomaly-detection',
                         steps: [
-                            { type: 'think', body: 'Monitoring competitive landscape for new product announcements, pricing changes, and positioning shifts...' },
-                            { type: 'tool', tool: 'market-data', body: 'Scanning press releases, job postings, and product changelog pages for top 3 competitors.' },
-                            { type: 'guardrail', body: 'Filtering out unverified sources. Only including confirmed announcements.' },
-                            { type: 'output', body: 'Competitive intelligence ready.', outputTitle: 'Competitor Update — This Week', outputBody: '<strong>Competitor A:</strong> Launched AI-powered dashboards (direct overlap with our Q2 roadmap). <strong>Competitor B:</strong> Raised Series C ($80M) — expect aggressive hiring and marketing spend. <strong>Competitor C:</strong> Quiet — but 6 new job postings for "AI/ML Engineer" suggest product investment. <strong>Action:</strong> Accelerate Q2 AI feature launch to maintain positioning.' }
+                            { type: 'think', body: 'Scanning billing data for the past 60 days to detect unusual patterns and outliers...' },
+                            { type: 'tool', tool: 'analytics', body: 'Running statistical analysis across provider billing codes, claim amounts, and frequency.' },
+                            { type: 'guardrail', body: 'Flagging 2 provider accounts with billing patterns exceeding 3 standard deviations from peer average.' },
+                            { type: 'output', body: 'Anomaly scan complete.', outputTitle: 'Billing Anomaly Report \u2014 Feb', outputBody: '<strong>Scanned:</strong> 42,000 claims across 1,800 providers. <strong>Anomalies Detected:</strong> 7 accounts flagged. <strong>High Priority:</strong> Provider #4821 \u2014 92% increase in E/M code 99215 usage (peer avg: +4%). Provider #3167 \u2014 duplicate billing on 23 claims ($34K). <strong>Estimated Recovery:</strong> $87K if confirmed. <strong>Next Step:</strong> Route to SIU for investigation.' }
                         ]
                     }
                 ]
             },
             hr: {
-                name: 'HR',
+                name: 'Human Resources',
                 desc: 'Screen candidates, streamline onboarding, and track engagement.',
                 commands: [
                     {
@@ -2650,7 +2546,7 @@
                         steps: [
                             { type: 'think', body: 'Evaluating 3 candidate resumes against the Senior Product Manager role requirements...' },
                             { type: 'tool', tool: 'hr-system', body: 'Matching candidates against job description, required skills, and team composition.' },
-                            { type: 'output', body: 'Screening complete.', outputTitle: 'Resume Screening — Sr. Product Manager', outputBody: '<strong>Candidate A (87% match):</strong> 8 years PM experience, healthcare SaaS background, strong on cross-functional leadership. Recommend: phone screen. <strong>Candidate B (72% match):</strong> 5 years PM, strong technical skills but limited healthcare domain experience. Recommend: skills assessment. <strong>Candidate C (54% match):</strong> Career changer, relevant MBA but no direct PM experience. Recommend: pass.' }
+                            { type: 'output', body: 'Screening complete.', outputTitle: 'Resume Screening \u2014 Sr. Product Manager', outputBody: '<strong>Candidate A (87% match):</strong> 8 years PM experience, healthcare SaaS background, strong on cross-functional leadership. Recommend: phone screen. <strong>Candidate B (72% match):</strong> 5 years PM, strong technical skills but limited healthcare domain experience. Recommend: skills assessment. <strong>Candidate C (54% match):</strong> Career changer, relevant MBA but no direct PM experience. Recommend: pass.' }
                         ]
                     },
                     {
@@ -2658,7 +2554,7 @@
                         steps: [
                             { type: 'think', body: 'Generating personalized 30-60-90 day onboarding plan for new hire starting March 3...' },
                             { type: 'tool', tool: 'hr-system', body: 'Pulling role requirements, team structure, and department-specific onboarding templates.' },
-                            { type: 'output', body: 'Onboarding plan generated.', outputTitle: '30-60-90 Day Plan — New Hire', outputBody: '<strong>Day 1-30:</strong> System access setup, compliance training, meet 12 key stakeholders, shadow 3 client calls. <strong>Day 31-60:</strong> Own first project (internal process improvement), attend cross-functional planning session, complete product certification. <strong>Day 61-90:</strong> Lead first client presentation, submit 90-day reflection, set Q2 goals with manager.' }
+                            { type: 'output', body: 'Onboarding plan generated.', outputTitle: '30-60-90 Day Plan \u2014 New Hire', outputBody: '<strong>Day 1-30:</strong> System access setup, compliance training, meet 12 key stakeholders, shadow 3 client calls. <strong>Day 31-60:</strong> Own first project (internal process improvement), attend cross-functional planning session, complete product certification. <strong>Day 61-90:</strong> Lead first client presentation, submit 90-day reflection, set Q2 goals with manager.' }
                         ]
                     },
                     {
@@ -2667,12 +2563,45 @@
                             { type: 'think', body: 'Analyzing responses from the latest employee pulse survey (142 responses, 78% participation)...' },
                             { type: 'tool', tool: 'hr-system', body: 'Aggregating scores across engagement dimensions and comparing to previous quarter.' },
                             { type: 'guardrail', body: 'Anonymizing all individual responses. Only reporting aggregate trends by department.' },
-                            { type: 'output', body: 'Survey analysis complete.', outputTitle: 'Pulse Survey Results — February', outputBody: '<strong>Overall Engagement:</strong> 7.8/10 (up from 7.4). <strong>Highest:</strong> Team collaboration (8.6/10), manager support (8.3/10). <strong>Lowest:</strong> Career development clarity (6.2/10), cross-department communication (6.5/10). <strong>Recommendation:</strong> Launch career pathing workshops in Q2. Schedule 2 cross-functional town halls per month.' }
+                            { type: 'output', body: 'Survey analysis complete.', outputTitle: 'Pulse Survey Results \u2014 February', outputBody: '<strong>Overall Engagement:</strong> 7.8/10 (up from 7.4). <strong>Highest:</strong> Team collaboration (8.6/10), manager support (8.3/10). <strong>Lowest:</strong> Career development clarity (6.2/10), cross-department communication (6.5/10). <strong>Recommendation:</strong> Launch career pathing workshops in Q2. Schedule 2 cross-functional town halls per month.' }
+                        ]
+                    }
+                ]
+            },
+            operations: {
+                name: 'Operations',
+                desc: 'Optimize workflows, monitor capacity, and streamline logistics.',
+                commands: [
+                    {
+                        name: '/capacity-check',
+                        steps: [
+                            { type: 'think', body: 'Analyzing current capacity across 8 regional call centers for the next 2 weeks...' },
+                            { type: 'tool', tool: 'workforce', body: 'Pulling scheduled shifts, PTO requests, and historical call volume forecasts.' },
+                            { type: 'guardrail', body: 'Flagging Southeast region \u2014 staffing drops below 80% threshold on March 7-8.' },
+                            { type: 'output', body: 'Capacity report ready.', outputTitle: 'Call Center Capacity \u2014 Next 14 Days', outputBody: '<strong>Overall Coverage:</strong> 91% (target: 95%). <strong>At Risk:</strong> Southeast region at 74% on Mar 7-8 (3 PTO + 1 FMLA). <strong>Over-Staffed:</strong> Midwest at 108% on Mar 10-12. <strong>Recommendation:</strong> Shift 4 agents from Midwest to Southeast remote queue for Mar 7-8. Estimated savings vs. overtime: $6,200.' }
+                        ]
+                    },
+                    {
+                        name: '/process-audit',
+                        steps: [
+                            { type: 'think', body: 'Mapping the prior authorization workflow to identify bottlenecks and redundancies...' },
+                            { type: 'tool', tool: 'workflow', body: 'Analyzing 2,400 prior auth requests from the past 90 days \u2014 tracking time at each step.' },
+                            { type: 'output', body: 'Process audit complete.', outputTitle: 'Prior Auth Workflow Audit', outputBody: '<strong>Avg. Turnaround:</strong> 4.8 days (target: 3 days). <strong>Bottleneck:</strong> Clinical review queue \u2014 avg. 2.1 day wait (43% of total time). <strong>Root Cause:</strong> 62% of requests require manual clinical review that could be auto-approved based on guidelines. <strong>Opportunity:</strong> Automating rule-based approvals could cut turnaround to 2.1 days and free 120 clinical hours/month.' }
+                        ]
+                    },
+                    {
+                        name: '/vendor-performance',
+                        steps: [
+                            { type: 'think', body: 'Evaluating Q4 performance for 12 contracted service vendors against SLA benchmarks...' },
+                            { type: 'tool', tool: 'procurement', body: 'Pulling delivery timelines, quality scores, and incident reports from vendor management system.' },
+                            { type: 'guardrail', body: 'Vendor #7 triggered penalty clause \u2014 SLA breach on response time for 3 consecutive months.' },
+                            { type: 'output', body: 'Vendor scorecard ready.', outputTitle: 'Vendor Performance \u2014 Q4 Scorecard', outputBody: '<strong>Evaluated:</strong> 12 vendors ($18.4M total contract value). <strong>Meeting SLA:</strong> 9 of 12 (75%). <strong>Top Performer:</strong> Vendor #3 \u2014 99.2% uptime, 4.6/5 quality score. <strong>Underperforming:</strong> Vendor #7 \u2014 SLA breach (response time 48hrs vs. 24hr target). Penalty: $42K credit owed. <strong>Action:</strong> Schedule performance review with Vendor #7. Initiate backup vendor evaluation.' }
                         ]
                     }
                 ]
             }
         };
+
 
         // ─── Plugin Console Elements ───
         var pluginGrid = document.getElementById('plugin-grid');
