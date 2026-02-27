@@ -1357,6 +1357,68 @@
     </footer>
 
     <!-- ═══════════════════════════════════════════
+         CLARIFYING QUESTIONS MODAL
+    ═══════════════════════════════════════════ -->
+    <div class="clarify-overlay" id="clarify-overlay">
+        <div class="clarify-modal">
+            <div class="clarify-modal__header">
+                <div>
+                    <div class="clarify-modal__title">Clarifying Questions</div>
+                    <div class="clarify-modal__subtitle">Answer these to automatically improve your prompt</div>
+                </div>
+                <button class="feedback-modal__close" id="clarify-close" type="button">&times;</button>
+            </div>
+            <div class="clarify-modal__body">
+                <div class="clarify-question">
+                    <div class="clarify-question__number">1</div>
+                    <div class="clarify-question__content">
+                        <label class="clarify-question__label">What is the specific job title for this role?</label>
+                        <span class="clarify-question__hint">e.g., "Senior Software Engineer," "Data Analyst," "Marketing Manager"</span>
+                        <input type="text" class="clarify-question__input" data-clarify="1" placeholder="Your answer...">
+                    </div>
+                </div>
+                <div class="clarify-question">
+                    <div class="clarify-question__number">2</div>
+                    <div class="clarify-question__content">
+                        <label class="clarify-question__label">What are the primary responsibilities this person will handle day-to-day?</label>
+                        <span class="clarify-question__hint">Be specific — e.g., "Develop Python-based APIs," "Manage social media content calendar"</span>
+                        <input type="text" class="clarify-question__input" data-clarify="2" placeholder="Your answer...">
+                    </div>
+                </div>
+                <div class="clarify-question">
+                    <div class="clarify-question__number">3</div>
+                    <div class="clarify-question__content">
+                        <label class="clarify-question__label">What essential skills, experience, and qualifications are required?</label>
+                        <span class="clarify-question__hint">e.g., "5 years experience in JavaScript," "Bachelor's in Computer Science"</span>
+                        <input type="text" class="clarify-question__input" data-clarify="3" placeholder="Your answer...">
+                    </div>
+                </div>
+                <div class="clarify-question">
+                    <div class="clarify-question__number">4</div>
+                    <div class="clarify-question__content">
+                        <label class="clarify-question__label">Briefly describe your company's industry, size, and culture.</label>
+                        <span class="clarify-question__hint">This helps craft the "About Us" and "Why Join Us" sections</span>
+                        <input type="text" class="clarify-question__input" data-clarify="4" placeholder="Your answer...">
+                    </div>
+                </div>
+                <div class="clarify-question">
+                    <div class="clarify-question__number">5</div>
+                    <div class="clarify-question__content">
+                        <label class="clarify-question__label">Are there any compensation details or unique perks to highlight?</label>
+                        <span class="clarify-question__hint">e.g., salary range, remote work, tuition reimbursement, equity</span>
+                        <input type="text" class="clarify-question__input" data-clarify="5" placeholder="Your answer...">
+                    </div>
+                </div>
+            </div>
+            <div class="clarify-modal__footer">
+                <button class="clarify-modal__cancel" id="clarify-cancel">Cancel</button>
+                <span class="clarify-modal__counter" id="clarify-counter">0 of 5 answered</span>
+                <button class="btn btn--build" id="clarify-generate">Generate &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
          JAVASCRIPT
     ═══════════════════════════════════════════ -->
     <script>
@@ -2127,68 +2189,6 @@
 
     })();
     </script>
-
-    <!-- ═══════════════════════════════════════════
-         CLARIFYING QUESTIONS MODAL
-    ═══════════════════════════════════════════ -->
-    <div class="clarify-overlay" id="clarify-overlay">
-        <div class="clarify-modal">
-            <div class="clarify-modal__header">
-                <div>
-                    <div class="clarify-modal__title">Clarifying Questions</div>
-                    <div class="clarify-modal__subtitle">Answer these to automatically improve your prompt</div>
-                </div>
-                <button class="feedback-modal__close" id="clarify-close" type="button">&times;</button>
-            </div>
-            <div class="clarify-modal__body">
-                <div class="clarify-question">
-                    <div class="clarify-question__number">1</div>
-                    <div class="clarify-question__content">
-                        <label class="clarify-question__label">What is the specific job title for this role?</label>
-                        <span class="clarify-question__hint">e.g., "Senior Software Engineer," "Data Analyst," "Marketing Manager"</span>
-                        <input type="text" class="clarify-question__input" data-clarify="1" placeholder="Your answer...">
-                    </div>
-                </div>
-                <div class="clarify-question">
-                    <div class="clarify-question__number">2</div>
-                    <div class="clarify-question__content">
-                        <label class="clarify-question__label">What are the primary responsibilities this person will handle day-to-day?</label>
-                        <span class="clarify-question__hint">Be specific — e.g., "Develop Python-based APIs," "Manage social media content calendar"</span>
-                        <input type="text" class="clarify-question__input" data-clarify="2" placeholder="Your answer...">
-                    </div>
-                </div>
-                <div class="clarify-question">
-                    <div class="clarify-question__number">3</div>
-                    <div class="clarify-question__content">
-                        <label class="clarify-question__label">What essential skills, experience, and qualifications are required?</label>
-                        <span class="clarify-question__hint">e.g., "5 years experience in JavaScript," "Bachelor's in Computer Science"</span>
-                        <input type="text" class="clarify-question__input" data-clarify="3" placeholder="Your answer...">
-                    </div>
-                </div>
-                <div class="clarify-question">
-                    <div class="clarify-question__number">4</div>
-                    <div class="clarify-question__content">
-                        <label class="clarify-question__label">Briefly describe your company's industry, size, and culture.</label>
-                        <span class="clarify-question__hint">This helps craft the "About Us" and "Why Join Us" sections</span>
-                        <input type="text" class="clarify-question__input" data-clarify="4" placeholder="Your answer...">
-                    </div>
-                </div>
-                <div class="clarify-question">
-                    <div class="clarify-question__number">5</div>
-                    <div class="clarify-question__content">
-                        <label class="clarify-question__label">Are there any compensation details or unique perks to highlight?</label>
-                        <span class="clarify-question__hint">e.g., salary range, remote work, tuition reimbursement, equity</span>
-                        <input type="text" class="clarify-question__input" data-clarify="5" placeholder="Your answer...">
-                    </div>
-                </div>
-            </div>
-            <div class="clarify-modal__footer">
-                <button class="clarify-modal__cancel" id="clarify-cancel">Cancel</button>
-                <span class="clarify-modal__counter" id="clarify-counter">0 of 5 answered</span>
-                <button class="btn btn--build" id="clarify-generate">Generate &rarr;</button>
-            </div>
-        </div>
-    </div>
 
     <!-- ═══════════════════════════════════════════
          FEEDBACK MODAL
