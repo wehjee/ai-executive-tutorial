@@ -634,9 +634,7 @@
             display: block;
         }
 
-        #headshot-download:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
+        #headshot-download {
         }
 
         @media (max-width: 600px) {
@@ -1033,7 +1031,7 @@
 
                     <!-- Right Pane: Result -->
                     <div class="sandbox__pane">
-                        <span class="sandbox__pane-label">Your LinkedIn Headshot</span>
+                        <span class="sandbox__pane-label">Your Generated Headshot</span>
 
                         <div class="headshot-result" id="headshot-result">
                             <!-- Empty state -->
@@ -1068,8 +1066,8 @@
                             </div>
                         </div>
 
-                        <div class="copy-btn-row">
-                            <button class="btn btn--sm" id="headshot-download" disabled>
+                        <div class="copy-btn-row" id="headshot-download-row" style="display:none;">
+                            <button class="btn btn--sm" id="headshot-download">
                                 Download Headshot
                                 <span class="btn__arrow">&rarr;</span>
                             </button>
@@ -1435,6 +1433,7 @@
         var beforeImg = document.getElementById('headshot-before');
         var afterImg = document.getElementById('headshot-after');
         var downloadBtn = document.getElementById('headshot-download');
+        var downloadRow = document.getElementById('headshot-download-row');
         var generateBtn = document.getElementById('headshot-generate');
         var promptTextareaEl = document.getElementById('headshot-prompt');
         var errorDisplay = document.getElementById('headshot-error');
@@ -1585,7 +1584,7 @@
             emptyState.style.display = '';
             comparison.style.display = 'none';
             loadingState.style.display = 'none';
-            downloadBtn.disabled = true;
+            downloadRow.style.display = 'none';
 
             // Reset to stock tab
             inputTabs.forEach(function (t) { t.classList.remove('headshot-tab--active'); });
@@ -1620,7 +1619,7 @@
             emptyState.style.display = '';
             comparison.style.display = 'none';
             loadingState.style.display = 'none';
-            downloadBtn.disabled = true;
+            downloadRow.style.display = 'none';
 
             updateGenerateButton();
             hideError();
@@ -1764,7 +1763,7 @@
                 beforeImg.src = photoDataUrl;
                 loadingState.style.display = 'none';
                 comparison.style.display = '';
-                downloadBtn.disabled = false;
+                downloadRow.style.display = '';
             })
             .catch(function (err) {
                 console.error('Headshot generation error:', err);
