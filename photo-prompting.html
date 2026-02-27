@@ -287,46 +287,61 @@
         }
 
 
-        /* ─── Sandbox Locked State ─── */
+        /* ─── Sandbox Locked State (Accordion) ─── */
         .sandbox--locked {
-            position: relative;
-            pointer-events: none;
+            background: none;
+            border: none;
+            padding: 0;
+            box-shadow: none;
+            overflow: visible;
         }
 
-        .sandbox__lock-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(2px);
-            z-index: 20;
+        .sandbox__locked-bar {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
             gap: 12px;
-            border-radius: 16px;
-        }
-
-        .sandbox__lock-icon {
-            font-size: 32px;
-            opacity: 0.5;
-        }
-
-        .sandbox__lock-text {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px 28px;
             font-family: var(--font-body);
-            font-size: 14px;
-            color: var(--text-muted);
-            text-align: center;
-            max-width: 280px;
-            line-height: 1.5;
         }
 
-        .sandbox--unlocked .sandbox__lock-overlay {
+        .sandbox__locked-bar-icon {
+            font-size: 18px;
+            opacity: 0.4;
+        }
+
+        .sandbox__locked-bar-title {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+        }
+
+        .sandbox__locked-bar-hint {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .sandbox__accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.6s var(--ease-out-expo),
+                        opacity 0.4s ease;
+        }
+
+        .sandbox--unlocked .sandbox__locked-bar {
             display: none;
         }
 
-        .sandbox--unlocked {
-            pointer-events: auto;
+        .sandbox--unlocked .sandbox__accordion-body {
+            max-height: 3000px;
+            opacity: 1;
         }
 
         /* ─── Prompt Evo Responsive ─── */
@@ -992,10 +1007,12 @@
                  HANDS-ON SANDBOX: LINKEDIN HEADSHOT STUDIO
             ═══════════════════════════════════════════ -->
             <div class="sandbox reveal sandbox--locked" id="sandbox-headshot">
-                <div class="sandbox__lock-overlay" id="headshotLockOverlay">
-                    <div class="sandbox__lock-icon">&#128274;</div>
-                    <div class="sandbox__lock-text">Complete all 3 workplace scenarios above to unlock</div>
+                <div class="sandbox__locked-bar" id="headshotLockedBar">
+                    <span class="sandbox__locked-bar-icon">&#128274;</span>
+                    <span class="sandbox__locked-bar-title">Step 2 &mdash; Generate Your Headshot</span>
+                    <span class="sandbox__locked-bar-hint">Complete all 3 scenarios to unlock</span>
                 </div>
+                <div class="sandbox__accordion-body" id="headshotAccordionBody">
                 <div class="sandbox__header">
                     <span class="sandbox__title">Step 2 &mdash; Generate Your Headshot</span>
                 </div>
@@ -1148,6 +1165,7 @@
                         </div>
                     </div>
                 </div>
+                </div><!-- /sandbox__accordion-body -->
             </div>
         </div>
     </div>
