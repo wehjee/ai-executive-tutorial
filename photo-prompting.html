@@ -654,6 +654,121 @@
                 margin: 0 auto;
             }
         }
+
+        /* ─── Stock Photo Preview ─── */
+        .headshot-stock {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .headshot-stock__preview {
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-secondary);
+            max-width: 180px;
+            margin: 0 auto 8px;
+        }
+
+        .headshot-stock__preview img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+        }
+
+        .headshot-stock__label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent-teal);
+            letter-spacing: 0.04em;
+            font-weight: 500;
+        }
+
+        /* ─── Style Selection ─── */
+        .headshot-style-section {
+            margin-bottom: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .headshot-style-section .field__label {
+            margin-bottom: 10px;
+        }
+
+        .headshot-styles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        /* ─── Level Selection ─── */
+        .headshot-level-section {
+            margin-bottom: 16px;
+        }
+
+        .headshot-level-section .field__label {
+            margin-bottom: 10px;
+        }
+
+        .headshot-level-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .headshot-level-pills .scenario-btn--active[data-level="1"] {
+            background: var(--accent-rose);
+            border-color: var(--accent-rose);
+            color: #fff;
+        }
+
+        .headshot-level-pills .scenario-btn--active[data-level="2"] {
+            background: var(--accent-gold);
+            border-color: var(--accent-gold);
+            color: #fff;
+        }
+
+        .headshot-level-pills .scenario-btn--active[data-level="3"] {
+            background: var(--accent-teal);
+            border-color: var(--accent-teal);
+            color: #fff;
+        }
+
+        .headshot-level-pills .scenario-btn--active[data-level="4"] {
+            background: var(--accent-lavender);
+            border-color: var(--accent-lavender);
+            color: #fff;
+        }
+
+        /* ─── Readonly Prompt Textarea ─── */
+        .field__textarea[readonly] {
+            cursor: default;
+            background: var(--bg-primary);
+            opacity: 0.85;
+        }
+
+        .headshot-prompt-hint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .headshot-styles,
+            .headshot-level-pills {
+                gap: 4px;
+            }
+
+            .headshot-styles .scenario-btn,
+            .headshot-level-pills .scenario-btn {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -826,24 +941,36 @@
                     <span class="sandbox__title">Step 2 &mdash; Generate Your Headshot</span>
                 </div>
                 <div class="sandbox__split">
-                    <!-- Left Pane: Photo Input + Prompt + Generate -->
+                    <!-- Left Pane: Photo Input + Style + Level + Generate -->
                     <div class="sandbox__pane sandbox__pane--left">
                         <span class="sandbox__pane-label">Your Photo</span>
 
-                        <!-- Upload / Selfie Tabs -->
+                        <!-- Photo Source Tabs (3 options) -->
                         <div class="headshot-input-tabs">
-                            <button class="headshot-tab headshot-tab--active" data-tab="upload">
+                            <button class="headshot-tab headshot-tab--active" data-tab="stock">
+                                <span class="headshot-tab__icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
+                                Stock Photo
+                            </button>
+                            <button class="headshot-tab" data-tab="upload">
                                 <span class="headshot-tab__icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span>
-                                Upload Photo
+                                Upload
                             </button>
                             <button class="headshot-tab" data-tab="selfie">
                                 <span class="headshot-tab__icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></span>
-                                Take Selfie
+                                Take Photo
                             </button>
                         </div>
 
-                        <!-- Upload Zone -->
-                        <div class="headshot-upload" id="headshot-upload">
+                        <!-- Stock Photo (default) -->
+                        <div class="headshot-stock" id="headshot-stock">
+                            <div class="headshot-stock__preview">
+                                <img src="images/Jim_Rechtin.jpg" alt="Demo stock photo" id="headshot-stock-img">
+                            </div>
+                            <div class="headshot-stock__label">Demo photo loaded</div>
+                        </div>
+
+                        <!-- Upload Zone (hidden by default) -->
+                        <div class="headshot-upload" id="headshot-upload" style="display:none;">
                             <div class="headshot-upload__icon">
                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                             </div>
@@ -864,7 +991,7 @@
                             <canvas id="selfie-canvas" style="display:none;"></canvas>
                         </div>
 
-                        <!-- Selfie Error (camera denied/unavailable) -->
+                        <!-- Selfie Error -->
                         <div class="headshot-selfie__error" id="selfie-error" style="display:none;">
                             <div class="headshot-selfie__error-icon">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34m-7.72-2.06a4 4 0 1 1-5.56-5.56"></path></svg>
@@ -878,11 +1005,45 @@
                             <button class="btn btn--sm headshot-change-btn" id="headshot-change">Change Photo</button>
                         </div>
 
-                        <!-- Prompt Textarea -->
+                        <!-- Style Selection -->
+                        <div class="headshot-style-section" id="headshot-style-section">
+                            <label class="field__label">Choose Style</label>
+                            <div class="headshot-styles">
+                                <button class="scenario-btn scenario-btn--active" data-style="professional">Professional Headshot</button>
+                                <button class="scenario-btn" data-style="anime">Anime Style</button>
+                                <button class="scenario-btn" data-style="artistic">Artistic Portrait</button>
+                                <button class="scenario-btn" data-style="vintage">Vintage Photo</button>
+                            </div>
+                        </div>
+
+                        <!-- Prompt Level Selection -->
+                        <div class="headshot-level-section" id="headshot-level-section">
+                            <label class="field__label">Prompt Level</label>
+                            <div class="step-indicator">
+                                <div class="step-indicator__dots">
+                                    <div class="step-indicator__dot step-indicator__dot--active" data-hs-step="1"></div>
+                                    <div class="step-indicator__dot" data-hs-step="2"></div>
+                                    <div class="step-indicator__dot" data-hs-step="3"></div>
+                                    <div class="step-indicator__dot" data-hs-step="4"></div>
+                                </div>
+                                <span class="step-indicator__label" id="headshot-step-label">Level 1 of 4 &mdash; Vague</span>
+                            </div>
+                            <div class="headshot-level-pills">
+                                <button class="scenario-btn scenario-btn--active" data-level="1">Vague</button>
+                                <button class="scenario-btn" data-level="2">Better</button>
+                                <button class="scenario-btn" data-level="3">Strong</button>
+                                <button class="scenario-btn" data-level="4">Expert</button>
+                            </div>
+                        </div>
+
+                        <!-- Loaded Prompt (readonly) -->
                         <div class="field">
                             <label class="field__label" for="headshot-prompt">Your Prompt</label>
-                            <textarea class="field__textarea" id="headshot-prompt" rows="4" placeholder="Paste your headshot prompt from Step 1 above, or type your own style description..."></textarea>
-                            <div class="field__hint" id="headshot-prompt-status">Describe how you want your headshot styled</div>
+                            <textarea class="field__textarea" id="headshot-prompt" rows="4" readonly></textarea>
+                            <div class="headshot-prompt-hint" id="headshot-prompt-status">
+                                <span class="quality-badge quality-badge--poor" id="headshot-quality-badge" style="display:inline;padding:2px 8px;font-size:10px">Vague</span>
+                                <span id="headshot-prompt-hint-text">Select a style and level to load a prompt</span>
+                            </div>
                         </div>
 
                         <!-- Generate Button -->
@@ -1221,9 +1382,62 @@
         loadStep(1);
 
 
+
         // ═══════════════════════════════════════════
         // LINKEDIN HEADSHOT STUDIO
         // ═══════════════════════════════════════════
+
+        // ─── Headshot Prompt Data (4 styles × 4 levels = 16 prompts) ───
+        var headshotPromptData = {
+            'professional': {
+                label: 'Professional Headshot',
+                qualityLabels: ['Vague', 'Better', 'Strong', 'Expert'],
+                qualities: ['poor', 'basic', 'good', 'expert'],
+                systemPrefix: 'Transform this photo into a professional LinkedIn headshot.',
+                prompts: [
+                    'Make this into a professional headshot.',
+                    'Create a professional corporate headshot. Clean background, good lighting, business attire appearance.',
+                    'Transform this into a polished LinkedIn headshot for a healthcare executive. Use a neutral gradient background (dark navy to charcoal). Apply professional studio lighting with soft key light from the upper left and subtle fill light. Ensure the subject appears approachable yet authoritative. Crisp focus on the face, shallow depth of field.',
+                    'Transform this into an executive-grade LinkedIn headshot for a senior healthcare leader at a Fortune 100 company. Background: smooth gradient from #1a2332 to #2d3748 (dark professional navy-charcoal). Lighting: Rembrandt-style three-point setup \u2014 key light at 45 degrees upper-left for dimensional modeling, fill light at 30% intensity from right to soften shadows, hair light from behind for subject separation. Skin retouching: subtle, natural \u2014 reduce blemishes while preserving skin texture and pores. Eyes: ensure catchlights are visible and sharp. Expression: confident, warm, approachable \u2014 slight natural smile reaching the eyes. Framing: head-and-shoulders composition with the subject positioned slightly off-center using rule of thirds. Color grading: warm professional tones, slight desaturation for editorial feel. Final result should be indistinguishable from a $500 studio session.'
+                ]
+            },
+            'anime': {
+                label: 'Anime Style',
+                qualityLabels: ['Vague', 'Better', 'Strong', 'Expert'],
+                qualities: ['poor', 'basic', 'good', 'expert'],
+                systemPrefix: 'Transform this photo into an anime-style illustration.',
+                prompts: [
+                    'Make this into an anime character.',
+                    'Turn this photo into an anime-style portrait. Use vibrant colors and large expressive eyes in a Japanese animation style.',
+                    'Transform this into a high-quality anime portrait in the style of modern Japanese animation. Maintain the subject\u2019s facial features and likeness while stylizing into anime proportions. Use vibrant, saturated colors with dramatic lighting \u2014 warm golden hour tones. Background: soft bokeh cityscape with cherry blossoms. Clean line art with detailed shading.',
+                    'Create a premium anime-style executive portrait. Style reference: hyper-detailed, cinematic quality modern anime. Maintain the subject\u2019s exact facial structure, hair style, and distinguishing features while translating into anime proportions (slightly larger eyes, refined features, smooth skin rendering). Outfit: transform their attire into a sleek, modern anime interpretation of business professional clothing with subtle fabric detail and accurate folds. Background: an impressionistic anime cityscape at golden hour \u2014 soft light rays streaming through floor-to-ceiling office windows with a panoramic city view. Lighting: warm rim light separating subject from background, soft ambient fill maintaining detail in shadows. Color palette: rich but not oversaturated \u2014 navy, warm amber, soft white highlights. Hair should have individual strand detail with subtle highlights. Final quality: studio-grade anime illustration suitable for professional use as a social media avatar.'
+                ]
+            },
+            'artistic': {
+                label: 'Artistic Portrait',
+                qualityLabels: ['Vague', 'Better', 'Strong', 'Expert'],
+                qualities: ['poor', 'basic', 'good', 'expert'],
+                systemPrefix: 'Transform this photo into an artistic portrait.',
+                prompts: [
+                    'Make this photo look artistic.',
+                    'Create an artistic portrait from this photo. Use painterly effects and dramatic lighting like a fine art photograph.',
+                    'Transform this into a fine art portrait in the style of contemporary editorial photography. Apply dramatic chiaroscuro lighting \u2014 strong directional light from one side creating deep, rich shadows. Muted, desaturated color palette with emphasis on warm skin tones against cool dark tones. Textured background suggesting a painted canvas or aged wall. The result should feel like a portrait hanging in a museum or featured in Vanity Fair.',
+                    'Create a museum-quality fine art portrait. Artistic direction: blend of editorial portraiture with chiaroscuro mastery. Lighting: single dramatic key light at 60 degrees from left, creating a Rembrandt triangle on the shadow side of the face \u2014 deep, painterly shadows that reveal character. Background: richly textured abstract surface \u2014 aged Venetian plaster in deep umber and burnt sienna tones, with subtle craquelure texture. Color grading: desaturated globally except for warm skin tones \u2014 create a three-color palette of deep charcoal, warm ivory, and rich amber. Skin rendering: preserve all natural texture and character lines \u2014 this is about authenticity, not perfection. Expression: capture a moment of quiet contemplation \u2014 eyes that tell a story. Composition: slightly unconventional crop \u2014 perhaps tighter on one side, creating tension and visual interest. Post-processing: subtle film grain, very slight vignette pulling focus to the eyes. The final image should feel timeless \u2014 equally at home in a corporate annual report or a gallery exhibition.'
+                ]
+            },
+            'vintage': {
+                label: 'Vintage Photo',
+                qualityLabels: ['Vague', 'Better', 'Strong', 'Expert'],
+                qualities: ['poor', 'basic', 'good', 'expert'],
+                systemPrefix: 'Transform this photo into a vintage-style photograph.',
+                prompts: [
+                    'Make this look old-fashioned.',
+                    'Transform this into a vintage photograph. Apply sepia tones, film grain, and classic portrait lighting from the 1960s era.',
+                    'Transform this into a vintage 1960s corporate portrait photograph. Apply authentic Kodachrome film color rendering \u2014 slightly warm with rich, saturated reds and deep blacks. Add subtle film grain consistent with Tri-X 400 stock. Lighting should emulate classic studio portrait setups of the era \u2014 broad, even key light with gentle shadows. Include a subtle warm color cast and slightly faded edges. The subject should look like a distinguished business leader from a 1965 Fortune magazine profile.',
+                    'Create an authentic 1960s executive portrait that looks like it was shot on a Hasselblad 500C. Film stock emulation: Kodak Ektachrome for color rendering \u2014 rich, slightly warm midtones with distinctive skin tone rendering. Grain structure: fine, organic grain matching medium format film pushed one stop \u2014 visible but not distracting, adding texture and authenticity. Lighting: classic dramatic portrait lighting \u2014 strong key light from 45 degrees creating sculpted facial features, with a carefully positioned fill card at 2:1 ratio to preserve shadow detail without flattening dimensionality. Background: graduated muslin backdrop in warm grey, with subtle hot spot from background light. Color palette: distinctive warm amber-gold cast of aged Ektachrome \u2014 whites slightly creamy, shadows trending warm rather than cool. Vignette: natural lens vignetting \u2014 gentle darkening in corners. Final processing: simulate slight color shift from 60 years of aging \u2014 very subtle magenta shift in highlights. The result should be indistinguishable from an archival photograph pulled from a 1965 corporate collection.'
+                ]
+            }
+        };
 
         // ─── API Configuration ───
         var GEMINI_API_KEY = 'AIzaSyCnBC1adVA5o24oeEcyEADurKXaJr4-RT4';
@@ -1252,40 +1466,65 @@
         var promptStatus = document.getElementById('headshot-prompt-status');
         var errorDisplay = document.getElementById('headshot-error');
         var inputTabs = document.querySelectorAll('.headshot-tab');
+        var stockZone = document.getElementById('headshot-stock');
 
         var photoLoaded = false;
         var photoDataUrl = null;
         var generatedImageUrl = null;
         var cameraStream = null;
         var isGenerating = false;
+        var currentStyle = 'professional';
+        var currentLevel = 1;
 
-        // ─── Input Tab Switching ───
+        // ─── Stock Photo Loader ───
+        function loadStockPhoto() {
+            var img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                var canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                photoDataUrl = dataUrl;
+                photoLoaded = true;
+                beforeImg.src = dataUrl;
+                updateGenerateButton();
+            };
+            img.src = 'images/Jim_Rechtin.jpg';
+        }
+
+        // ─── Tab Switching (3 tabs: stock / upload / selfie) ───
         inputTabs.forEach(function (tab) {
             tab.addEventListener('click', function () {
                 var targetTab = tab.getAttribute('data-tab');
                 inputTabs.forEach(function (t) { t.classList.remove('headshot-tab--active'); });
                 tab.classList.add('headshot-tab--active');
 
-                if (targetTab === 'upload') {
+                // Hide all source panels
+                stockZone.style.display = 'none';
+                uploadZone.style.display = 'none';
+                selfieZone.style.display = 'none';
+                selfieError.style.display = 'none';
+                originalContainer.style.display = 'none';
+                stopCamera();
+
+                if (targetTab === 'stock') {
+                    stockZone.style.display = '';
+                    loadStockPhoto();
+                } else if (targetTab === 'upload') {
                     uploadZone.style.display = '';
-                    selfieZone.style.display = 'none';
-                    selfieError.style.display = 'none';
-                    stopCamera();
                 } else if (targetTab === 'selfie') {
-                    uploadZone.style.display = 'none';
                     selfieZone.style.display = '';
-                    selfieError.style.display = 'none';
                     startCamera();
                 }
-
-                // Hide original if showing (let user re-capture/re-upload)
-                if (!photoLoaded) return;
             });
         });
 
         // ─── Camera Functions ───
         function startCamera() {
-            if (cameraStream) return; // already running
+            if (cameraStream) return;
 
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 selfieZone.style.display = 'none';
@@ -1318,27 +1557,22 @@
         // ─── Selfie Capture ───
         selfieCapture.addEventListener('click', function () {
             if (!cameraStream) return;
-
             var vw = selfieVideo.videoWidth;
             var vh = selfieVideo.videoHeight;
             selfieCanvas.width = vw;
             selfieCanvas.height = vh;
             var ctx = selfieCanvas.getContext('2d');
-            // Mirror the capture to match the mirrored video preview
             ctx.translate(vw, 0);
             ctx.scale(-1, 1);
             ctx.drawImage(selfieVideo, 0, 0, vw, vh);
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-
             var dataUrl = selfieCanvas.toDataURL('image/jpeg', 0.9);
             loadPhotoFromDataUrl(dataUrl);
             stopCamera();
         });
 
         // ─── File Upload ───
-        uploadZone.addEventListener('click', function () {
-            fileInput.click();
-        });
+        uploadZone.addEventListener('click', function () { fileInput.click(); });
 
         uploadZone.addEventListener('dragover', function (e) {
             e.preventDefault();
@@ -1364,23 +1598,26 @@
             }
         });
 
+        // ─── Change Photo ───
         changeBtn.addEventListener('click', function () {
             fileInput.value = '';
             photoLoaded = false;
             photoDataUrl = null;
             generatedImageUrl = null;
             originalContainer.style.display = 'none';
-            uploadZone.style.display = '';
-            selfieZone.style.display = 'none';
             emptyState.style.display = '';
             comparison.style.display = 'none';
             loadingState.style.display = 'none';
             downloadBtn.disabled = true;
-            updateGenerateButton();
 
-            // Reset to upload tab
+            // Reset to stock tab
             inputTabs.forEach(function (t) { t.classList.remove('headshot-tab--active'); });
             inputTabs[0].classList.add('headshot-tab--active');
+            stockZone.style.display = '';
+            uploadZone.style.display = 'none';
+            selfieZone.style.display = 'none';
+            loadStockPhoto();
+            updateGenerateButton();
         });
 
         function loadPhotoFromFile(file) {
@@ -1395,46 +1632,106 @@
             photoDataUrl = dataUrl;
             photoLoaded = true;
 
-            // Show original preview
             originalImg.src = dataUrl;
+            stockZone.style.display = 'none';
             uploadZone.style.display = 'none';
             selfieZone.style.display = 'none';
             originalContainer.style.display = '';
 
-            // Show the original in the "before" panel, keep result empty until generated
             beforeImg.src = dataUrl;
-
-            // Reset result state
             generatedImageUrl = null;
             emptyState.style.display = '';
             comparison.style.display = 'none';
             loadingState.style.display = 'none';
             downloadBtn.disabled = true;
 
-            // Update generate button
             updateGenerateButton();
             hideError();
+        }
+
+        // ─── Style Selection ───
+        var styleBtns = document.querySelectorAll('[data-style]');
+        styleBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                currentStyle = btn.getAttribute('data-style');
+                styleBtns.forEach(function (b) {
+                    b.classList.toggle('scenario-btn--active', b.getAttribute('data-style') === currentStyle);
+                });
+                loadHeadshotPrompt();
+            });
+        });
+
+        // ─── Level Selection ───
+        var levelPills = document.querySelectorAll('[data-level]');
+        var hsStepDots = document.querySelectorAll('[data-hs-step]');
+        var hsStepLabel = document.getElementById('headshot-step-label');
+
+        levelPills.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                currentLevel = parseInt(btn.getAttribute('data-level'));
+                levelPills.forEach(function (b) {
+                    b.classList.toggle('scenario-btn--active', parseInt(b.getAttribute('data-level')) === currentLevel);
+                });
+                updateStepIndicator();
+                loadHeadshotPrompt();
+            });
+        });
+
+        hsStepDots.forEach(function (dot) {
+            dot.addEventListener('click', function () {
+                currentLevel = parseInt(dot.getAttribute('data-hs-step'));
+                levelPills.forEach(function (b) {
+                    b.classList.toggle('scenario-btn--active', parseInt(b.getAttribute('data-level')) === currentLevel);
+                });
+                updateStepIndicator();
+                loadHeadshotPrompt();
+            });
+        });
+
+        function updateStepIndicator() {
+            var data = headshotPromptData[currentStyle];
+            hsStepLabel.textContent = 'Level ' + currentLevel + ' of 4 \u2014 ' + data.qualityLabels[currentLevel - 1];
+
+            hsStepDots.forEach(function (dot) {
+                var dotStep = parseInt(dot.getAttribute('data-hs-step'));
+                dot.classList.remove('step-indicator__dot--active', 'step-indicator__dot--done');
+                if (dotStep === currentLevel) {
+                    dot.classList.add('step-indicator__dot--active');
+                } else if (dotStep < currentLevel) {
+                    dot.classList.add('step-indicator__dot--done');
+                }
+            });
+        }
+
+        // ─── Prompt Loading ───
+        function loadHeadshotPrompt() {
+            var data = headshotPromptData[currentStyle];
+            var prompt = data.prompts[currentLevel - 1];
+            promptTextareaEl.value = prompt;
+
+            var badge = document.getElementById('headshot-quality-badge');
+            var hint = document.getElementById('headshot-prompt-hint-text');
+            var quality = data.qualities[currentLevel - 1];
+            var qualityLabel = data.qualityLabels[currentLevel - 1];
+
+            badge.className = 'quality-badge quality-badge--' + quality;
+            badge.textContent = qualityLabel;
+            badge.style.display = 'inline';
+            badge.style.padding = '2px 8px';
+            badge.style.fontSize = '10px';
+            hint.textContent = qualityLabel + ' prompt loaded \u2014 click Generate';
+
+            promptStatus.classList.add('field__hint--detected');
+            updateStepIndicator();
+            updateGenerateButton();
         }
 
         // ─── Generate Button State ───
         function updateGenerateButton() {
             var promptText = promptTextareaEl.value.trim();
-            var hasPrompt = promptText.length > 10;
+            var hasPrompt = promptText.length > 5;
             generateBtn.disabled = !(photoLoaded && hasPrompt) || isGenerating;
         }
-
-        promptTextareaEl.addEventListener('input', function () {
-            updateGenerateButton();
-            // Update hint
-            var text = promptTextareaEl.value.trim();
-            if (text.length > 10) {
-                promptStatus.textContent = 'Ready to generate — click the button below';
-                promptStatus.classList.add('field__hint--detected');
-            } else {
-                promptStatus.textContent = 'Describe how you want your headshot styled';
-                promptStatus.classList.remove('field__hint--detected');
-            }
-        });
 
         // ─── Error Display ───
         function showError(message) {
@@ -1457,7 +1754,6 @@
             isGenerating = true;
             hideError();
 
-            // Show loading state
             generateBtn.classList.add('btn--generate--loading');
             generateBtn.querySelector('.btn__label').style.display = 'none';
             generateBtn.querySelector('.btn__loading-text').style.display = '';
@@ -1466,19 +1762,16 @@
             comparison.style.display = 'none';
             loadingState.style.display = '';
 
-            // Prepare the image data
             var base64Data = photoDataUrl.split(',')[1];
             var mimeType = photoDataUrl.split(';')[0].split(':')[1] || 'image/jpeg';
 
-            // Build the prompt
             var userPrompt = promptTextareaEl.value.trim();
-            var systemPrompt = 'Transform this photo into a professional LinkedIn headshot. ' +
+            var styleData = headshotPromptData[currentStyle];
+            var systemPrompt = styleData.systemPrefix + ' ' +
                 'Style instructions: ' + userPrompt + '. ' +
                 'Keep the person\'s face and identity clearly recognizable. ' +
-                'Create a clean, professional background. Apply flattering, even lighting. ' +
-                'The result should look like a high-quality corporate headshot suitable for LinkedIn.';
+                'The result should be a high-quality image.';
 
-            // Build request body (Gemini API uses camelCase)
             var requestBody = {
                 contents: [{
                     parts: [
@@ -1496,7 +1789,6 @@
                 }
             };
 
-            // Make API call
             fetch(GEMINI_ENDPOINT + '?key=' + GEMINI_API_KEY, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1511,19 +1803,14 @@
                 return response.json();
             })
             .then(function (data) {
-                // Find the image part in the response
-                // Gemini API returns camelCase keys (inlineData, mimeType)
                 var imageData = null;
                 var imageMime = 'image/png';
                 if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
                     data.candidates[0].content.parts.forEach(function (part) {
-                        // Check camelCase format (inlineData)
                         if (part.inlineData && part.inlineData.data) {
                             imageData = part.inlineData.data;
                             imageMime = part.inlineData.mimeType || 'image/png';
-                        }
-                        // Also check snake_case format (inline_data) as fallback
-                        else if (part.inline_data && part.inline_data.data) {
+                        } else if (part.inline_data && part.inline_data.data) {
                             imageData = part.inline_data.data;
                             imageMime = part.inline_data.mime_type || 'image/png';
                         }
@@ -1534,12 +1821,9 @@
                     throw new Error('No image was generated. The AI may not have been able to process this request. Try a different prompt or photo.');
                 }
 
-                // Display the generated image
                 generatedImageUrl = 'data:' + imageMime + ';base64,' + imageData;
-
                 afterImg.src = generatedImageUrl;
                 beforeImg.src = photoDataUrl;
-
                 loadingState.style.display = 'none';
                 comparison.style.display = '';
                 downloadBtn.disabled = false;
@@ -1548,7 +1832,6 @@
                 console.error('Headshot generation error:', err);
                 loadingState.style.display = 'none';
                 emptyState.style.display = '';
-
                 var errorMsg = err.message || 'Something went wrong. Please try again.';
                 if (errorMsg.includes('API_KEY') || errorMsg.includes('API key')) {
                     errorMsg = 'Invalid API key. Please check the configuration.';
@@ -1567,8 +1850,6 @@
         // ─── Download ───
         downloadBtn.addEventListener('click', function () {
             if (!generatedImageUrl) return;
-
-            // Convert base64 data URL to blob for download
             var parts = generatedImageUrl.split(',');
             var mime = parts[0].match(/:(.*?);/)[1];
             var bstr = atob(parts[1]);
@@ -1576,13 +1857,16 @@
             var u8arr = new Uint8Array(n);
             while (n--) { u8arr[n] = bstr.charCodeAt(n); }
             var blob = new Blob([u8arr], { type: mime });
-
             var link = document.createElement('a');
-            link.download = 'linkedin-headshot.png';
+            link.download = 'headshot-' + currentStyle + '.png';
             link.href = URL.createObjectURL(blob);
             link.click();
             URL.revokeObjectURL(link.href);
         });
+
+        // ─── Initialize ───
+        loadStockPhoto();
+        loadHeadshotPrompt();
 
     })();
     </script>
