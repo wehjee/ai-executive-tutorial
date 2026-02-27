@@ -287,6 +287,48 @@
         }
 
 
+        /* ─── Sandbox Locked State ─── */
+        .sandbox--locked {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .sandbox__lock-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(2px);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border-radius: 16px;
+        }
+
+        .sandbox__lock-icon {
+            font-size: 32px;
+            opacity: 0.5;
+        }
+
+        .sandbox__lock-text {
+            font-family: var(--font-body);
+            font-size: 14px;
+            color: var(--text-muted);
+            text-align: center;
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
+        .sandbox--unlocked .sandbox__lock-overlay {
+            display: none;
+        }
+
+        .sandbox--unlocked {
+            pointer-events: auto;
+        }
+
         /* ─── Prompt Evo Responsive ─── */
         @media (max-width: 900px) {
             .sandbox__header {
@@ -792,7 +834,7 @@
     ═══════════════════════════════════════════ -->
     <nav class="nav" id="nav">
         <a class="nav__brand" href="index.html">
-            <div class="nav__logo" onclick="event.preventDefault();event.stopPropagation();window.location.href='vibe-coding.html'" style="cursor:pointer">✨</div>
+            <div class="nav__logo" id="navLogo" style="cursor:pointer">✨</div>
             <span class="nav__title">Enterprise AI  — Humana Leadership Series</span>
         </a>
         <div class="nav__links">
@@ -949,7 +991,11 @@
             <!-- ═══════════════════════════════════════════
                  HANDS-ON SANDBOX: LINKEDIN HEADSHOT STUDIO
             ═══════════════════════════════════════════ -->
-            <div class="sandbox reveal">
+            <div class="sandbox reveal sandbox--locked" id="sandbox-headshot">
+                <div class="sandbox__lock-overlay" id="headshotLockOverlay">
+                    <div class="sandbox__lock-icon">&#128274;</div>
+                    <div class="sandbox__lock-text">Complete all 3 workplace scenarios above to unlock</div>
+                </div>
                 <div class="sandbox__header">
                     <span class="sandbox__title">Step 2 &mdash; Generate Your Headshot</span>
                 </div>
@@ -1268,6 +1314,9 @@
 
         var currentScenario = 'goal-setting';
         var currentStep = 1;
+        var completedScenarios = {};
+        var headshotSandbox = document.getElementById('sandbox-headshot');
+        var navLogo = document.getElementById('navLogo');
 
         /* ─── Scenario Selection ─── */
         evoScenarioBtns.forEach(function(btn) {
@@ -1329,7 +1378,34 @@
                 requestAnimationFrame(function() {
                     previewContent.classList.add('preview__content--visible');
                 });
+
+                // Track scenario completion
+                completedScenarios[currentScenario] = true;
+                checkHeadshotUnlock();
             }, 800);
+        });
+
+        /* ─── Headshot Unlock Logic ─── */
+        function checkHeadshotUnlock() {
+            var allDone = completedScenarios['goal-setting']
+                && completedScenarios['job-description']
+                && completedScenarios['project-update'];
+            if (allDone) {
+                unlockHeadshot();
+            }
+        }
+
+        function unlockHeadshot() {
+            headshotSandbox.classList.remove('sandbox--locked');
+            headshotSandbox.classList.add('sandbox--unlocked');
+        }
+
+        /* ─── Nav Logo: Unlock shortcut ─── */
+        navLogo.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            unlockHeadshot();
+            headshotSandbox.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
 
         // Initialize
