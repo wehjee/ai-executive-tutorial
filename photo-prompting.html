@@ -421,7 +421,7 @@
             width: 28px;
             height: 28px;
             border-radius: 50%;
-            background: var(--accent-teal);
+            background: var(--accent-warm);
             color: #fff;
             font-family: var(--font-mono);
             font-size: 12px;
@@ -446,16 +446,8 @@
             display: block;
         }
 
-        .clarify-question__hint {
-            font-family: var(--font-body);
-            font-size: 11px;
-            color: var(--text-muted);
-            display: block;
-            margin-top: 3px;
-            margin-bottom: 8px;
-        }
-
         .clarify-question__input {
+            margin-top: 8px;
             width: 100%;
             padding: 10px 14px;
             border: 1px solid var(--border-subtle);
@@ -469,7 +461,7 @@
 
         .clarify-question__input:focus {
             outline: none;
-            border-color: var(--accent-teal);
+            border-color: var(--accent-warm);
         }
 
         .clarify-question__input::placeholder {
@@ -1373,40 +1365,35 @@
                     <div class="clarify-question__number">1</div>
                     <div class="clarify-question__content">
                         <label class="clarify-question__label">What is the specific job title for this role?</label>
-                        <span class="clarify-question__hint">e.g., "Senior Software Engineer," "Data Analyst," "Marketing Manager"</span>
-                        <input type="text" class="clarify-question__input" data-clarify="1" placeholder="Your answer...">
+                        <input type="text" class="clarify-question__input" data-clarify="1" placeholder="e.g., Senior Software Engineer, Data Analyst, Marketing Manager">
                     </div>
                 </div>
                 <div class="clarify-question">
                     <div class="clarify-question__number">2</div>
                     <div class="clarify-question__content">
                         <label class="clarify-question__label">What are the primary responsibilities this person will handle day-to-day?</label>
-                        <span class="clarify-question__hint">Be specific — e.g., "Develop Python-based APIs," "Manage social media content calendar"</span>
-                        <input type="text" class="clarify-question__input" data-clarify="2" placeholder="Your answer...">
+                        <input type="text" class="clarify-question__input" data-clarify="2" placeholder="e.g., Develop Python-based APIs, Manage social media content calendar">
                     </div>
                 </div>
                 <div class="clarify-question">
                     <div class="clarify-question__number">3</div>
                     <div class="clarify-question__content">
                         <label class="clarify-question__label">What essential skills, experience, and qualifications are required?</label>
-                        <span class="clarify-question__hint">e.g., "5 years experience in JavaScript," "Bachelor's in Computer Science"</span>
-                        <input type="text" class="clarify-question__input" data-clarify="3" placeholder="Your answer...">
+                        <input type="text" class="clarify-question__input" data-clarify="3" placeholder="e.g., 5 years in JavaScript, Bachelor's in Computer Science">
                     </div>
                 </div>
                 <div class="clarify-question">
                     <div class="clarify-question__number">4</div>
                     <div class="clarify-question__content">
                         <label class="clarify-question__label">Briefly describe your company's industry, size, and culture.</label>
-                        <span class="clarify-question__hint">This helps craft the "About Us" and "Why Join Us" sections</span>
-                        <input type="text" class="clarify-question__input" data-clarify="4" placeholder="Your answer...">
+                        <input type="text" class="clarify-question__input" data-clarify="4" placeholder="e.g., Fortune 500 healthcare, 50K employees, innovation-driven">
                     </div>
                 </div>
                 <div class="clarify-question">
                     <div class="clarify-question__number">5</div>
                     <div class="clarify-question__content">
                         <label class="clarify-question__label">Are there any compensation details or unique perks to highlight?</label>
-                        <span class="clarify-question__hint">e.g., salary range, remote work, tuition reimbursement, equity</span>
-                        <input type="text" class="clarify-question__input" data-clarify="5" placeholder="Your answer...">
+                        <input type="text" class="clarify-question__input" data-clarify="5" placeholder="e.g., $120K-$155K, remote work, tuition reimbursement, equity">
                     </div>
                 </div>
             </div>
