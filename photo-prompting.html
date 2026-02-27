@@ -863,7 +863,7 @@
             ═══════════════════════════════════════════ -->
             <div class="sandbox reveal" id="sandbox-evo">
                 <div class="sandbox__header">
-                    <div class="sandbox__title">Step 1 &mdash; Prompt Evolution</div>
+                    <div class="sandbox__title">Select a Workplace Scenario</div>
                     <div class="sandbox__scenarios">
                         <button class="scenario-btn scenario-btn--active" data-scenario="goal-setting">Goal Setting</button>
                         <button class="scenario-btn" data-scenario="job-description">Job Description</button>
@@ -875,21 +875,17 @@
                     <!-- Left Pane: Prompt -->
                     <div class="sandbox__pane sandbox__pane--left">
                         <span class="sandbox__pane-label">Your Prompt</span>
-                        <div class="step-indicator">
-                            <div class="step-indicator__dots">
-                                <div class="step-indicator__dot step-indicator__dot--active" data-step-dot="1"></div>
-                                <div class="step-indicator__dot" data-step-dot="2"></div>
-                                <div class="step-indicator__dot" data-step-dot="3"></div>
-                                <div class="step-indicator__dot" data-step-dot="4"></div>
+                        <div class="headshot-level-section">
+                            <label class="field__label">Prompt Level</label>
+                            <div class="headshot-level-pills">
+                                <button class="scenario-btn scenario-btn--active" data-evo-level="1">Vague</button>
+                                <button class="scenario-btn" data-evo-level="2">Better</button>
+                                <button class="scenario-btn" data-evo-level="3">Strong</button>
+                                <button class="scenario-btn" data-evo-level="4">Expert</button>
                             </div>
-                            <span class="step-indicator__label" id="stepLabel">Prompt 1 of 4</span>
                         </div>
                         <div class="field">
-                            <textarea class="field__textarea" id="promptArea" placeholder="Select a scenario to see prompt evolution..." readonly></textarea>
-                        </div>
-                        <div class="sandbox__actions">
-                            <button class="btn btn--build" id="buildBtn">Send to AI &rarr;</button>
-                            <button class="btn btn--iterate" id="iterateBtn" disabled>Next Level &rarr;</button>
+                            <textarea class="field__textarea" id="promptArea" placeholder="Select a scenario and prompt level..." readonly></textarea>
                         </div>
                     </div>
 
@@ -1231,96 +1227,53 @@
 
         /* ─── DOM References ─── */
         var promptArea = document.getElementById('promptArea');
-        var buildBtn = document.getElementById('buildBtn');
-        var iterateBtn = document.getElementById('iterateBtn');
         var previewContent = document.getElementById('previewContent');
         var previewEmpty = document.getElementById('previewEmpty');
         var previewLoading = document.getElementById('previewLoading');
-        var stepLabel = document.getElementById('stepLabel');
-        var stepDots = document.querySelectorAll('[data-step-dot]');
-        var scenarioBtns = document.querySelectorAll('.scenario-btn');
+        var evoScenarioBtns = document.querySelectorAll('[data-scenario]');
+        var evoLevelPills = document.querySelectorAll('[data-evo-level]');
 
         var currentScenario = 'goal-setting';
-        var currentStep = 0;
-        var built = false;
+        var currentStep = 1;
 
         /* ─── Scenario Selection ─── */
-        function selectScenario(key) {
-            currentScenario = key;
-            currentStep = 0;
-            built = false;
-
-            scenarioBtns.forEach(function(btn) {
-                btn.classList.toggle('scenario-btn--active', btn.dataset.scenario === key);
+        evoScenarioBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                currentScenario = btn.dataset.scenario;
+                evoScenarioBtns.forEach(function(b) {
+                    b.classList.toggle('scenario-btn--active', b.dataset.scenario === currentScenario);
+                });
+                loadEvoStep(currentStep);
             });
-
-            loadStep(1);
-        }
-
-        scenarioBtns.forEach(function(btn) {
-            btn.addEventListener('click', function() { selectScenario(btn.dataset.scenario); });
         });
 
-        /* ─── Step Loading ─── */
-        function loadStep(step) {
-            currentStep = step;
-            built = false;
+        /* ─── Level Selection ─── */
+        evoLevelPills.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                currentStep = parseInt(btn.getAttribute('data-evo-level'));
+                evoLevelPills.forEach(function(b) {
+                    b.classList.toggle('scenario-btn--active', parseInt(b.getAttribute('data-evo-level')) === currentStep);
+                });
+                loadEvoStep(currentStep);
+            });
+        });
 
+        /* ─── Load Step (prompt + auto-show output) ─── */
+        function loadEvoStep(step) {
+            currentStep = step;
             var data = promptEvolutionData[currentScenario];
             promptArea.value = data.prompts[step - 1];
 
-            // Update step indicator
-            stepLabel.textContent = 'Prompt ' + step + ' of 4';
-            stepDots.forEach(function(dot) {
-                var dotStep = parseInt(dot.dataset.stepDot);
-                dot.classList.remove('step-indicator__dot--active', 'step-indicator__dot--done');
-                if (dotStep === step) {
-                    dot.classList.add('step-indicator__dot--active');
-                } else if (dotStep < step) {
-                    dot.classList.add('step-indicator__dot--done');
-                }
-            });
-
-            // Reset preview for step 1
-            if (step === 1) {
-                previewContent.classList.remove('preview__content--visible');
-                previewContent.innerHTML = '';
-                previewEmpty.style.display = 'flex';
-            }
-
-            // Button states
-            buildBtn.disabled = false;
-            buildBtn.textContent = 'Send to AI \u2192';
-            iterateBtn.disabled = true;
-            iterateBtn.style.opacity = '0';
-
-        }
-
-        /* ─── Step dot click ─── */
-        stepDots.forEach(function(dot) {
-            dot.addEventListener('click', function() {
-                var step = parseInt(dot.dataset.stepDot);
-                loadStep(step);
-            });
-        });
-
-        /* ─── Build Action ─── */
-        function triggerBuild() {
-            if (built) return;
-            built = true;
-            buildBtn.disabled = true;
-
-            // Show loading
+            // Show loading shimmer
             previewEmpty.style.display = 'none';
             previewLoading.classList.add('preview__loading--active');
             previewContent.classList.remove('preview__content--visible');
 
-            // Simulate build time
+            // Simulate AI response
             setTimeout(function() {
-                var data = promptEvolutionData[currentScenario];
-                var quality = data.qualities[currentStep - 1];
-                var qualityLabel = data.qualityLabels[currentStep - 1];
-                var output = data.outputs[currentStep - 1];
+                var quality = data.qualities[step - 1];
+                var qualityLabel = data.qualityLabels[step - 1];
+                var output = data.outputs[step - 1];
 
                 var html = '<div class="quality-badge quality-badge--' + quality + '">' + qualityLabel + ' Prompt</div>';
                 html += '<div class="preview__output-text">' + output + '</div>';
@@ -1328,30 +1281,14 @@
 
                 previewLoading.classList.remove('preview__loading--active');
 
-                // Animate in
                 requestAnimationFrame(function() {
                     previewContent.classList.add('preview__content--visible');
                 });
-
-                // Show iterate button if not on last step
-                if (currentStep < 4) {
-                    iterateBtn.disabled = false;
-                    iterateBtn.style.opacity = '1';
-                }
-            }, 1200);
+            }, 800);
         }
 
-        buildBtn.addEventListener('click', triggerBuild);
-
-        iterateBtn.addEventListener('click', function() {
-            if (currentStep < 4) {
-                loadStep(currentStep + 1);
-                setTimeout(triggerBuild, 200);
-            }
-        });
-
-        // Initialize with linkedin scenario, step 1
-        loadStep(1);
+        // Initialize
+        loadEvoStep(1);
 
 
 
