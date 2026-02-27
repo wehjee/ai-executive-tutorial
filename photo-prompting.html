@@ -344,6 +344,170 @@
             opacity: 1;
         }
 
+        /* ─── Clarifying Questions Modal ─── */
+        .clarify-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1010;
+            background: rgba(26, 25, 23, 0.45);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s var(--ease-out-expo);
+        }
+
+        .clarify-overlay--active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .clarify-modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 580px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+            transform: translateY(12px);
+            transition: transform 0.3s var(--ease-out-expo);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .clarify-overlay--active .clarify-modal {
+            transform: translateY(0);
+        }
+
+        .clarify-modal__header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 28px 28px 0;
+        }
+
+        .clarify-modal__title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            color: var(--text-primary);
+        }
+
+        .clarify-modal__subtitle {
+            font-family: var(--font-body);
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .clarify-modal__body {
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .clarify-question {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .clarify-question__number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent-teal);
+            color: #fff;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .clarify-question__content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .clarify-question__label {
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.5;
+            display: block;
+        }
+
+        .clarify-question__hint {
+            font-family: var(--font-body);
+            font-size: 11px;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 3px;
+            margin-bottom: 8px;
+        }
+
+        .clarify-question__input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            font-family: var(--font-body);
+            font-size: 13px;
+            color: var(--text-primary);
+            transition: border-color 0.2s ease;
+        }
+
+        .clarify-question__input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+        }
+
+        .clarify-question__input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        .clarify-modal__footer {
+            display: flex;
+            align-items: center;
+            padding: 16px 28px;
+            border-top: 1px solid var(--border-subtle);
+            gap: 12px;
+        }
+
+        .clarify-modal__cancel {
+            background: none;
+            border: none;
+            font-family: var(--font-body);
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .clarify-modal__cancel:hover {
+            color: var(--text-primary);
+        }
+
+        .clarify-modal__counter {
+            flex: 1;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
         /* ─── Prompt Evo Responsive ─── */
         @media (max-width: 900px) {
             .sandbox__header {
@@ -1376,6 +1540,16 @@
 
         /* ─── Send to AI ─── */
         evoSendBtn.addEventListener('click', function() {
+            // For job-description: show clarifying questions modal
+            if (currentScenario === 'job-description') {
+                openClarifyModal();
+                return;
+            }
+
+            runEvoGenerate();
+        });
+
+        function runEvoGenerate() {
             evoSendBtn.disabled = true;
             var data = promptEvolutionData[currentScenario];
 
@@ -1401,6 +1575,76 @@
                 completedScenarios[currentScenario] = true;
                 checkHeadshotUnlock();
             }, 800);
+        }
+
+        /* ─── Clarifying Questions Output ─── */
+        var clarifyOutput = '<div class="preview__sample-output"><strong>Senior Data Analyst \u2014 Population Health Analytics</strong><br>Reports to: VP of Data Science<br><br><em>Help us prevent hospitalizations before they happen.</em><br><br>Our Population Health Analytics division is investing $50M in predictive models that identify at-risk members and intervene early. We need a Senior Data Analyst who can turn claims data into lifesaving insights.<br><br><strong>What You\u2019ll Do:</strong><br>\u2022 Build predictive models on 10M+ claims records to identify hospitalization risk<br>\u2022 Partner with clinical teams to design early intervention programs<br>\u2022 Create executive dashboards driving $200M in care management decisions<br>\u2022 Analyze Medicare/Medicaid data to uncover cost-saving opportunities<br>\u2022 Translate complex data findings into actionable insights for non-technical stakeholders<br><br><strong>What You Bring:</strong><br>\u2022 5+ years in healthcare analytics<br>\u2022 Advanced SQL, Python/R, Tableau<br>\u2022 Experience with Medicare/Medicaid datasets<br>\u2022 Bachelor\u2019s in Computer Science, Statistics, or related field<br><br><strong>Nice to Have:</strong><br>\u2022 Machine learning experience, Databricks, HL7/FHIR<br><br><strong>Why Join Us:</strong><br>\u2022 Remote flexibility with quarterly on-sites<br>\u2022 Tuition reimbursement up to $10K/year<br>\u2022 The chance to advance health equity for 25M members<br>\u2022 Competitive salary range: $120K\u2013$155K + equity</div><div class="preview__tip-callout"><strong>\u2705 How clarifying questions improved this output:</strong><br><br>Your 5 answers gave the AI what it couldn\u2019t guess on its own:<br><br>\u2022 <strong>Job title</strong> \u2192 "Senior Data Analyst" set the seniority, scope, and salary expectations<br>\u2022 <strong>Responsibilities</strong> \u2192 Specific tasks like "predictive models on claims data" replaced generic filler<br>\u2022 <strong>Qualifications</strong> \u2192 "SQL, Python, Medicare data" attracted the right talent instead of everyone<br>\u2022 <strong>Company context</strong> \u2192 "$50M investment" and "25M members" made the role feel meaningful<br>\u2022 <strong>Compensation &amp; perks</strong> \u2192 Salary range and remote work close the deal for top candidates<br><br>Without these answers, the AI would\u2019ve produced a generic description no one clicks on. <strong>Clarifying questions turn a vague request into a precise brief</strong> \u2014 the AI does the writing, but you provide the intelligence.</div>';
+
+        /* ─── Clarifying Questions Modal ─── */
+        var clarifyOverlay = document.getElementById('clarify-overlay');
+        var clarifyInputs = document.querySelectorAll('[data-clarify]');
+        var clarifyCounter = document.getElementById('clarify-counter');
+        var clarifyGenerateBtn = document.getElementById('clarify-generate');
+
+        function openClarifyModal() {
+            // Reset inputs
+            clarifyInputs.forEach(function(inp) { inp.value = ''; });
+            updateClarifyCounter();
+            clarifyOverlay.classList.add('clarify-overlay--active');
+        }
+
+        function closeClarifyModal() {
+            clarifyOverlay.classList.remove('clarify-overlay--active');
+        }
+
+        function updateClarifyCounter() {
+            var filled = 0;
+            clarifyInputs.forEach(function(inp) {
+                if (inp.value.trim() !== '') filled++;
+            });
+            clarifyCounter.textContent = filled + ' of 5 answered';
+        }
+
+        clarifyInputs.forEach(function(inp) {
+            inp.addEventListener('input', updateClarifyCounter);
+        });
+
+        document.getElementById('clarify-close').addEventListener('click', closeClarifyModal);
+        document.getElementById('clarify-cancel').addEventListener('click', closeClarifyModal);
+
+        clarifyOverlay.addEventListener('click', function(e) {
+            if (e.target === clarifyOverlay) closeClarifyModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && clarifyOverlay.classList.contains('clarify-overlay--active')) {
+                closeClarifyModal();
+            }
+        });
+
+        // Generate from clarifying questions
+        clarifyGenerateBtn.addEventListener('click', function() {
+            closeClarifyModal();
+            evoSendBtn.disabled = true;
+
+            // Show loading shimmer
+            previewEmpty.style.display = 'none';
+            previewLoading.classList.add('preview__loading--active');
+            previewContent.classList.remove('preview__content--visible');
+
+            setTimeout(function() {
+                var html = '<div class="preview__output-text">' + clarifyOutput + '</div>';
+                previewContent.innerHTML = html;
+
+                previewLoading.classList.remove('preview__loading--active');
+
+                requestAnimationFrame(function() {
+                    previewContent.classList.add('preview__content--visible');
+                });
+
+                completedScenarios['job-description'] = true;
+                checkHeadshotUnlock();
+            }, 1200);
         });
 
         /* ─── Headshot Unlock Logic ─── */
@@ -1883,6 +2127,68 @@
 
     })();
     </script>
+
+    <!-- ═══════════════════════════════════════════
+         CLARIFYING QUESTIONS MODAL
+    ═══════════════════════════════════════════ -->
+    <div class="clarify-overlay" id="clarify-overlay">
+        <div class="clarify-modal">
+            <div class="clarify-modal__header">
+                <div>
+                    <div class="clarify-modal__title">Clarifying Questions</div>
+                    <div class="clarify-modal__subtitle">Answer these to automatically improve your prompt</div>
+                </div>
+                <button class="feedback-modal__close" id="clarify-close" type="button">&times;</button>
+            </div>
+            <div class="clarify-modal__body">
+                <div class="clarify-question">
+                    <div class="clarify-question__number">1</div>
+                    <div class="clarify-question__content">
+                        <label class="clarify-question__label">What is the specific job title for this role?</label>
+                        <span class="clarify-question__hint">e.g., "Senior Software Engineer," "Data Analyst," "Marketing Manager"</span>
+                        <input type="text" class="clarify-question__input" data-clarify="1" placeholder="Your answer...">
+                    </div>
+                </div>
+                <div class="clarify-question">
+                    <div class="clarify-question__number">2</div>
+                    <div class="clarify-question__content">
+                        <label class="clarify-question__label">What are the primary responsibilities this person will handle day-to-day?</label>
+                        <span class="clarify-question__hint">Be specific — e.g., "Develop Python-based APIs," "Manage social media content calendar"</span>
+                        <input type="text" class="clarify-question__input" data-clarify="2" placeholder="Your answer...">
+                    </div>
+                </div>
+                <div class="clarify-question">
+                    <div class="clarify-question__number">3</div>
+                    <div class="clarify-question__content">
+                        <label class="clarify-question__label">What essential skills, experience, and qualifications are required?</label>
+                        <span class="clarify-question__hint">e.g., "5 years experience in JavaScript," "Bachelor's in Computer Science"</span>
+                        <input type="text" class="clarify-question__input" data-clarify="3" placeholder="Your answer...">
+                    </div>
+                </div>
+                <div class="clarify-question">
+                    <div class="clarify-question__number">4</div>
+                    <div class="clarify-question__content">
+                        <label class="clarify-question__label">Briefly describe your company's industry, size, and culture.</label>
+                        <span class="clarify-question__hint">This helps craft the "About Us" and "Why Join Us" sections</span>
+                        <input type="text" class="clarify-question__input" data-clarify="4" placeholder="Your answer...">
+                    </div>
+                </div>
+                <div class="clarify-question">
+                    <div class="clarify-question__number">5</div>
+                    <div class="clarify-question__content">
+                        <label class="clarify-question__label">Are there any compensation details or unique perks to highlight?</label>
+                        <span class="clarify-question__hint">e.g., salary range, remote work, tuition reimbursement, equity</span>
+                        <input type="text" class="clarify-question__input" data-clarify="5" placeholder="Your answer...">
+                    </div>
+                </div>
+            </div>
+            <div class="clarify-modal__footer">
+                <button class="clarify-modal__cancel" id="clarify-cancel">Cancel</button>
+                <span class="clarify-modal__counter" id="clarify-counter">0 of 5 answered</span>
+                <button class="btn btn--build" id="clarify-generate">Generate &rarr;</button>
+            </div>
+        </div>
+    </div>
 
     <!-- ═══════════════════════════════════════════
          FEEDBACK MODAL
