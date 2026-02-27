@@ -742,19 +742,6 @@
             color: #fff;
         }
 
-        /* ─── Readonly Prompt Textarea ─── */
-        .field__textarea[readonly] {
-            cursor: default;
-            background: var(--bg-primary);
-            opacity: 0.85;
-        }
-
-        .headshot-prompt-hint {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-        }
 
         @media (max-width: 600px) {
             .headshot-styles,
@@ -1019,15 +1006,6 @@
                         <!-- Prompt Level Selection -->
                         <div class="headshot-level-section" id="headshot-level-section">
                             <label class="field__label">Prompt Level</label>
-                            <div class="step-indicator">
-                                <div class="step-indicator__dots">
-                                    <div class="step-indicator__dot step-indicator__dot--active" data-hs-step="1"></div>
-                                    <div class="step-indicator__dot" data-hs-step="2"></div>
-                                    <div class="step-indicator__dot" data-hs-step="3"></div>
-                                    <div class="step-indicator__dot" data-hs-step="4"></div>
-                                </div>
-                                <span class="step-indicator__label" id="headshot-step-label">Level 1 of 4 &mdash; Vague</span>
-                            </div>
                             <div class="headshot-level-pills">
                                 <button class="scenario-btn scenario-btn--active" data-level="1">Vague</button>
                                 <button class="scenario-btn" data-level="2">Better</button>
@@ -1036,14 +1014,10 @@
                             </div>
                         </div>
 
-                        <!-- Loaded Prompt (readonly) -->
+                        <!-- Prompt Textarea -->
                         <div class="field">
                             <label class="field__label" for="headshot-prompt">Your Prompt</label>
-                            <textarea class="field__textarea" id="headshot-prompt" rows="4" readonly></textarea>
-                            <div class="headshot-prompt-hint" id="headshot-prompt-status">
-                                <span class="quality-badge quality-badge--poor" id="headshot-quality-badge" style="display:inline;padding:2px 8px;font-size:10px">Vague</span>
-                                <span id="headshot-prompt-hint-text">Select a style and level to load a prompt</span>
-                            </div>
+                            <textarea class="field__textarea" id="headshot-prompt" rows="4"></textarea>
                         </div>
 
                         <!-- Generate Button -->
@@ -1463,7 +1437,6 @@
         var downloadBtn = document.getElementById('headshot-download');
         var generateBtn = document.getElementById('headshot-generate');
         var promptTextareaEl = document.getElementById('headshot-prompt');
-        var promptStatus = document.getElementById('headshot-prompt-status');
         var errorDisplay = document.getElementById('headshot-error');
         var inputTabs = document.querySelectorAll('.headshot-tab');
         var stockZone = document.getElementById('headshot-stock');
@@ -1478,21 +1451,25 @@
 
         // ─── Stock Photo Loader ───
         function loadStockPhoto() {
-            var img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = function() {
-                var canvas = document.createElement('canvas');
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-                photoDataUrl = dataUrl;
-                photoLoaded = true;
-                beforeImg.src = dataUrl;
-                updateGenerateButton();
-            };
-            img.src = 'images/Jim_Rechtin.jpg';
+            fetch('images/Jim_Rechtin.jpg')
+                .then(function(res) { return res.blob(); })
+                .then(function(blob) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        photoDataUrl = e.target.result;
+                        photoLoaded = true;
+                        beforeImg.src = photoDataUrl;
+                        updateGenerateButton();
+                    };
+                    reader.readAsDataURL(blob);
+                })
+                .catch(function() {
+                    // Fallback: just set the src directly
+                    photoLoaded = true;
+                    photoDataUrl = null;
+                    beforeImg.src = 'images/Jim_Rechtin.jpg';
+                    updateGenerateButton();
+                });
         }
 
         // ─── Tab Switching (3 tabs: stock / upload / selfie) ───
@@ -1663,8 +1640,6 @@
 
         // ─── Level Selection ───
         var levelPills = document.querySelectorAll('[data-level]');
-        var hsStepDots = document.querySelectorAll('[data-hs-step]');
-        var hsStepLabel = document.getElementById('headshot-step-label');
 
         levelPills.forEach(function (btn) {
             btn.addEventListener('click', function () {
@@ -1672,59 +1647,22 @@
                 levelPills.forEach(function (b) {
                     b.classList.toggle('scenario-btn--active', parseInt(b.getAttribute('data-level')) === currentLevel);
                 });
-                updateStepIndicator();
                 loadHeadshotPrompt();
             });
         });
-
-        hsStepDots.forEach(function (dot) {
-            dot.addEventListener('click', function () {
-                currentLevel = parseInt(dot.getAttribute('data-hs-step'));
-                levelPills.forEach(function (b) {
-                    b.classList.toggle('scenario-btn--active', parseInt(b.getAttribute('data-level')) === currentLevel);
-                });
-                updateStepIndicator();
-                loadHeadshotPrompt();
-            });
-        });
-
-        function updateStepIndicator() {
-            var data = headshotPromptData[currentStyle];
-            hsStepLabel.textContent = 'Level ' + currentLevel + ' of 4 \u2014 ' + data.qualityLabels[currentLevel - 1];
-
-            hsStepDots.forEach(function (dot) {
-                var dotStep = parseInt(dot.getAttribute('data-hs-step'));
-                dot.classList.remove('step-indicator__dot--active', 'step-indicator__dot--done');
-                if (dotStep === currentLevel) {
-                    dot.classList.add('step-indicator__dot--active');
-                } else if (dotStep < currentLevel) {
-                    dot.classList.add('step-indicator__dot--done');
-                }
-            });
-        }
 
         // ─── Prompt Loading ───
         function loadHeadshotPrompt() {
             var data = headshotPromptData[currentStyle];
             var prompt = data.prompts[currentLevel - 1];
             promptTextareaEl.value = prompt;
-
-            var badge = document.getElementById('headshot-quality-badge');
-            var hint = document.getElementById('headshot-prompt-hint-text');
-            var quality = data.qualities[currentLevel - 1];
-            var qualityLabel = data.qualityLabels[currentLevel - 1];
-
-            badge.className = 'quality-badge quality-badge--' + quality;
-            badge.textContent = qualityLabel;
-            badge.style.display = 'inline';
-            badge.style.padding = '2px 8px';
-            badge.style.fontSize = '10px';
-            hint.textContent = qualityLabel + ' prompt loaded \u2014 click Generate';
-
-            promptStatus.classList.add('field__hint--detected');
-            updateStepIndicator();
             updateGenerateButton();
         }
+
+        // ─── Textarea edit listener ───
+        promptTextareaEl.addEventListener('input', function () {
+            updateGenerateButton();
+        });
 
         // ─── Generate Button State ───
         function updateGenerateButton() {
