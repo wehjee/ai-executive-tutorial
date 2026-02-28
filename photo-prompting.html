@@ -1118,12 +1118,12 @@
                     <div class="sandbox__pane sandbox__pane--left">
                         <span class="sandbox__pane-label">Your Prompt</span>
                         <div class="headshot-level-section">
-                            <label class="field__label">Prompt Level</label>
+                            <label class="field__label">Prompt</label>
                             <div class="headshot-level-pills">
-                                <button class="scenario-btn scenario-btn--active" data-evo-level="1">Vague</button>
-                                <button class="scenario-btn" data-evo-level="2">Better</button>
-                                <button class="scenario-btn" data-evo-level="3">Strong</button>
-                                <button class="scenario-btn" data-evo-level="4">Expert</button>
+                                <button class="scenario-btn scenario-btn--active" data-evo-level="1">1</button>
+                                <button class="scenario-btn" data-evo-level="2">2</button>
+                                <button class="scenario-btn" data-evo-level="3">3</button>
+                                <button class="scenario-btn" data-evo-level="4">4</button>
                             </div>
                         </div>
                         <div class="field">
@@ -1398,7 +1398,7 @@
                 </div>
             </div>
             <div class="clarify-modal__footer">
-                <button class="clarify-modal__cancel" id="clarify-cancel">Cancel</button>
+                <button class="clarify-modal__cancel" id="clarify-skip">Skip</button>
                 <span class="clarify-modal__counter" id="clarify-counter">0 of 5 answered</span>
                 <button class="btn btn--build" id="clarify-generate">Generate &rarr;</button>
             </div>
@@ -1629,6 +1629,8 @@
         /* ─── Clarifying Questions Output ─── */
         var clarifyOutput = '<div class="preview__sample-output"><strong>Senior Data Analyst \u2014 Population Health Analytics</strong><br>Reports to: VP of Data Science<br><br><em>Help us prevent hospitalizations before they happen.</em><br><br>Our Population Health Analytics division is investing $50M in predictive models that identify at-risk members and intervene early. We need a Senior Data Analyst who can turn claims data into lifesaving insights.<br><br><strong>What You\u2019ll Do:</strong><br>\u2022 Build predictive models on 10M+ claims records to identify hospitalization risk<br>\u2022 Partner with clinical teams to design early intervention programs<br>\u2022 Create executive dashboards driving $200M in care management decisions<br>\u2022 Analyze Medicare/Medicaid data to uncover cost-saving opportunities<br>\u2022 Translate complex data findings into actionable insights for non-technical stakeholders<br><br><strong>What You Bring:</strong><br>\u2022 5+ years in healthcare analytics<br>\u2022 Advanced SQL, Python/R, Tableau<br>\u2022 Experience with Medicare/Medicaid datasets<br>\u2022 Bachelor\u2019s in Computer Science, Statistics, or related field<br><br><strong>Nice to Have:</strong><br>\u2022 Machine learning experience, Databricks, HL7/FHIR<br><br><strong>Why Join Us:</strong><br>\u2022 Remote flexibility with quarterly on-sites<br>\u2022 Tuition reimbursement up to $10K/year<br>\u2022 The chance to advance health equity for 25M members<br>\u2022 Competitive salary range: $120K\u2013$155K + equity</div><div class="preview__tip-callout"><strong>\u2705 How clarifying questions improved this output:</strong><br><br>Your 5 answers gave the AI what it couldn\u2019t guess on its own:<br><br>\u2022 <strong>Job title</strong> \u2192 "Senior Data Analyst" set the seniority, scope, and salary expectations<br>\u2022 <strong>Responsibilities</strong> \u2192 Specific tasks like "predictive models on claims data" replaced generic filler<br>\u2022 <strong>Qualifications</strong> \u2192 "SQL, Python, Medicare data" attracted the right talent instead of everyone<br>\u2022 <strong>Company context</strong> \u2192 "$50M investment" and "25M members" made the role feel meaningful<br>\u2022 <strong>Compensation &amp; perks</strong> \u2192 Salary range and remote work close the deal for top candidates<br><br>Without these answers, the AI would\u2019ve produced a generic description no one clicks on. <strong>Clarifying questions turn a vague request into a precise brief</strong> \u2014 the AI does the writing, but you provide the intelligence.</div>';
 
+        var skipOutput = '<div class="preview__sample-output"><strong>Data Analyst</strong><br><br>We are looking for a Data Analyst to join our team. The ideal candidate will have experience with data analysis and reporting. You will work with various teams to provide insights and support decision-making.<br><br><strong>Responsibilities:</strong><br>\u2022 Analyze data and create reports<br>\u2022 Support business teams with insights<br>\u2022 Maintain dashboards and data pipelines<br>\u2022 Communicate findings to stakeholders<br><br><strong>Qualifications:</strong><br>\u2022 Bachelor\u2019s degree in a related field<br>\u2022 Experience with SQL and Excel<br>\u2022 Strong communication skills<br>\u2022 Attention to detail</div><div class="preview__tip-callout"><strong>\u2728 How clarifying questions would have improved this:</strong><br><br>Without context, the AI produced a generic description that could be for any company. Here\u2019s what was missing:<br><br>\u2022 <strong>No job title specificity</strong> \u2014 "Data Analyst" is too broad. Is it senior? What domain?<br>\u2022 <strong>No real responsibilities</strong> \u2014 "Analyze data" says nothing about what data or why it matters<br>\u2022 <strong>No qualifications filter</strong> \u2014 Without specific skills, you\u2019ll get hundreds of unqualified applicants<br>\u2022 <strong>No company story</strong> \u2014 No mission, no team size, no impact \u2014 nothing to attract top talent<br>\u2022 <strong>No compensation or perks</strong> \u2014 Candidates skip listings without salary ranges<br><br>Go back and try again \u2014 answer the 5 clarifying questions and watch the AI produce a description that actually attracts the right people. <strong>The difference isn\u2019t the AI. It\u2019s the input.</strong></div>';
+
         /* ─── Clarifying Questions Modal ─── */
         var clarifyOverlay = document.getElementById('clarify-overlay');
         var clarifyInputs = document.querySelectorAll('[data-clarify]');
@@ -1659,7 +1661,29 @@
         });
 
         document.getElementById('clarify-close').addEventListener('click', closeClarifyModal);
-        document.getElementById('clarify-cancel').addEventListener('click', closeClarifyModal);
+        document.getElementById('clarify-skip').addEventListener('click', function() {
+            closeClarifyModal();
+            evoSendBtn.disabled = true;
+
+            // Show loading shimmer
+            previewEmpty.style.display = 'none';
+            previewLoading.classList.add('preview__loading--active');
+            previewContent.classList.remove('preview__content--visible');
+
+            setTimeout(function() {
+                var html = '<div class="preview__output-text">' + skipOutput + '</div>';
+                previewContent.innerHTML = html;
+
+                previewLoading.classList.remove('preview__loading--active');
+
+                requestAnimationFrame(function() {
+                    previewContent.classList.add('preview__content--visible');
+                });
+
+                completedScenarios['job-description'] = true;
+                checkHeadshotUnlock();
+            }, 800);
+        });
 
         clarifyOverlay.addEventListener('click', function(e) {
             if (e.target === clarifyOverlay) closeClarifyModal();
