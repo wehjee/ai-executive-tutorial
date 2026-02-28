@@ -916,11 +916,11 @@ body::before {
         display: flex;
     }
 
-    /* Mobile nav overlay */
+    /* Mobile nav overlay — full screen, centered */
     .nav__links {
         display: none;
         position: fixed;
-        top: 64px;
+        top: 0;
         left: 0;
         right: 0;
         bottom: 0;
