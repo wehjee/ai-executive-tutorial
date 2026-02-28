@@ -138,6 +138,13 @@ body::before {
     background: var(--bg-secondary);
 }
 
+/* Feedback link inside nav — hidden on desktop, shown on mobile */
+.nav__link--feedback {
+    display: none;
+    color: var(--accent-warm);
+    font-weight: 500;
+}
+
 /* ═══════════════════════════════════════════
    BUTTONS
 ═══════════════════════════════════════════ */
@@ -881,6 +888,21 @@ body::before {
     .framework__arrow { transform: rotate(90deg); }
     .page__number { display: none; }
 
+    /* Hide long title on mobile — keep logo only */
+    .nav__title {
+        display: none;
+    }
+
+    /* Hide standalone feedback button — it moves into the overlay */
+    .nav__feedback {
+        display: none;
+    }
+
+    /* Show mobile-only feedback link inside overlay */
+    .nav__link--feedback {
+        display: block;
+    }
+
     /* Hamburger visible on mobile */
     .nav__hamburger {
         display: flex;
@@ -1121,13 +1143,6 @@ body::before {
     color: var(--text-secondary);
     font-weight: 300;
     line-height: 1.6;
-}
-
-@media (max-width: 900px) {
-    .nav__feedback {
-        font-size: 11px;
-        padding: 4px 12px;
-    }
 }
 
 @media (max-width: 480px) {
