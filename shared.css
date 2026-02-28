@@ -916,15 +916,22 @@ body::before {
         display: flex;
     }
 
+    /* Make nav solid on mobile */
+    .nav {
+        background: #FAFAF8;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
     /* Mobile nav overlay — full screen, centered */
     .nav__links {
         display: none;
         position: fixed;
         top: 0;
         left: 0;
-        right: 0;
-        bottom: 0;
-        background: var(--bg-primary);
+        width: 100%;
+        height: 100%;
+        background: #FAFAF8;
         flex-direction: column;
         align-items: center;
         justify-content: center;
