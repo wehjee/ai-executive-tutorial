@@ -1375,6 +1375,251 @@
             }
         }
 
+        /* ═══════════════════════════════════════════
+           AGENT MODAL
+        ═══════════════════════════════════════════ */
+        .agent-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1010;
+            background: rgba(26, 25, 23, 0.45);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s var(--ease-out-expo);
+        }
+
+        .agent-modal-overlay--active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .agent-modal {
+            background: var(--bg-card);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+            transform: translateY(12px);
+            transition: transform 0.3s var(--ease-out-expo);
+        }
+
+        .agent-modal-overlay--active .agent-modal {
+            transform: translateY(0);
+        }
+
+        .agent-modal__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-modal__agent {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .agent-modal__emoji {
+            font-size: 36px;
+            line-height: 1;
+        }
+
+        .agent-modal__name {
+            font-family: var(--font-display);
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        .agent-modal__dept {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-top: 2px;
+        }
+
+        .agent-modal__close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .agent-modal__close:hover {
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+        }
+
+        .agent-modal__body {
+            padding: 24px 28px;
+        }
+
+        .agent-modal__label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .agent-modal__projects {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .agent-modal__project {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-subtle);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s var(--ease-out-expo);
+            font-family: var(--font-body);
+        }
+
+        .agent-modal__project:hover {
+            border-color: var(--accent-gold);
+            background: var(--bg-card-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .agent-modal__project-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .agent-modal__project-count {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+        }
+
+        .agent-modal__divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .agent-modal__divider::before,
+        .agent-modal__divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-subtle);
+        }
+
+        .agent-modal__divider span {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .agent-modal__new {
+            display: flex;
+            gap: 10px;
+        }
+
+        .agent-modal__input {
+            flex: 1;
+            padding: 10px 16px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-subtle);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.25s var(--ease-out-expo);
+        }
+
+        .agent-modal__input:focus {
+            border-color: var(--accent-gold);
+        }
+
+        .agent-modal__input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .agent-modal__create {
+            flex-shrink: 0;
+        }
+
+        .agent-modal__success {
+            text-align: center;
+            padding: 40px 28px;
+        }
+
+        .agent-modal__success-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(58, 143, 126, 0.12);
+            color: var(--accent-teal);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 16px;
+        }
+
+        .agent-modal__success-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .agent-modal__success-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 480px) {
+            .agent-modal__new {
+                flex-direction: column;
+            }
+
+            .agent-modal__body {
+                padding: 20px;
+            }
+
+            .agent-modal__header {
+                padding: 20px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -3099,6 +3344,153 @@
         // Initial render
         renderAgents();
 
+    })();
+    </script>
+
+    <!-- ═══════════════════════════════════════════
+         AGENT MODAL
+    ═══════════════════════════════════════════ -->
+    <div class="agent-modal-overlay" id="agent-modal-overlay">
+        <div class="agent-modal">
+            <div class="agent-modal__header">
+                <div class="agent-modal__agent">
+                    <span class="agent-modal__emoji" id="agent-modal-emoji"></span>
+                    <div>
+                        <div class="agent-modal__name" id="agent-modal-name"></div>
+                        <div class="agent-modal__dept" id="agent-modal-dept"></div>
+                    </div>
+                </div>
+                <button class="agent-modal__close" id="agent-modal-close" type="button">&times;</button>
+            </div>
+            <div class="agent-modal__body" id="agent-modal-body">
+                <div class="agent-modal__label">Add to Project</div>
+                <div class="agent-modal__projects" id="agent-modal-projects"></div>
+                <div class="agent-modal__divider"><span>or</span></div>
+                <div class="agent-modal__new">
+                    <input type="text" class="agent-modal__input" id="agent-modal-input" placeholder="New project name...">
+                    <button class="btn btn--build agent-modal__create" id="agent-modal-create" type="button">Create Project &rarr;</button>
+                </div>
+            </div>
+            <div class="agent-modal__success" id="agent-modal-success" style="display:none">
+                <div class="agent-modal__success-icon">&#10003;</div>
+                <div class="agent-modal__success-title" id="agent-modal-success-title"></div>
+                <div class="agent-modal__success-text" id="agent-modal-success-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var dummyProjects = [
+            { name: 'Q3 Benefits Review', agents: 2 },
+            { name: 'Claims Processing Pilot', agents: 4 },
+            { name: 'Member Outreach 2026', agents: 1 }
+        ];
+
+        var overlay = document.getElementById('agent-modal-overlay');
+        var modalBody = document.getElementById('agent-modal-body');
+        var modalSuccess = document.getElementById('agent-modal-success');
+        var modalEmoji = document.getElementById('agent-modal-emoji');
+        var modalName = document.getElementById('agent-modal-name');
+        var modalDept = document.getElementById('agent-modal-dept');
+        var modalProjects = document.getElementById('agent-modal-projects');
+        var modalInput = document.getElementById('agent-modal-input');
+        var modalCreate = document.getElementById('agent-modal-create');
+        var modalClose = document.getElementById('agent-modal-close');
+        var successTitle = document.getElementById('agent-modal-success-title');
+        var successText = document.getElementById('agent-modal-success-text');
+
+        var deptLabels = {
+            legal: 'Legal', data: 'Data', hr: 'Human Resources',
+            operations: 'Operations', productivity: 'Productivity', engineering: 'Engineering'
+        };
+
+        var selectedAgentName = '';
+        var closeTimer = null;
+
+        function openAgentModal(agent) {
+            selectedAgentName = agent.name;
+            modalEmoji.textContent = agent.emoji;
+            modalName.textContent = agent.name;
+            modalDept.textContent = deptLabels[agent.dept];
+            modalInput.value = '';
+
+            // Render project list
+            modalProjects.innerHTML = dummyProjects.map(function(p) {
+                return '<button class="agent-modal__project" type="button" data-project="' + p.name + '">' +
+                    '<span class="agent-modal__project-name">' + p.name + '</span>' +
+                    '<span class="agent-modal__project-count">' + p.agents + ' agent' + (p.agents !== 1 ? 's' : '') + '</span>' +
+                '</button>';
+            }).join('');
+
+            // Reset to body view
+            modalBody.style.display = 'block';
+            modalSuccess.style.display = 'none';
+
+            overlay.classList.add('agent-modal-overlay--active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAgentModal() {
+            overlay.classList.remove('agent-modal-overlay--active');
+            document.body.style.overflow = '';
+            if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+        }
+
+        function showSuccess(projectName) {
+            modalBody.style.display = 'none';
+            modalSuccess.style.display = 'block';
+            successTitle.textContent = 'Agent Added';
+            successText.textContent = selectedAgentName + ' has been added to ' + projectName + '.';
+
+            closeTimer = setTimeout(closeAgentModal, 1500);
+        }
+
+        // Open on card click (event delegation)
+        var agentGrid = document.getElementById('agent-grid');
+        agentGrid.addEventListener('click', function(e) {
+            var card = e.target.closest('.explore-agent-card');
+            if (!card) return;
+            var name = card.querySelector('.explore-agent-card__name').textContent;
+            var tag = card.querySelector('.explore-agent-card__tag').textContent.toLowerCase();
+            var emoji = card.querySelector('.explore-agent-card__emoji').textContent;
+            // Find matching dept key
+            var dept = '';
+            for (var key in deptLabels) {
+                if (deptLabels[key].toLowerCase() === tag) { dept = key; break; }
+            }
+            openAgentModal({ name: name, emoji: emoji, dept: dept });
+        });
+
+        // Select existing project
+        modalProjects.addEventListener('click', function(e) {
+            var btn = e.target.closest('.agent-modal__project');
+            if (!btn) return;
+            var projectName = btn.getAttribute('data-project');
+            showSuccess(projectName);
+        });
+
+        // Create new project
+        modalCreate.addEventListener('click', function() {
+            var name = modalInput.value.trim();
+            if (!name) { modalInput.focus(); return; }
+            showSuccess(name);
+        });
+
+        modalInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { modalCreate.click(); }
+        });
+
+        // Close
+        modalClose.addEventListener('click', closeAgentModal);
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) closeAgentModal();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && overlay.classList.contains('agent-modal-overlay--active')) {
+                closeAgentModal();
+            }
+        });
     })();
     </script>
 
