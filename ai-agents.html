@@ -1190,6 +1190,191 @@
             }
         }
 
+        /* ═══════════════════════════════════════════
+           EXPLORE AGENTS
+        ═══════════════════════════════════════════ */
+        .explore-agents {
+            margin-top: 64px;
+        }
+
+        .explore-agents__title {
+            font-family: var(--font-display);
+            font-size: clamp(24px, 3vw, 32px);
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .explore-agents__intro {
+            font-size: 15px;
+            color: var(--text-secondary);
+            max-width: 520px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .explore-agents__search {
+            margin-bottom: 16px;
+        }
+
+        .explore-agents__search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 16px 10px 40px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-subtle);
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.25s var(--ease-out-expo);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239C998F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 14px center;
+        }
+
+        .explore-agents__search-input:focus {
+            border-color: var(--accent-gold);
+        }
+
+        .explore-agents__search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .explore-agents__filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 28px;
+        }
+
+        .explore-filter {
+            padding: 7px 18px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1.5px solid var(--border-subtle);
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.25s var(--ease-out-expo);
+        }
+
+        .explore-filter:hover {
+            border-color: var(--border-active);
+            color: var(--text-primary);
+        }
+
+        .explore-filter--active {
+            background: var(--accent-gold);
+            border-color: var(--accent-gold);
+            color: #FFFFFF;
+        }
+
+        .explore-filter--active:hover {
+            background: var(--accent-gold);
+            border-color: var(--accent-gold);
+            color: #FFFFFF;
+        }
+
+        .explore-agents__grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .explore-agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s var(--ease-out-expo);
+            cursor: default;
+        }
+
+        .explore-agent-card:hover {
+            border-color: var(--border-active);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .explore-agent-card__emoji {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .explore-agent-card__name {
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .explore-agent-card__desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .explore-agent-card__meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .explore-agent-card__tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 100px;
+            color: var(--accent-gold);
+        }
+
+        .explore-agent-card__tools {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.02em;
+            color: var(--text-muted);
+        }
+
+        .explore-agents__empty {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .explore-agents__grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .explore-agents__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .explore-agents__search-input {
+                max-width: 100%;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1565,6 +1750,31 @@
                     </div>
                     <div class="plugin-output__feed" id="plugin-feed"></div>
                 </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 EXPLORE AGENTS
+            ═══════════════════════════════════════════ -->
+            <div class="explore-agents reveal">
+                <h2 class="explore-agents__title">Explore Agents</h2>
+                <p class="explore-agents__intro">Browse ready-to-deploy agents across your organization. Filter by department or search by name.</p>
+
+                <div class="explore-agents__search">
+                    <input type="text" class="explore-agents__search-input" id="agent-search" placeholder="Search agents...">
+                </div>
+
+                <div class="explore-agents__filters" id="agent-filters">
+                    <button class="explore-filter explore-filter--active" data-filter="all" type="button">All</button>
+                    <button class="explore-filter" data-filter="legal" type="button">Legal</button>
+                    <button class="explore-filter" data-filter="data" type="button">Data</button>
+                    <button class="explore-filter" data-filter="hr" type="button">Human Resources</button>
+                    <button class="explore-filter" data-filter="operations" type="button">Operations</button>
+                    <button class="explore-filter" data-filter="productivity" type="button">Productivity</button>
+                    <button class="explore-filter" data-filter="engineering" type="button">Engineering</button>
+                </div>
+
+                <div class="explore-agents__grid" id="agent-grid"></div>
+                <div class="explore-agents__empty" id="agent-empty" style="display:none">No agents match your search.</div>
             </div>
 
         </div><!-- end .page__content -->
@@ -2791,6 +3001,103 @@
                 pluginTimeouts.push(t);
             });
         });
+
+        /* ═══════════════════════════════════════════
+           EXPLORE AGENTS
+        ═══════════════════════════════════════════ */
+        var deptLabels = {
+            legal: 'Legal',
+            data: 'Data',
+            hr: 'Human Resources',
+            operations: 'Operations',
+            productivity: 'Productivity',
+            engineering: 'Engineering'
+        };
+
+        var agentCatalog = [
+            { name: 'Contract Reviewer', emoji: '\uD83D\uDCCB', dept: 'legal', desc: 'Analyzes contracts for risk clauses, compliance gaps, and renewal terms.', tools: ['Document Parser', 'Risk Scorer'] },
+            { name: 'Regulatory Monitor', emoji: '\u2696\uFE0F', dept: 'legal', desc: 'Tracks regulatory changes across CMS, state DOIs, and federal agencies.', tools: ['Web Monitor', 'Alert System'] },
+            { name: 'Policy Summarizer', emoji: '\uD83D\uDCDC', dept: 'legal', desc: 'Condenses lengthy policy documents into executive-ready briefs.', tools: ['NLP Engine', 'Template Builder'] },
+
+            { name: 'Claims Anomaly Detector', emoji: '\uD83D\uDD0D', dept: 'data', desc: 'Flags unusual claims patterns that may indicate fraud or billing errors.', tools: ['SQL Agent', 'Anomaly Model'] },
+            { name: 'Member Risk Stratifier', emoji: '\uD83D\uDCCA', dept: 'data', desc: 'Segments members by health risk score for proactive outreach.', tools: ['Predictive Model', 'Data Pipeline'] },
+            { name: 'Dashboard Generator', emoji: '\uD83D\uDCC8', dept: 'data', desc: 'Builds executive dashboards from raw datasets with natural language queries.', tools: ['Chart Engine', 'SQL Agent'] },
+
+            { name: 'Resume Screener', emoji: '\uD83D\uDC64', dept: 'hr', desc: 'Ranks applicants against job requirements and surfaces top candidates.', tools: ['NLP Engine', 'Scoring Model'] },
+            { name: 'Onboarding Assistant', emoji: '\uD83C\uDFAF', dept: 'hr', desc: 'Guides new hires through benefits enrollment, training, and compliance.', tools: ['Knowledge Base', 'Task Scheduler'] },
+            { name: 'Employee Pulse Analyzer', emoji: '\uD83D\uDCAC', dept: 'hr', desc: 'Synthesizes survey responses into actionable engagement insights.', tools: ['Sentiment Model', 'Report Builder'] },
+
+            { name: 'Capacity Planner', emoji: '\uD83C\uDFE5', dept: 'operations', desc: 'Forecasts staffing and facility needs based on enrollment trends.', tools: ['Forecasting Model', 'Resource Optimizer'] },
+            { name: 'Incident Triager', emoji: '\uD83D\uDEA8', dept: 'operations', desc: 'Classifies and routes operational incidents to the right response team.', tools: ['Classifier', 'Routing Engine'] },
+            { name: 'Vendor Scorecard Agent', emoji: '\uD83E\uDD1D', dept: 'operations', desc: 'Evaluates vendor performance against SLAs and cost benchmarks.', tools: ['Data Aggregator', 'Scoring Model'] },
+
+            { name: 'Meeting Summarizer', emoji: '\uD83D\uDCDD', dept: 'productivity', desc: 'Generates action items and key decisions from meeting transcripts.', tools: ['Transcription API', 'NLP Engine'] },
+            { name: 'Email Prioritizer', emoji: '\uD83D\uDCE7', dept: 'productivity', desc: 'Classifies and prioritizes incoming emails by urgency and relevance.', tools: ['Classifier', 'Priority Queue'] },
+            { name: 'Report Drafter', emoji: '\uD83D\uDCC4', dept: 'productivity', desc: 'Drafts weekly status reports from project data and team updates.', tools: ['Template Builder', 'Data Aggregator'] },
+
+            { name: 'Code Review Assistant', emoji: '\uD83D\uDD27', dept: 'engineering', desc: 'Reviews pull requests for bugs, security issues, and style violations.', tools: ['Static Analyzer', 'Security Scanner'] },
+            { name: 'Incident Postmortem Writer', emoji: '\uD83D\uDCCB', dept: 'engineering', desc: 'Generates structured postmortems from incident timelines and logs.', tools: ['Log Parser', 'Template Builder'] },
+            { name: 'API Health Monitor', emoji: '\uD83D\uDDA5\uFE0F', dept: 'engineering', desc: 'Monitors API endpoints and alerts on latency spikes or error rates.', tools: ['Health Checker', 'Alert System'] }
+        ];
+
+        var agentGrid = document.getElementById('agent-grid');
+        var agentEmpty = document.getElementById('agent-empty');
+        var agentSearch = document.getElementById('agent-search');
+        var agentFilterBtns = document.querySelectorAll('[data-filter]');
+        var currentAgentFilter = 'all';
+
+        function renderAgents() {
+            var term = agentSearch.value.toLowerCase().trim();
+            var filtered = agentCatalog.filter(function(a) {
+                var matchesFilter = currentAgentFilter === 'all' || a.dept === currentAgentFilter;
+                var matchesSearch = term === '' ||
+                    a.name.toLowerCase().indexOf(term) > -1 ||
+                    a.desc.toLowerCase().indexOf(term) > -1 ||
+                    a.dept.toLowerCase().indexOf(term) > -1 ||
+                    deptLabels[a.dept].toLowerCase().indexOf(term) > -1;
+                return matchesFilter && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                agentGrid.innerHTML = '';
+                agentEmpty.style.display = 'block';
+                return;
+            }
+
+            agentEmpty.style.display = 'none';
+            agentGrid.innerHTML = filtered.map(function(a) {
+                return '<div class="explore-agent-card">' +
+                    '<div class="explore-agent-card__emoji">' + a.emoji + '</div>' +
+                    '<div class="explore-agent-card__name">' + a.name + '</div>' +
+                    '<div class="explore-agent-card__desc">' + a.desc + '</div>' +
+                    '<div class="explore-agent-card__meta">' +
+                        '<span class="explore-agent-card__tag">' + deptLabels[a.dept] + '</span>' +
+                        '<span class="explore-agent-card__tools">' + a.tools.join(' \u00B7 ') + '</span>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        // Filter pills
+        agentFilterBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                currentAgentFilter = btn.getAttribute('data-filter');
+                agentFilterBtns.forEach(function(b) {
+                    b.classList.toggle('explore-filter--active', b.getAttribute('data-filter') === currentAgentFilter);
+                });
+                renderAgents();
+            });
+        });
+
+        // Search with debounce
+        var searchTimeout;
+        agentSearch.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(renderAgents, 150);
+        });
+
+        // Initial render
+        renderAgents();
 
     })();
     </script>
