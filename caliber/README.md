@@ -28,6 +28,9 @@ cd caliber && python3 -m http.server 8080
   - `app.js` — hash router + every screen + inline SVG charts
 - Charts (line, bar, sparkline, 2×2 Value/Viability matrix, knowledge graph) are
   hand-drawn inline SVG, so it works fully offline.
+- **Design language:** ElevenLabs (eggshell ground, achromatic palette, black pill
+  buttons, light-weight serif headlines, hairline shadows). Full token reference and
+  the mapping to Caliber's surfaces live in [`STYLE.md`](STYLE.md).
 
 ## Information architecture (PRD §9)
 

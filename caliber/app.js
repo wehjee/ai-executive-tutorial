@@ -104,17 +104,17 @@
     const path = arr => arr.map((v, i) => `${i ? 'L' : 'M'}${xs(i).toFixed(1)},${ys(v).toFixed(1)}`).join(' ');
     const area = arr => path(arr) + ` L${xs(n - 1)},${ys(0)} L${xs(0)},${ys(0)} Z`;
     let grid = '';
-    for (let g = 0; g <= 16; g += 4) grid += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${ys(g)}" y2="${ys(g)}" stroke="#EFF2F6"/><text x="${pad.l - 8}" y="${ys(g) + 3}" text-anchor="end" font-size="10" fill="#94A3B8">$${g}M</text>`;
-    let xlab = trend.labels.map((l, i) => `<text x="${xs(i)}" y="${h - 8}" text-anchor="middle" font-size="10" fill="#94A3B8">${l}</text>`).join('');
+    for (let g = 0; g <= 16; g += 4) grid += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${ys(g)}" y2="${ys(g)}" stroke="#efece9"/><text x="${pad.l - 8}" y="${ys(g) + 3}" text-anchor="end" font-size="10" fill="#a59f97">$${g}M</text>`;
+    let xlab = trend.labels.map((l, i) => `<text x="${xs(i)}" y="${h - 8}" text-anchor="middle" font-size="10" fill="#a59f97">${l}</text>`).join('');
     return `<svg class="chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
       ${grid}${xlab}
-      <defs><linearGradient id="lg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#14B8A6" stop-opacity=".22"/><stop offset="1" stop-color="#14B8A6" stop-opacity="0"/></linearGradient></defs>
+      <defs><linearGradient id="lg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#000000" stop-opacity=".22"/><stop offset="1" stop-color="#000000" stop-opacity="0"/></linearGradient></defs>
       <path d="${area(trend.realized)}" fill="url(#lg)"/>
-      <path d="${path(trend.projected)}" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="5 4"/>
-      <path d="${path(trend.realized)}" fill="none" stroke="#0F6E6E" stroke-width="2.5"/>
-      ${trend.realized.map((v, i) => `<circle cx="${xs(i)}" cy="${ys(v)}" r="2.6" fill="#0F6E6E"/>`).join('')}
+      <path d="${path(trend.projected)}" fill="none" stroke="#a59f97" stroke-width="2" stroke-dasharray="5 4"/>
+      <path d="${path(trend.realized)}" fill="none" stroke="#000000" stroke-width="2.5"/>
+      ${trend.realized.map((v, i) => `<circle cx="${xs(i)}" cy="${ys(v)}" r="2.6" fill="#000000"/>`).join('')}
     </svg>
-    <div class="legend"><span><i style="background:#0F6E6E"></i>Verified value realized</span><span><i style="background:#94A3B8"></i>Projected</span></div>`;
+    <div class="legend"><span><i style="background:#000000"></i>Verified value realized</span><span><i style="background:#a59f97"></i>Projected</span></div>`;
   }
 
   function barChart(items, w = 640, h = 230) {
@@ -123,18 +123,18 @@
     const bw = (w - pad.l - pad.r) / items.length;
     const ys = v => h - pad.b - (v / max) * (h - pad.t - pad.b);
     let grid = '';
-    for (let g = 0; g <= max; g += Math.ceil(max / 4)) grid += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${ys(g)}" y2="${ys(g)}" stroke="#EFF2F6"/><text x="${pad.l - 8}" y="${ys(g) + 3}" text-anchor="end" font-size="10" fill="#94A3B8">$${g}M</text>`;
+    for (let g = 0; g <= max; g += Math.ceil(max / 4)) grid += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${ys(g)}" y2="${ys(g)}" stroke="#efece9"/><text x="${pad.l - 8}" y="${ys(g) + 3}" text-anchor="end" font-size="10" fill="#a59f97">$${g}M</text>`;
     const bars = items.map((it, i) => {
       const x = pad.l + i * bw + bw * 0.18, bWidth = bw * 0.64, y = ys(it.v);
-      return `<rect x="${x}" y="${y}" width="${bWidth}" height="${h - pad.b - y}" rx="5" fill="${it.c || '#0F6E6E'}"/>
-        <text x="${x + bWidth / 2}" y="${y - 6}" text-anchor="middle" font-size="11" font-weight="700" fill="#0F172A">$${it.v}M</text>
-        <text x="${x + bWidth / 2}" y="${h - 34}" text-anchor="middle" font-size="10.5" fill="#475569">${it.label}</text>
-        ${it.sub ? `<text x="${x + bWidth / 2}" y="${h - 20}" text-anchor="middle" font-size="9.5" fill="#94A3B8">${it.sub}</text>` : ''}`;
+      return `<rect x="${x}" y="${y}" width="${bWidth}" height="${h - pad.b - y}" rx="5" fill="${it.c || '#000000'}"/>
+        <text x="${x + bWidth / 2}" y="${y - 6}" text-anchor="middle" font-size="11" font-weight="700" fill="#000000">$${it.v}M</text>
+        <text x="${x + bWidth / 2}" y="${h - 34}" text-anchor="middle" font-size="10.5" fill="#777169">${it.label}</text>
+        ${it.sub ? `<text x="${x + bWidth / 2}" y="${h - 20}" text-anchor="middle" font-size="9.5" fill="#a59f97">${it.sub}</text>` : ''}`;
     }).join('');
     return `<svg class="chart" viewBox="0 0 ${w} ${h}">${grid}${bars}</svg>`;
   }
 
-  function miniSpark(arr, color = '#0F6E6E', w = 120, h = 34) {
+  function miniSpark(arr, color = '#000000', w = 120, h = 34) {
     const max = Math.max(...arr), min = Math.min(...arr);
     const xs = i => (i / (arr.length - 1)) * w;
     const ys = v => h - 3 - ((v - min) / (max - min || 1)) * (h - 6);
@@ -147,42 +147,42 @@
     const qx = pad + (w - 2 * pad) / 2, qy = pad + (h - 2 * pad) / 2;
     const sx = v => pad + (v / 100) * (w - 2 * pad);
     const sy = v => (h - pad) - (v / 100) * (h - 2 * pad);
-    const qColor = { 'Quick Wins': '#16A34A', 'Big Bets': '#7C3AED', 'Fill-ins': '#0EA5E9', 'Avoid': '#94A3B8' };
+    const qColor = { 'Quick Wins': '#3f7d52', 'Big Bets': '#4b4f8a', 'Fill-ins': '#3a7aa0', 'Avoid': '#a59f97' };
     const bubbles = DB.useCases.map(uc => {
       const x = sx(DB.viabilityScore(uc)), y = sy(DB.valueScore(uc));
       const r = 9 + Math.sqrt(uc.impact) * 7;
-      const c = qColor[uc.quadrant] || '#0F6E6E';
+      const c = qColor[uc.quadrant] || '#000000';
       return `<g class="bubble" data-uc="${uc.id}"><circle cx="${x}" cy="${y}" r="${r}" fill="${c}" fill-opacity=".2" stroke="${c}" stroke-width="2"/>
         <circle cx="${x}" cy="${y}" r="3" fill="${c}"/>
-        <text x="${x}" y="${y - r - 6}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#0F172A">${uc.name}</text>
-        <text x="${x}" y="${y - r - 6 + 13}" text-anchor="middle" font-size="9.5" fill="#64748B">${fmt$(uc.impact)}</text></g>`;
+        <text x="${x}" y="${y - r - 6}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#000000">${uc.name}</text>
+        <text x="${x}" y="${y - r - 6 + 13}" text-anchor="middle" font-size="9.5" fill="#777169">${fmt$(uc.impact)}</text></g>`;
     }).join('');
     return `<svg class="chart" viewBox="0 0 ${w} ${h}">
       <rect x="${pad}" y="${pad}" width="${w - 2 * pad}" height="${h - 2 * pad}" fill="none"/>
-      <rect x="${pad}" y="${pad}" width="${qx - pad}" height="${qy - pad}" fill="#7C3AED" fill-opacity=".03"/>
-      <rect x="${qx}" y="${pad}" width="${w - pad - qx}" height="${qy - pad}" fill="#16A34A" fill-opacity=".04"/>
-      <rect x="${pad}" y="${qy}" width="${qx - pad}" height="${h - pad - qy}" fill="#94A3B8" fill-opacity=".05"/>
-      <rect x="${qx}" y="${qy}" width="${w - pad - qx}" height="${h - pad - qy}" fill="#0EA5E9" fill-opacity=".03"/>
-      <line x1="${qx}" y1="${pad}" x2="${qx}" y2="${h - pad}" stroke="#E2E8F0" stroke-dasharray="4 4"/>
-      <line x1="${pad}" y1="${qy}" x2="${w - pad}" y2="${qy}" stroke="#E2E8F0" stroke-dasharray="4 4"/>
-      <text x="${pad + 8}" y="${pad + 16}" class="matrix-quadlbl" style="fill:#7C3AED">Big Bets</text>
-      <text x="${w - pad - 8}" y="${pad + 16}" text-anchor="end" class="matrix-quadlbl" style="fill:#16A34A">Quick Wins</text>
+      <rect x="${pad}" y="${pad}" width="${qx - pad}" height="${qy - pad}" fill="#4b4f8a" fill-opacity=".03"/>
+      <rect x="${qx}" y="${pad}" width="${w - pad - qx}" height="${qy - pad}" fill="#3f7d52" fill-opacity=".04"/>
+      <rect x="${pad}" y="${qy}" width="${qx - pad}" height="${h - pad - qy}" fill="#a59f97" fill-opacity=".05"/>
+      <rect x="${qx}" y="${qy}" width="${w - pad - qx}" height="${h - pad - qy}" fill="#3a7aa0" fill-opacity=".03"/>
+      <line x1="${qx}" y1="${pad}" x2="${qx}" y2="${h - pad}" stroke="#e5e5e5" stroke-dasharray="4 4"/>
+      <line x1="${pad}" y1="${qy}" x2="${w - pad}" y2="${qy}" stroke="#e5e5e5" stroke-dasharray="4 4"/>
+      <text x="${pad + 8}" y="${pad + 16}" class="matrix-quadlbl" style="fill:#4b4f8a">Big Bets</text>
+      <text x="${w - pad - 8}" y="${pad + 16}" text-anchor="end" class="matrix-quadlbl" style="fill:#3f7d52">Quick Wins</text>
       <text x="${pad + 8}" y="${h - pad - 8}" class="matrix-quadlbl">Avoid</text>
-      <text x="${w - pad - 8}" y="${h - pad - 8}" text-anchor="end" class="matrix-quadlbl" style="fill:#0EA5E9">Fill-ins</text>
-      <text x="${w / 2}" y="${h - 10}" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">Viability →</text>
-      <text x="14" y="${h / 2}" text-anchor="middle" font-size="11" font-weight="600" fill="#475569" transform="rotate(-90 14 ${h / 2})">Value →</text>
+      <text x="${w - pad - 8}" y="${h - pad - 8}" text-anchor="end" class="matrix-quadlbl" style="fill:#3a7aa0">Fill-ins</text>
+      <text x="${w / 2}" y="${h - 10}" text-anchor="middle" font-size="11" font-weight="600" fill="#777169">Viability →</text>
+      <text x="14" y="${h / 2}" text-anchor="middle" font-size="11" font-weight="600" fill="#777169" transform="rotate(-90 14 ${h / 2})">Value →</text>
       ${bubbles}
     </svg>`;
   }
 
   function knowledgeGraph(w = 640, h = 440) {
     const g = DB.graph;
-    const kindColor = { dept: '#0F6E6E', system: '#2563EB', reg: '#DC2626', wf: '#7C3AED' };
+    const kindColor = { dept: '#000000', system: '#0447ff', reg: '#b23b30', wf: '#4b4f8a' };
     const px = n => 30 + n.x * (w - 60), py = n => 24 + n.y * (h - 48);
     const byId = id => g.nodes.find(n => n.id === id);
     const edges = g.edges.map(([a, b]) => {
       const na = byId(a), nb = byId(b);
-      return `<line x1="${px(na)}" y1="${py(na)}" x2="${px(nb)}" y2="${py(nb)}" stroke="#CBD5E1" stroke-width="1.4"/>`;
+      return `<line x1="${px(na)}" y1="${py(na)}" x2="${px(nb)}" y2="${py(nb)}" stroke="#d8d4cf" stroke-width="1.4"/>`;
     }).join('');
     const nodes = g.nodes.map(n => {
       const c = kindColor[n.kind];
@@ -191,7 +191,7 @@
         <text x="${px(n)}" y="${py(n) - 16}" text-anchor="middle">${n.label}</text></g>`;
     }).join('');
     return `<svg class="chart" viewBox="0 0 ${w} ${h}">${edges}${nodes}</svg>
-      <div class="legend"><span><i style="background:#0F6E6E"></i>Department</span><span><i style="background:#2563EB"></i>System</span><span><i style="background:#DC2626"></i>Regulation</span><span><i style="background:#7C3AED"></i>Workflow</span></div>`;
+      <div class="legend"><span><i style="background:#000000"></i>Department</span><span><i style="background:#0447ff"></i>System</span><span><i style="background:#b23b30"></i>Regulation</span><span><i style="background:#4b4f8a"></i>Workflow</span></div>`;
   }
 
   /* ───────────────────────── App shell ───────────────────────── */
@@ -234,7 +234,7 @@
   }
 
   function brandMark(s = 26) {
-    return `<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#14B8A6"/><path d="M16 6a10 10 0 100 20" stroke="#06302C" stroke-width="2.6" stroke-linecap="round"/><circle cx="16" cy="16" r="3.2" fill="#06302C"/></svg>`;
+    return `<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#000000"/><path d="M16 6a10 10 0 100 20" stroke="#fdfcfc" stroke-width="2.6" stroke-linecap="round"/><circle cx="16" cy="16" r="3.2" fill="#fdfcfc"/></svg>`;
   }
 
   function pageHead(title, lead, actions, crumb) {
@@ -304,7 +304,7 @@
       <div class="kpi__label">${icon(k.icon)} ${k.label}</div>
       <div class="kpi__value">${k.value}</div>
       <div class="kpi__delta ${k.dir}">${k.dir === 'up' ? '▲' : k.dir === 'down' ? '▼' : '•'} ${k.delta}</div>
-      <div class="kpi__spark">${miniSpark(k.spark, '#14B8A6', 96, 34)}</div>
+      <div class="kpi__spark">${miniSpark(k.spark, '#a59f97', 96, 34)}</div>
     </div>`).join('');
 
     const funMax = Math.max(...DB.funnel.map(f => f.value));
@@ -453,7 +453,7 @@
       ${pageHead('Compass · Value & Viability Matrix', 'Open scoring you can inspect and reproduce. Bubble size = $ impact. Click any bubble for the transparent scorecard.')}
       ${tabs([['Objectives', '/compass/objectives'], ['Use Cases', '/compass/usecases'], ['Matrix', '/compass/matrix']], '/compass/matrix')}
       <div class="card"><div class="card__body">${matrix()}
-        <div class="legend"><span><i style="background:#16A34A"></i>Quick Wins</span><span><i style="background:#7C3AED"></i>Big Bets</span><span><i style="background:#0EA5E9"></i>Fill-ins</span><span><i style="background:#94A3B8"></i>Avoid</span></div></div></div>${protoNote()}`, 'compass', '/compass/matrix');
+        <div class="legend"><span><i style="background:#3f7d52"></i>Quick Wins</span><span><i style="background:#4b4f8a"></i>Big Bets</span><span><i style="background:#3a7aa0"></i>Fill-ins</span><span><i style="background:#a59f97"></i>Avoid</span></div></div></div>${protoNote()}`, 'compass', '/compass/matrix');
   }
   function bindCompassMatrix() {
     document.querySelectorAll('.bubble').forEach(b => b.addEventListener('click', () => location.hash = '/compass/usecases/' + b.dataset.uc));
@@ -511,7 +511,7 @@
             <div class="stat-row mb-16"><div class="stat"><b class="num">${uc.roi.payback} mo</b><span>Payback period</span></div><div class="stat"><b class="num">±${uc.roi.conf}%</b><span>Confidence range</span></div></div>
             <div class="divider"></div>
             <div class="small muted mb-8">Return distribution (P10 · P50 · P90)</div>
-            ${miniSpark([uc.roi.ret * (1 - uc.roi.conf / 100), uc.roi.ret * .92, uc.roi.ret, uc.roi.ret * 1.05, uc.roi.ret * (1 + uc.roi.conf / 100)], '#16A34A', 280, 50)}
+            ${miniSpark([uc.roi.ret * (1 - uc.roi.conf / 100), uc.roi.ret * .92, uc.roi.ret, uc.roi.ret * 1.05, uc.roi.ret * (1 + uc.roi.conf / 100)], '#3f7d52', 280, 50)}
           </div></div>
           <div class="card"><div class="card__head"><h3>Governance thread</h3></div><div class="card__body">
             <div class="audit-item" style="padding-top:0"><div class="audit-ico">${icon('user')}</div><div><b>Dana Whitfield</b> · CAIO<br><span class="muted">Strong objective alignment. Approving for Q3.</span><div class="audit-time">2h ago</div></div></div>
@@ -536,12 +536,12 @@
   /* ── Forge ── */
   function vForge() {
     const steps = [
-      { type: 'Trigger', t: 'New prior-auth request', d: 'Webhook from Epic (FHIR)', ico: 'bolt', c: '#2563EB' },
-      { type: 'Fetch data', t: 'Pull clinical context', d: 'FHIR bundle + payer rules (X12 278)', ico: 'box', c: '#0F6E6E' },
-      { type: 'Decision', t: 'Meets auto-approval criteria?', d: 'Claude · clinical-tuned · guardrails on', ico: 'compass', c: '#7C3AED' },
-      { type: 'Human checkpoint', t: 'Route low-confidence to nurse', d: 'HITL · threshold < 0.85', ico: 'user', c: '#F59E0B', hitl: true },
-      { type: 'Action', t: 'Submit determination', d: 'Write back to Epic + notify', ico: 'check', c: '#16A34A' },
-      { type: 'Output', t: 'Log to Pulse + audit', d: 'Value event + immutable record', ico: 'doc', c: '#475569' },
+      { type: 'Trigger', t: 'New prior-auth request', d: 'Webhook from Epic (FHIR)', ico: 'bolt', c: '#0447ff' },
+      { type: 'Fetch data', t: 'Pull clinical context', d: 'FHIR bundle + payer rules (X12 278)', ico: 'box', c: '#000000' },
+      { type: 'Decision', t: 'Meets auto-approval criteria?', d: 'Claude · clinical-tuned · guardrails on', ico: 'compass', c: '#4b4f8a' },
+      { type: 'Human checkpoint', t: 'Route low-confidence to nurse', d: 'HITL · threshold < 0.85', ico: 'user', c: '#9a6b1f', hitl: true },
+      { type: 'Action', t: 'Submit determination', d: 'Write back to Epic + notify', ico: 'check', c: '#3f7d52' },
+      { type: 'Output', t: 'Log to Pulse + audit', d: 'Value event + immutable record', ico: 'doc', c: '#777169' },
     ];
     const nodes = steps.map((s, i) => `${i ? '<div class="node-connector"></div>' : ''}
       <div class="node ${i === 2 ? 'sel' : ''}" data-step="${i}">
@@ -582,7 +582,7 @@
     return shell(`
       ${pageHead('Forge · Sandbox', 'Run the agent on sample data and inspect the full step-by-step trace before you deploy.', `<button class="btn btn--primary" id="deploy-sb">${icon('check')} Looks good → Deploy</button>`, '<a href="#/forge">Forge</a> / Sandbox')}
       <div class="grid grid--2">
-        <div class="card"><div class="card__head"><h3>Sample input</h3><span class="sub">PA-88142</span></div><div class="card__body"><div class="formula" style="color:#CBD5E1;background:#0F172A">{
+        <div class="card"><div class="card__head"><h3>Sample input</h3><span class="sub">PA-88142</span></div><div class="card__body"><div class="formula" style="color:#d8d4cf;background:#000000">{
   "<span class="hl">request</span>": "prior_auth",
   "procedure": "MRI lumbar spine (72148)",
   "member": "M-4471882",
@@ -715,7 +715,7 @@
 
   /* ── Pulse ── */
   function vPulse() {
-    const bars = DB.initiatives.map(i => ({ label: i.name.split(' ')[0], sub: i.flag === 'drifting' ? 'drifting' : 'on track', v: +(i.actual.ret / 1000).toFixed(1), c: i.flag === 'drifting' ? '#F59E0B' : '#0F6E6E' }));
+    const bars = DB.initiatives.map(i => ({ label: i.name.split(' ')[0], sub: i.flag === 'drifting' ? 'drifting' : 'on track', v: +(i.actual.ret / 1000).toFixed(1), c: i.flag === 'drifting' ? '#9a6b1f' : '#000000' }));
     const allOnTrack = DB.initiatives.filter(i => i.flag === 'on-track').length;
     const alerts = [
       { t: 'Eligibility Verification Bot drifting', d: 'Return at 70% of plan — quality below threshold', sev: 'warning' },
