@@ -67,6 +67,11 @@ a { color: var(--primary); text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
 ::selection { background: var(--accent-dim); }
 
+/* base icon size — parent-specific rules (.btn .ico, .nav-item .ico, …) override this */
+.ico { width: 16px; height: 16px; flex: none; }
+/* colored tile containers want a slightly larger glyph */
+.mkt-card__ico .ico, .node__ico .ico, .audit-ico .ico { width: 18px; height: 18px; }
+
 /* ───────────────────────── Scrollbar ───────────────────────── */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 8px; border: 2px solid var(--canvas); }
