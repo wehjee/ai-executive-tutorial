@@ -43,6 +43,7 @@
     drag: 'M9 5h.01M9 12h.01M9 19h.01M15 5h.01M15 12h.01M15 19h.01',
     sliders: 'M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6',
     clock: 'M12 22a10 10 0 100-20 10 10 0 000 20zM12 6v6l4 2',
+    menu: 'M3 12h18M3 6h18M3 18h18',
   };
   function icon(name, cls) {
     return `<svg class="ico ${cls || ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${I[name] || ''}"/></svg>`;
@@ -212,14 +213,16 @@
       return `<div class="nav-group"><div class="nav-item ${active ? 'active' : ''}" data-route="${n.route}">${icon(n.icon)}<span>${n.label}</span></div>${subs}</div>`;
     }).join('');
     return `<div class="app">
-      <aside class="sidebar">
-        <div class="sidebar__brand">${brandMark(26)}<span>Caliber</span></div>
+      <div class="sidebar-scrim" id="sidebar-scrim"></div>
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand">${brandMark(26)}<span>Caliber</span><button class="iconbtn sidebar__close" id="sidebar-close" title="Close menu">${icon('x')}</button></div>
         <nav class="sidebar__nav">${nav}</nav>
         <div class="sidebar__foot">Open AI value platform<br><b>Verity Health System</b> · Strategic tier</div>
       </aside>
       <div class="main">
         <header class="topbar">
-          <button class="orgswitch"><span class="logo">VH</span>Verity Health System ▾</button>
+          <button class="iconbtn menu-btn" id="menu-toggle" title="Menu" aria-label="Open menu">${icon('menu')}</button>
+          <button class="orgswitch"><span class="logo">VH</span><span class="orgswitch__name">Verity Health System</span> ▾</button>
           <div class="topbar__search">${icon('search')}<input placeholder="Search use cases, agents, reports…"></div>
           <div class="topbar__spacer"></div>
           <button class="iconbtn" title="Notifications">${icon('bell')}<span class="badge-dot"></span></button>
@@ -363,7 +366,7 @@
     b && b.addEventListener('click', () => {
       const grid = ['Epic', 'Cerner', 'Snowflake', 'Databricks', 'ServiceNow', 'SharePoint', 'Salesforce', 'Workday', 'Box'].map(n =>
         `<div class="palette-item" style="cursor:pointer">${icon('link')}<span>${n}</span></div>`).join('');
-      openModal('Add a connection', `<p class="muted mb-16">Choose a system to connect. Caliber uses open standards (FHIR R4, X12, OMOP) — no custom ETL required.</p><div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px">${grid}</div>`,
+      openModal('Add a connection', `<p class="muted mb-16">Choose a system to connect. Caliber uses open standards (FHIR R4, X12, OMOP) — no custom ETL required.</p><div class="grid grid--conn">${grid}</div>`,
         `<button class="btn" data-close>Cancel</button><button class="btn btn--primary" id="conn-go">Connect</button>`);
       $('#conn-go').addEventListener('click', () => { closeOverlays(); toast('Connection initiated — OAuth handshake started'); });
     });
@@ -491,7 +494,7 @@
     return shell(`
       ${pageHead(uc.name, '', `${approved ? `<span class="pill pill--success" style="padding:8px 14px">${icon('check')} Approved</span>` : `<button class="btn btn--primary" id="approve-uc">${icon('check')} Approve</button>`}<button class="btn" id="find-agent">${icon('grid')} Find marketplace agent</button><button class="btn" data-route="/forge">${icon('forge')} Build in Forge</button>`, `<a href="#/compass/usecases">Use Cases</a> / ${uc.name}`)}
       <div class="flex gap-8 wrap mb-24">${statusPill(uc.status)}<span class="tag">${uc.dept}</span><span class="tag">Owner: ${uc.owner}</span><span class="tag">${uc.quadrant}</span></div>
-      <div class="grid" style="grid-template-columns:1.4fr 1fr;gap:18px">
+      <div class="grid grid--detail">
         <div>
           <div class="card mb-16"><div class="card__body">
             <h3 style="font-size:13px;margin-bottom:6px">Problem</h3><p class="muted mb-16">${uc.problem}</p>
@@ -960,6 +963,15 @@
       const routes = ['/pulse', '/compass/matrix', '/fleet/deployments', '/compass/usecases'];
       kpiWrap.querySelectorAll('.kpi').forEach((k, i) => { k.style.cursor = 'pointer'; k.addEventListener('click', () => location.hash = routes[i]); });
     }
+    // Mobile off-canvas sidebar
+    const sidebar = $('#sidebar'), scrim = $('#sidebar-scrim');
+    const openNav = () => { sidebar && sidebar.classList.add('open'); scrim && scrim.classList.add('open'); };
+    const closeNav = () => { sidebar && sidebar.classList.remove('open'); scrim && scrim.classList.remove('open'); };
+    $('#menu-toggle') && $('#menu-toggle').addEventListener('click', openNav);
+    $('#sidebar-close') && $('#sidebar-close').addEventListener('click', closeNav);
+    scrim && scrim.addEventListener('click', closeNav);
+    // tapping any nav entry closes the drawer (navigation re-renders the shell anyway)
+    sidebar && sidebar.querySelectorAll('.nav-item, .nav-sub a').forEach(el => el.addEventListener('click', closeNav));
   }
 
   window.addEventListener('hashchange', render);
