@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Minecraft NYC — Voxel Manhattan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #87ceeb; }
+    canvas { display: block; }
+
+    .hud {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 10;
+        color: #fff;
+        font-family: 'Press Start 2P', monospace;
+        text-shadow: 2px 2px 0 rgba(0,0,0,.55);
+        pointer-events: none;
+        max-width: min(560px, calc(100vw - 32px));
+    }
+    .hud h1 { font-size: 20px; letter-spacing: 1px; color: #ffd83d; }
+    .hud .sub { font-size: 8px; line-height: 1.9; margin-top: 10px; color: #eaf6ff; }
+    .hud .keys { font-size: 8px; line-height: 1.9; margin-top: 10px; color: #c8e6c9; }
+
+    .buttons {
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        z-index: 10;
+        display: flex;
+        gap: 10px;
+    }
+    .mc-btn {
+        font-family: 'Press Start 2P', monospace;
+        font-size: 10px;
+        color: #fff;
+        background: #6f6f6f;
+        border: none;
+        padding: 12px 14px;
+        cursor: pointer;
+        box-shadow: inset -3px -4px 0 rgba(0,0,0,.35), inset 3px 3px 0 rgba(255,255,255,.35), 0 3px 0 rgba(0,0,0,.4);
+        text-shadow: 1px 1px 0 rgba(0,0,0,.6);
+    }
+    .mc-btn:active { transform: translateY(2px); box-shadow: inset -3px -4px 0 rgba(0,0,0,.35), inset 3px 3px 0 rgba(255,255,255,.35), 0 1px 0 rgba(0,0,0,.4); }
+    .mc-btn.green { background: #4caf50; }
+
+    .crosshair {
+        position: fixed;
+        top: 50%; left: 50%;
+        width: 14px; height: 14px;
+        margin: -7px 0 0 -7px;
+        z-index: 9;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity .2s;
+    }
+    .crosshair::before, .crosshair::after {
+        content: '';
+        position: absolute;
+        background: rgba(255,255,255,.85);
+    }
+    .crosshair::before { left: 6px; top: 0; width: 2px; height: 14px; }
+    .crosshair::after { top: 6px; left: 0; width: 14px; height: 2px; }
+    body.locked .crosshair { opacity: 1; }
+
+    .touchpad {
+        position: fixed;
+        bottom: 16px;
+        left: 16px;
+        z-index: 10;
+        display: none;
+        gap: 10px;
+    }
+    @media (pointer: coarse) { .touchpad { display: flex; } }
+    .touchpad .mc-btn { font-size: 14px; padding: 16px 18px; }
+
+    .toast {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 11;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 9px;
+        color: #fff;
+        background: rgba(0,0,0,.55);
+        padding: 10px 14px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity .4s;
+        white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="hud">
+    <h1>&#9935; MINECRAFT NYC</h1>
+    <div class="sub">8-BIT MANHATTAN &mdash; EMPIRE STATE &middot; CHRYSLER &middot; ONE WTC &middot; FLATIRON &middot; LADY LIBERTY &middot; BROOKLYN BRIDGE &middot; CENTRAL PARK &middot; TIMES SQUARE</div>
+    <div class="keys" id="keys">CLICK TO EXPLORE &middot; WASD MOVE &middot; MOUSE LOOK &middot; SPACE UP &middot; SHIFT DOWN &middot; ESC RELEASE</div>
+</div>
+<div class="crosshair"></div>
+<div class="buttons">
+    <button class="mc-btn green" id="tourBtn">&#9992; TOUR</button>
+    <button class="mc-btn" id="dayNightBtn">&#127769; NIGHT</button>
+</div>
+<div class="touchpad">
+    <button class="mc-btn" id="fwdBtn">&#9650;</button>
+    <button class="mc-btn" id="backBtn">&#9660;</button>
+    <button class="mc-btn" id="upBtn">&#8679;</button>
+    <button class="mc-btn" id="downBtn">&#8681;</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ════════════════════════════════════════════════════════════
+//  PIXEL TEXTURES (16x16 procedural, Minecraft-style)
+// ════════════════════════════════════════════════════════════
+let seed = 1337;
+function rand() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+
+function makeTex(draw) {
+    const c = document.createElement('canvas');
+    c.width = 16; c.height = 16;
+    draw(c.getContext('2d'));
+    const t = new THREE.CanvasTexture(c);
+    t.magFilter = THREE.NearestFilter;
+    t.minFilter = THREE.NearestFilter;
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+}
+function px(ctx, x, y, col) { ctx.fillStyle = col; ctx.fillRect(x, y, 1, 1); }
+function noiseFill(ctx, cols) {
+    for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++)
+        px(ctx, x, y, cols[Math.floor(rand() * cols.length)]);
+}
+
+const TEX = {};
+TEX.grassTop  = makeTex(c => noiseFill(c, ['#5cab3a', '#67b943', '#54a034', '#71c24c']));
+TEX.dirt      = makeTex(c => noiseFill(c, ['#7a5a3a', '#6e5034', '#84623f', '#65492f']));
+TEX.grassSide = makeTex(c => {
+    noiseFill(c, ['#7a5a3a', '#6e5034', '#84623f', '#65492f']);
+    for (let x = 0; x < 16; x++) {
+        const d = 3 + Math.floor(rand() * 3);
+        for (let y = 0; y < d; y++) px(c, x, y, ['#5cab3a', '#67b943', '#54a034'][Math.floor(rand() * 3)]);
+    }
+});
+TEX.sidewalk = makeTex(c => {
+    noiseFill(c, ['#b9b9b4', '#b0b0ab', '#c2c2bd', '#a8a8a3']);
+    c.fillStyle = '#8e8e8a';
+    c.fillRect(0, 7, 16, 1); c.fillRect(7, 0, 1, 16);
+});
+TEX.road = makeTex(c => noiseFill(c, ['#3c3c40', '#37373b', '#424246', '#333337']));
+TEX.roadLineNS = makeTex(c => {
+    noiseFill(c, ['#3c3c40', '#37373b', '#424246', '#333337']);
+    c.fillStyle = '#e8c33a';
+    c.fillRect(7, 1, 2, 6); c.fillRect(7, 10, 2, 6);
+});
+TEX.roadLineEW = makeTex(c => {
+    noiseFill(c, ['#3c3c40', '#37373b', '#424246', '#333337']);
+    c.fillStyle = '#e8c33a';
+    c.fillRect(1, 7, 6, 2); c.fillRect(10, 7, 6, 2);
+});
+TEX.water = makeTex(c => noiseFill(c, ['#2a6fd4', '#2f78e0', '#2566c4', '#3a82e8']));
+TEX.stone = makeTex(c => noiseFill(c, ['#8e8e8e', '#848484', '#999999', '#7c7c7c']));
+TEX.sand  = makeTex(c => noiseFill(c, ['#e0d098', '#d8c890', '#e8d8a4', '#d0c088']));
+TEX.wood  = makeTex(c => {
+    noiseFill(c, ['#6b4a2a', '#5f4124', '#755230']);
+    c.fillStyle = '#4a3018';
+    c.fillRect(3, 0, 1, 16); c.fillRect(9, 0, 1, 16); c.fillRect(13, 0, 1, 16);
+});
+TEX.leaves = makeTex(c => noiseFill(c, ['#3e7d2c', '#357024', '#478c33', '#2e6420']));
+TEX.copper = makeTex(c => noiseFill(c, ['#4fa68c', '#46997f', '#5ab399', '#3f8d74']));
+TEX.gold   = makeTex(c => noiseFill(c, ['#f5c842', '#eaba30', '#ffd95c', '#dcae28']));
+
+function facadeBrick(base, dark, light) {
+    return makeTex(c => {
+        noiseFill(c, [base, dark, light]);
+        c.fillStyle = 'rgba(0,0,0,0.25)';
+        for (let y = 0; y < 16; y += 4) c.fillRect(0, y, 16, 1);
+        // punched windows with lintels
+        c.fillStyle = '#1c2a3a';
+        c.fillRect(3, 5, 3, 5); c.fillRect(10, 5, 3, 5);
+        c.fillStyle = '#7fa8c8';
+        c.fillRect(4, 6, 1, 2); c.fillRect(11, 6, 1, 2);
+    });
+}
+TEX.brickRed   = facadeBrick('#9c4a32', '#8a3f2a', '#ac553c');
+TEX.brickBrown = facadeBrick('#7a5a40', '#6c4e36', '#88664a');
+TEX.facadeGray = makeTex(c => {
+    noiseFill(c, ['#b4b0a6', '#aba79d', '#bdb9af']);
+    for (let wy = 0; wy < 2; wy++) for (let wx = 0; wx < 3; wx++) {
+        const lit = rand() < 0.3;
+        c.fillStyle = lit ? '#ffd982' : '#22303e';
+        c.fillRect(2 + wx * 5, 3 + wy * 7, 3, 4);
+    }
+});
+function glassFacade(frame, paneA, paneB) {
+    return makeTex(c => {
+        c.fillStyle = frame; c.fillRect(0, 0, 16, 16);
+        for (let wy = 0; wy < 4; wy++) for (let wx = 0; wx < 4; wx++) {
+            const lit = rand() < 0.22;
+            c.fillStyle = lit ? '#ffdf8a' : (rand() < 0.5 ? paneA : paneB);
+            c.fillRect(1 + wx * 4, 1 + wy * 4, 3, 3);
+        }
+    });
+}
+TEX.glassBlue = glassFacade('#3a4a58', '#8fc4e8', '#6faedd');
+TEX.glassDark = glassFacade('#1e2228', '#3a4a5c', '#2c3a4a');
+TEX.chrome    = glassFacade('#9aa4ac', '#dde8ee', '#c2d2dc');
+TEX.billboard = makeTex(c => {
+    const neon = ['#ff3366', '#33ddff', '#ffee33', '#66ff44', '#ff8822', '#dd44ff', '#ffffff'];
+    for (let y = 0; y < 16; y += 2) {
+        const col = neon[Math.floor(rand() * neon.length)];
+        for (let x = 0; x < 16; x++) px(c, x, y, rand() < 0.7 ? col : '#101018'), px(c, x, y + 1, rand() < 0.7 ? col : '#101018');
+    }
+});
+TEX.bridgeStone = makeTex(c => {
+    noiseFill(c, ['#a08a6e', '#967f64', '#aa9478']);
+    c.fillStyle = 'rgba(0,0,0,0.3)';
+    c.fillRect(0, 5, 16, 1); c.fillRect(0, 11, 16, 1); c.fillRect(8, 0, 1, 5); c.fillRect(3, 6, 1, 5); c.fillRect(11, 12, 1, 4);
+});
+
+// ════════════════════════════════════════════════════════════
+//  BLOCK TYPES & MATERIALS
+// ════════════════════════════════════════════════════════════
+const lam = (tex, opts = {}) => new THREE.MeshLambertMaterial({ map: tex, ...opts });
+
+const grassMats = [
+    lam(TEX.grassSide), lam(TEX.grassSide),
+    lam(TEX.grassTop), lam(TEX.dirt),
+    lam(TEX.grassSide), lam(TEX.grassSide),
+];
+// facade materials get emissiveMap for night-time lit windows
+const nightGlow = [];
+function glow(tex, day = 0) {
+    const m = new THREE.MeshLambertMaterial({ map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: day });
+    nightGlow.push(m);
+    return m;
+}
+
+const MATS = {
+    GRASS:      grassMats,
+    SIDEWALK:   lam(TEX.sidewalk),
+    ROAD:       lam(TEX.road),
+    ROAD_NS:    lam(TEX.roadLineNS),
+    ROAD_EW:    lam(TEX.roadLineEW),
+    WATER:      lam(TEX.water),
+    BRICK_RED:  glow(TEX.brickRed),
+    BRICK_BROWN:glow(TEX.brickBrown),
+    FACADE:     glow(TEX.facadeGray),
+    GLASS_BLUE: glow(TEX.glassBlue),
+    GLASS_DARK: glow(TEX.glassDark),
+    CHROME:     glow(TEX.chrome),
+    STONE:      lam(TEX.stone),
+    SAND:       lam(TEX.sand),
+    WOOD:       lam(TEX.wood),
+    LEAVES:     lam(TEX.leaves),
+    COPPER:     lam(TEX.copper),
+    GOLD:       new THREE.MeshLambertMaterial({ map: TEX.gold, emissive: 0xffc23a, emissiveMap: TEX.gold, emissiveIntensity: 0.5 }),
+    BILLBOARD:  new THREE.MeshLambertMaterial({ map: TEX.billboard, emissive: 0xffffff, emissiveMap: TEX.billboard, emissiveIntensity: 0.9 }),
+    BRIDGE:     lam(TEX.bridgeStone),
+};
+
+// ════════════════════════════════════════════════════════════
+//  VOXEL WORLD GENERATION
+// ════════════════════════════════════════════════════════════
+const vox = new Map();
+const key = (x, y, z) => x + ',' + y + ',' + z;
+const setVox = (x, y, z, t) => vox.set(key(x, y, z), t);
+const hasVox = (x, y, z) => vox.has(key(x, y, z));
+
+// Manhattan-ish island: long ellipse, z = south(-) to north(+)
+const ISLAND_LEN = 128;
+function halfWidth(z) {
+    const f = 1 - (z / ISLAND_LEN) ** 2;
+    if (f <= 0) return -1;
+    return Math.max(8, 40 * Math.pow(f, 0.55));
+}
+const inIsland = (x, z) => Math.abs(z) <= ISLAND_LEN && Math.abs(x) <= halfWidth(z);
+
+// Central Park
+const PARK = { x0: -16, x1: 16, z0: 28, z1: 104 };
+const inPark = (x, z) => x >= PARK.x0 && x <= PARK.x1 && z >= PARK.z0 && z <= PARK.z1;
+const inPond = (x, z) => ((x - 0) / 9) ** 2 + ((z - 68) / 6) ** 2 <= 1;
+
+// street grid: avenues run N-S (3 wide, every 12), streets run E-W (2 wide, every 10)
+const aveCol = x => ((x + 600) % 12);
+const stRow  = z => ((z + 600) % 10);
+const isAve = x => aveCol(x) < 3;
+const isSt  = z => stRow(z) < 2;
+const isRoad = (x, z) => inIsland(x, z) && !inPark(x, z) && (isAve(x) || isSt(z));
+
+// reserved landmark zones (no generic buildings)
+const reserved = [];
+const reserve = (x0, z0, x1, z1) => reserved.push([x0, z0, x1, z1]);
+const isReserved = (x0, z0, x1, z1) =>
+    reserved.some(([a, b, c, d]) => x0 <= c && x1 >= a && z0 <= d && z1 >= b);
+
+// ── ground layer ─────────────────────────────────────────────
+for (let z = -ISLAND_LEN; z <= ISLAND_LEN; z++) {
+    const hw = Math.floor(halfWidth(z));
+    if (hw < 0) continue;
+    for (let x = -hw; x <= hw; x++) {
+        let t = 'SIDEWALK';
+        if (inPark(x, z)) t = inPond(x, z) ? 'WATER' : 'GRASS';
+        else if (isRoad(x, z)) {
+            if (isAve(x) && aveCol(x) === 1 && !isSt(z)) t = 'ROAD_NS';
+            else if (isSt(z) && !isAve(x) && stRow(z) === 0 && (((z + 600) / 10 | 0) % 2 === 0)) t = 'ROAD_EW';
+            else t = 'ROAD';
+        }
+        setVox(x, 0, z, t);
+    }
+}
+
+// ── building helpers ─────────────────────────────────────────
+function shell(x0, z0, w, d, y0, h, type) {
+    const x1 = x0 + w - 1, z1 = z0 + d - 1, top = y0 + h - 1;
+    for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++) {
+        const edge = (x === x0 || x === x1 || z === z0 || z === z1);
+        if (edge) for (let y = y0; y <= top; y++) setVox(x, y, z, type);
+        else setVox(x, top, z, type); // roof
+    }
+}
+function tieredBuilding(cx, cz, w, d, h, type) {
+    const tiers = h >= 30
+        ? [[w, d, Math.round(h * .45)], [Math.max(3, w - 2), Math.max(3, d - 2), Math.round(h * .75)], [Math.max(2, w - 4), Math.max(2, d - 4), h]]
+        : h >= 18
+        ? [[w, d, Math.round(h * .6)], [Math.max(3, w - 2), Math.max(3, d - 2), h]]
+        : [[w, d, h]];
+    let prev = 1;
+    for (const [tw, td, th] of tiers) {
+        shell(cx - (tw >> 1), cz - (td >> 1), tw, td, prev, th - prev + 1, type);
+        prev = th;
+    }
+}
+
+// ════════════════════════════════════════════════════════════
+//  LANDMARKS
+// ════════════════════════════════════════════════════════════
+
+// — Empire State Building (midtown, center) —
+{
+    const cx = 0, cz = 6;
+    reserve(cx - 9, cz - 7, cx + 9, cz + 7);
+    shell(cx - 7, cz - 5, 15, 11, 1, 8, 'FACADE');
+    shell(cx - 5, cz - 4, 11, 9, 8, 14, 'FACADE');
+    shell(cx - 3, cz - 2, 7, 5, 22, 26, 'FACADE');
+    shell(cx - 2, cz - 1, 5, 3, 48, 7, 'FACADE');
+    shell(cx - 1, cz, 3, 1, 55, 4, 'CHROME');
+    for (let y = 59; y <= 66; y++) setVox(cx, y, cz, y > 64 ? 'GOLD' : 'CHROME');
+}
+
+// — Chrysler Building —
+{
+    const cx = 19, cz = 20;
+    reserve(cx - 6, cz - 6, cx + 6, cz + 6);
+    shell(cx - 4, cz - 4, 9, 9, 1, 30, 'FACADE');
+    shell(cx - 3, cz - 3, 7, 7, 30, 5, 'CHROME');
+    shell(cx - 2, cz - 2, 5, 5, 35, 4, 'CHROME');
+    shell(cx - 1, cz - 1, 3, 3, 39, 4, 'CHROME');
+    for (let y = 43; y <= 49; y++) setVox(cx, y, cz, 'CHROME');
+}
+
+// — One World Trade Center (downtown) —
+{
+    const cx = -3, cz = -96;
+    reserve(cx - 7, cz - 7, cx + 7, cz + 7);
+    shell(cx - 5, cz - 5, 11, 11, 1, 5, 'GLASS_DARK');
+    for (let y = 6; y <= 62; y++) {
+        const r = Math.round(5 - (y - 6) / 56 * 2.5);
+        const x0 = cx - r, x1 = cx + r, z0 = cz - r, z1 = cz + r;
+        for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++)
+            if (x === x0 || x === x1 || z === z0 || z === z1 || y === 62)
+                setVox(x, y, z, 'GLASS_BLUE');
+    }
+    for (let y = 63; y <= 74; y++) setVox(cx, y, cz, 'CHROME');
+}
+
+// — Flatiron Building (triangular) —
+{
+    const cz0 = -32, cx = -8, h = 14;
+    reserve(cx - 6, cz0 - 1, cx + 6, cz0 + 12);
+    for (let i = 0; i <= 11; i++) {
+        const w = Math.max(1, Math.round(i * 0.8));
+        for (let x = cx - w; x <= cx + w; x++) {
+            const edge = (x === cx - w || x === cx + w || i === 0 || i === 11);
+            for (let y = 1; y <= h; y++)
+                if (edge || y === h) setVox(x, y, cz0 + i, 'BRICK_BROWN');
+        }
+    }
+}
+
+// — Times Square (billboard towers) —
+{
+    reserve(-15, 14, -4, 26);
+    tieredBuilding(-12, 17, 5, 5, 18, 'GLASS_DARK');
+    tieredBuilding(-7, 23, 5, 5, 22, 'GLASS_BLUE');
+    tieredBuilding(-12, 24, 4, 4, 13, 'FACADE');
+    // splash billboards on the faces overlooking the avenue
+    for (const [bx, bz, h] of [[-10, 17, 16], [-5, 23, 20], [-10, 24, 11]])
+        for (let y = 3; y <= h - 3; y++)
+            for (let dz = -1; dz <= 1; dz++)
+                if (hasVox(bx, y, bz + dz)) setVox(bx, y, bz + dz, 'BILLBOARD');
+}
+
+// — Statue of Liberty (harbor island, southwest) —
+{
+    const cx = -55, cz = -142;
+    for (let x = cx - 4; x <= cx + 4; x++) for (let z = cz - 4; z <= cz + 4; z++)
+        if ((x - cx) ** 2 + (z - cz) ** 2 <= 18) setVox(x, 0, z, 'SAND');
+    shell(cx - 2, cz - 2, 5, 5, 1, 6, 'STONE');
+    for (let y = 7; y <= 14; y++)
+        for (let x = cx - 1; x <= cx + 1; x++) for (let z = cz - 1; z <= cz + 1; z++)
+            setVox(x, y, z, 'COPPER');
+    setVox(cx, 15, cz, 'COPPER'); setVox(cx, 16, cz, 'COPPER');           // head
+    setVox(cx - 1, 17, cz - 1, 'GOLD'); setVox(cx + 1, 17, cz - 1, 'GOLD'); // crown
+    setVox(cx - 1, 17, cz + 1, 'GOLD'); setVox(cx + 1, 17, cz + 1, 'GOLD');
+    for (let y = 13; y <= 20; y++) setVox(cx + 2, y, cz, 'COPPER');        // raised arm
+    setVox(cx + 2, 21, cz, 'GOLD'); setVox(cx + 2, 22, cz, 'GOLD');        // torch
+    setVox(cx - 2, 12, cz, 'COPPER'); setVox(cx - 2, 13, cz, 'STONE');     // tablet arm
+}
+
+// — Brooklyn Bridge (east river crossing) —
+{
+    const zA = -82, zB = -79, deckY = 8;
+    const xStart = Math.floor(halfWidth(-80)) - 2, xEnd = 96;
+    for (let x = xStart; x <= xEnd; x++)
+        for (let z = zA; z <= zB; z++) setVox(x, deckY, z, x % 8 < 4 ? 'BRIDGE' : 'STONE');
+    for (const tx of [xStart + 12, xStart + 38]) {                          // gothic towers
+        for (const z of [zA - 1, zB + 1])
+            for (let y = 1; y <= 22; y++) {
+                setVox(tx - 1, y, z, 'BRIDGE'); setVox(tx + 1, y, z, 'BRIDGE');
+                if (y <= 4 || y >= 14) setVox(tx, y, z, 'BRIDGE');          // arch opening
+            }
+        for (let x = tx - 1; x <= tx + 1; x++) for (let z = zA - 1; z <= zB + 1; z++)
+            setVox(x, 23, z, 'BRIDGE');
+    }
+    const tower1 = xStart + 12, tower2 = xStart + 38;                       // main cables
+    function cable(xa, xb, ya, yb) {
+        for (let x = xa; x <= xb; x++) {
+            const t = (x - xa) / Math.max(1, xb - xa);
+            const y = Math.round(ya + (yb - ya) * (t * t));
+            setVox(x, Math.max(deckY + 1, y), zA - 1, 'STONE');
+            setVox(x, Math.max(deckY + 1, y), zB + 1, 'STONE');
+        }
+    }
+    cable(xStart, tower1, deckY + 1, 23);
+    const mid = (tower1 + tower2) >> 1;
+    cable(tower1, mid, 23, deckY + 1); cable(mid, tower2, deckY + 1, 23);
+    cable(tower2, xEnd - 4, 23, deckY + 1);
+    // ramps down at each end
+    for (let i = 1; i <= deckY - 1; i++)
+        for (let z = zA; z <= zB; z++) {
+            setVox(xStart - i, deckY - i, z, 'BRIDGE');
+            if (xEnd + i < 100) setVox(xEnd + i, deckY - i, z, 'BRIDGE');
+        }
+    reserve(xStart - 10, zA - 4, xEnd, zB + 4);
+}
+
+// ════════════════════════════════════════════════════════════
+//  GENERIC CITY BLOCKS
+// ════════════════════════════════════════════════════════════
+function districtHeight(z) {
+    if (z < -64)  return 8 + Math.floor(rand() * rand() * 38);   // downtown spikes
+    if (z < -22)  return 5 + Math.floor(rand() * 11);            // villages / soho
+    if (z < PARK.z0) return 10 + Math.floor(rand() * rand() * 42); // midtown
+    if (z <= PARK.z1) return 5 + Math.floor(rand() * 7);         // park flanks
+    return 4 + Math.floor(rand() * 6);                           // uptown
+}
+function pickType(h) {
+    if (h >= 26) return rand() < 0.5 ? 'GLASS_BLUE' : (rand() < 0.5 ? 'GLASS_DARK' : 'FACADE');
+    if (h >= 13) return rand() < 0.4 ? 'FACADE' : (rand() < 0.5 ? 'GLASS_DARK' : 'BRICK_BROWN');
+    return rand() < 0.55 ? 'BRICK_RED' : 'BRICK_BROWN';
+}
+
+for (let zb = -600; zb <= 600; zb += 10) {        // street period anchors
+    for (let xb = -600; xb <= 600; xb += 12) {    // avenue period anchors
+        const lx0 = xb + 4, lx1 = xb + 10;        // buildable footprint inside lot
+        const lz0 = zb + 3, lz1 = zb + 8;
+        if (lx1 < -45 || lx0 > 45 || lz1 < -ISLAND_LEN || lz0 > ISLAND_LEN) continue;
+        // entire footprint must be on land, outside park & landmarks
+        let ok = true;
+        for (const [px_, pz_] of [[lx0, lz0], [lx1, lz0], [lx0, lz1], [lx1, lz1]])
+            if (!inIsland(px_, pz_) || inPark(px_, pz_)) { ok = false; break; }
+        if (!ok || isReserved(lx0, lz0, lx1, lz1)) continue;
+        if (rand() < 0.08) continue;              // empty lot
+        const cz = (lz0 + lz1) >> 1;
+        const h = districtHeight(cz);
+        const w = 5 + Math.floor(rand() * 3);     // 5-7
+        const d = 4 + Math.floor(rand() * 3);     // 4-6
+        tieredBuilding((lx0 + lx1) >> 1, cz, w, d, h, pickType(h));
+    }
+}
+
+// ── Central Park trees ───────────────────────────────────────
+for (let i = 0; i < 110; i++) {
+    const x = PARK.x0 + 2 + Math.floor(rand() * (PARK.x1 - PARK.x0 - 3));
+    const z = PARK.z0 + 2 + Math.floor(rand() * (PARK.z1 - PARK.z0 - 3));
+    if (inPond(x, z)) continue;
+    const th = 2 + Math.floor(rand() * 2);
+    for (let y = 1; y <= th; y++) setVox(x, y, z, 'WOOD');
+    for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+        setVox(x + dx, th + 1, z + dz, 'LEAVES');
+        if (Math.abs(dx) + Math.abs(dz) < 2) setVox(x + dx, th + 2, z + dz, 'LEAVES');
+    }
+}
+
+// ════════════════════════════════════════════════════════════
+//  SCENE / RENDERER
+// ════════════════════════════════════════════════════════════
+const scene = new THREE.Scene();
+const DAY = { sky: new THREE.Color(0x87ceeb), hemi: 1.0, sun: 1.3, fog: [180, 460], glowI: 0, sunCol: new THREE.Color(0xfff2d0) };
+const NIGHT = { sky: new THREE.Color(0x0a1026), hemi: 0.18, sun: 0.12, fog: [160, 420], glowI: 0.55, sunCol: new THREE.Color(0x8090c0) };
+scene.fog = new THREE.Fog(DAY.sky.clone(), ...DAY.fog);
+
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 900);
+camera.position.set(0, 34, -185);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(DAY.sky);
+document.body.appendChild(renderer.domElement);
+
+const hemi = new THREE.HemisphereLight(0xcfe8ff, 0x4a5a3a, DAY.hemi);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(DAY.sunCol, DAY.sun);
+sun.position.set(120, 180, -60);
+scene.add(sun);
+
+// ── water plane ──────────────────────────────────────────────
+const waterTex = TEX.water.clone();
+waterTex.wrapS = waterTex.wrapT = THREE.RepeatWrapping;
+waterTex.repeat.set(120, 120);
+waterTex.magFilter = THREE.NearestFilter; waterTex.minFilter = THREE.NearestFilter;
+const water = new THREE.Mesh(
+    new THREE.PlaneGeometry(1200, 1200),
+    new THREE.MeshLambertMaterial({ map: waterTex, transparent: true, opacity: 0.92 })
+);
+water.rotation.x = -Math.PI / 2;
+water.position.y = 0.55;
+scene.add(water);
+
+// ── voxels → instanced meshes (cull fully-buried blocks) ────
+const buckets = {};
+for (const [k, t] of vox) {
+    const [x, y, z] = k.split(',').map(Number);
+    if (hasVox(x + 1, y, z) && hasVox(x - 1, y, z) && hasVox(x, y + 1, z) &&
+        hasVox(x, y - 1, z) && hasVox(x, y, z + 1) && hasVox(x, y, z - 1)) continue;
+    (buckets[t] ||= []).push(x, y, z);
+}
+const boxGeo = new THREE.BoxGeometry(1, 1, 1);
+const m4 = new THREE.Matrix4();
+let blockCount = 0;
+for (const [t, arr] of Object.entries(buckets)) {
+    const n = arr.length / 3;
+    blockCount += n;
+    const mesh = new THREE.InstancedMesh(boxGeo, MATS[t], n);
+    for (let i = 0; i < n; i++) {
+        m4.makeTranslation(arr[i * 3] + 0.5, arr[i * 3 + 1] + 0.5, arr[i * 3 + 2] + 0.5);
+        mesh.setMatrixAt(i, m4);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    scene.add(mesh);
+}
+console.log(`Minecraft NYC: ${blockCount.toLocaleString()} blocks rendered`);
+
+// ── yellow cabs ──────────────────────────────────────────────
+const lanes = [];
+for (let x = -44; x <= 44; x++) {
+    if (aveCol(x) !== 1) continue;
+    let z0 = null;
+    for (let z = -ISLAND_LEN; z <= ISLAND_LEN + 1; z++) {
+        const road = isRoad(x, z) && isAve(x);
+        if (road && z0 === null) z0 = z;
+        if (!road && z0 !== null) {
+            if (z - z0 > 20) lanes.push({ axis: 'z', x, a: z0, b: z - 1 });
+            z0 = null;
+        }
+    }
+}
+for (let z = -120; z <= 120; z += 30) {
+    if (!isSt(z)) continue;
+    let x0 = null;
+    for (let x = -45; x <= 46; x++) {
+        const road = isRoad(x, z);
+        if (road && x0 === null) x0 = x;
+        if (!road && x0 !== null) {
+            if (x - x0 > 20) lanes.push({ axis: 'x', z, a: x0, b: x - 1 });
+            x0 = null;
+        }
+    }
+}
+const cabGeo = new THREE.BoxGeometry(0.9, 0.55, 1.8);
+const cabTex = makeTex(c => {
+    noiseFill(c, ['#f7c52d', '#efbc24']);
+    c.fillStyle = '#1a1a1a'; c.fillRect(0, 4, 16, 3);
+});
+const cabs = new THREE.InstancedMesh(cabGeo, lam(cabTex), Math.min(44, lanes.length * 3));
+const cabState = [];
+for (let i = 0; i < cabs.count; i++) {
+    const lane = lanes[Math.floor(rand() * lanes.length)];
+    cabState.push({ lane, t: rand(), speed: 3.5 + rand() * 3, dir: rand() < 0.5 ? 1 : -1 });
+}
+scene.add(cabs);
+const quatNS = new THREE.Quaternion();
+const quatEW = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+const v3 = new THREE.Vector3(), sc1 = new THREE.Vector3(1, 1, 1);
+
+// ── clouds ───────────────────────────────────────────────────
+const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 });
+const clouds = [];
+for (let i = 0; i < 14; i++) {
+    const g = new THREE.Group();
+    const n = 2 + Math.floor(rand() * 3);
+    for (let j = 0; j < n; j++) {
+        const m = new THREE.Mesh(boxGeo, cloudMat);
+        m.scale.set(8 + rand() * 12, 2, 5 + rand() * 7);
+        m.position.set(rand() * 14 - 7, rand() * 2, rand() * 8 - 4);
+        g.add(m);
+    }
+    g.position.set(rand() * 500 - 250, 78 + rand() * 22, rand() * 500 - 250);
+    g.userData.speed = 1 + rand() * 2;
+    scene.add(g);
+    clouds.push(g);
+}
+
+// ── stars ────────────────────────────────────────────────────
+const starGeo = new THREE.BufferGeometry();
+{
+    const pts = new Float32Array(700 * 3);
+    for (let i = 0; i < 700; i++) {
+        const th = rand() * Math.PI * 2, ph = rand() * Math.PI * 0.45;
+        pts[i * 3] = Math.cos(th) * Math.sin(ph) * 700;
+        pts[i * 3 + 1] = Math.cos(ph) * 700;
+        pts[i * 3 + 2] = Math.sin(th) * Math.sin(ph) * 700;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+}
+const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 2, transparent: true, opacity: 0, fog: false });
+scene.add(new THREE.Points(starGeo, starMat));
+
+// ════════════════════════════════════════════════════════════
+//  CONTROLS — fly camera (pointer lock) + touch + guided tour
+// ════════════════════════════════════════════════════════════
+let yaw = Math.PI, pitch = -0.06;            // start facing the skyline (looking +z)
+// shareable viewpoint: #x,y,z,yaw,pitch
+if (location.hash.length > 1) {
+    const p = location.hash.slice(1).split(',').map(Number);
+    if (p.length === 5 && p.every(Number.isFinite)) {
+        camera.position.set(p[0], p[1], p[2]);
+        yaw = p[3]; pitch = p[4];
+    }
+}
+const keys = {};
+let touring = false;
+
+addEventListener('keydown', e => { keys[e.code] = true; if (touring) setTour(false); });
+addEventListener('keyup', e => keys[e.code] = false);
+
+renderer.domElement.addEventListener('click', () => {
+    if (matchMedia('(pointer: coarse)').matches) return;
+    renderer.domElement.requestPointerLock();
+});
+document.addEventListener('pointerlockchange', () =>
+    document.body.classList.toggle('locked', document.pointerLockElement === renderer.domElement));
+addEventListener('mousemove', e => {
+    if (document.pointerLockElement !== renderer.domElement) return;
+    yaw -= e.movementX * 0.0024;
+    pitch = Math.max(-1.45, Math.min(1.45, pitch - e.movementY * 0.0024));
+    if (touring) setTour(false);
+});
+
+// touch look + buttons
+let lastTouch = null;
+renderer.domElement.addEventListener('touchstart', e => { lastTouch = e.touches[0]; }, { passive: true });
+renderer.domElement.addEventListener('touchmove', e => {
+    const t = e.touches[0];
+    if (lastTouch) {
+        yaw -= (t.clientX - lastTouch.clientX) * 0.005;
+        pitch = Math.max(-1.45, Math.min(1.45, pitch - (t.clientY - lastTouch.clientY) * 0.005));
+        if (touring) setTour(false);
+    }
+    lastTouch = t;
+}, { passive: true });
+const touchMove = { fwd: 0, up: 0 };
+function bindHold(id, fn) {
+    const el = document.getElementById(id);
+    const on = e => { e.preventDefault(); fn(1); };
+    const off = () => fn(0);
+    el.addEventListener('touchstart', on); el.addEventListener('touchend', off);
+    el.addEventListener('mousedown', on); el.addEventListener('mouseup', off);
+}
+bindHold('fwdBtn',  v => touchMove.fwd = v);
+bindHold('backBtn', v => touchMove.fwd = -v);
+bindHold('upBtn',   v => touchMove.up = v);
+bindHold('downBtn', v => touchMove.up = -v);
+
+// guided tour: flythrough of the landmarks
+const tourPath = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 36, -190),
+    new THREE.Vector3(-42, 22, -150),
+    new THREE.Vector3(-30, 16, -118),
+    new THREE.Vector3(28, 18, -96),
+    new THREE.Vector3(58, 16, -80),
+    new THREE.Vector3(20, 24, -50),
+    new THREE.Vector3(-22, 22, -28),
+    new THREE.Vector3(-26, 34, 12),
+    new THREE.Vector3(8, 52, 22),
+    new THREE.Vector3(26, 30, 52),
+    new THREE.Vector3(0, 26, 116),
+    new THREE.Vector3(-48, 34, 40),
+    new THREE.Vector3(-44, 40, -60),
+], true, 'catmullrom', 0.4);
+const tourLook = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 20, -96),
+    new THREE.Vector3(-55, 14, -142),
+    new THREE.Vector3(-3, 35, -96),
+    new THREE.Vector3(-3, 40, -96),
+    new THREE.Vector3(36, 18, -80),
+    new THREE.Vector3(-8, 10, -28),
+    new THREE.Vector3(-9, 14, 20),
+    new THREE.Vector3(0, 42, 6),
+    new THREE.Vector3(19, 38, 20),
+    new THREE.Vector3(0, 8, 68),
+    new THREE.Vector3(0, 30, 6),
+    new THREE.Vector3(0, 32, -20),
+    new THREE.Vector3(0, 28, -60),
+], true, 'catmullrom', 0.4);
+let tourT = 0;
+const tourBtn = document.getElementById('tourBtn');
+function setTour(on) {
+    touring = on;
+    tourBtn.textContent = on ? '■ STOP' : '✈ TOUR';
+    tourBtn.classList.toggle('green', !on);
+    showToast(on ? 'HELICOPTER TOUR — TOUCH ANYTHING TO TAKE OVER' : 'FREE FLIGHT');
+}
+tourBtn.addEventListener('click', () => setTour(!touring));
+
+// day / night
+let nightAmt = 0, nightTarget = 0;
+const dnBtn = document.getElementById('dayNightBtn');
+dnBtn.addEventListener('click', () => {
+    nightTarget = nightTarget === 0 ? 1 : 0;
+    dnBtn.innerHTML = nightTarget ? '&#9728; DAY' : '&#127769; NIGHT';
+    showToast(nightTarget ? 'THE CITY THAT NEVER SLEEPS' : 'GOOD MORNING, NEW YORK');
+});
+
+const toast = document.getElementById('toast');
+let toastTimer;
+function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+}
+
+addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+});
+
+// ════════════════════════════════════════════════════════════
+//  MAIN LOOP
+// ════════════════════════════════════════════════════════════
+const clock = new THREE.Clock();
+const lookTarget = new THREE.Vector3();
+const skyCol = new THREE.Color();
+
+function animate() {
+    requestAnimationFrame(animate);
+    const dt = Math.min(clock.getDelta(), 0.1);
+    const t = clock.elapsedTime;
+
+    // day/night transition
+    nightAmt += (nightTarget - nightAmt) * Math.min(1, dt * 1.6);
+    skyCol.lerpColors(DAY.sky, NIGHT.sky, nightAmt);
+    renderer.setClearColor(skyCol);
+    scene.fog.color.copy(skyCol);
+    scene.fog.near = DAY.fog[0] + (NIGHT.fog[0] - DAY.fog[0]) * nightAmt;
+    scene.fog.far  = DAY.fog[1] + (NIGHT.fog[1] - DAY.fog[1]) * nightAmt;
+    hemi.intensity = DAY.hemi + (NIGHT.hemi - DAY.hemi) * nightAmt;
+    sun.intensity  = DAY.sun + (NIGHT.sun - DAY.sun) * nightAmt;
+    sun.color.lerpColors(DAY.sunCol, NIGHT.sunCol, nightAmt);
+    starMat.opacity = nightAmt * 0.9;
+    const gi = DAY.glowI + (NIGHT.glowI - DAY.glowI) * nightAmt;
+    for (const m of nightGlow) m.emissiveIntensity = gi;
+
+    // camera
+    if (touring) {
+        tourT = (tourT + dt / 95) % 1;
+        tourPath.getPointAt(tourT, camera.position);
+        tourLook.getPointAt(tourT, lookTarget);
+        camera.lookAt(lookTarget);
+        // keep yaw/pitch in sync so takeover is seamless
+        const e = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ');
+        yaw = e.y; pitch = e.x;
+    } else {
+        camera.rotation.set(pitch, yaw, 0, 'YXZ');
+        const speed = (keys['ControlLeft'] || keys['ControlRight'] ? 34 : 16) * dt;
+        const fwd = (keys['KeyW'] || keys['ArrowUp'] ? 1 : 0) - (keys['KeyS'] || keys['ArrowDown'] ? 1 : 0) + touchMove.fwd;
+        const strafe = (keys['KeyD'] || keys['ArrowRight'] ? 1 : 0) - (keys['KeyA'] || keys['ArrowLeft'] ? 1 : 0);
+        const fly = (keys['Space'] ? 1 : 0) - (keys['ShiftLeft'] || keys['ShiftRight'] ? 1 : 0) + touchMove.up;
+        v3.set(strafe, 0, -fwd).normalize().multiplyScalar(speed * (Math.abs(fwd) + Math.abs(strafe) > 0 ? 1 : 0));
+        v3.applyEuler(camera.rotation);
+        camera.position.add(v3);
+        camera.position.y = Math.max(2, Math.min(160, camera.position.y + fly * speed));
+        camera.position.x = Math.max(-300, Math.min(300, camera.position.x));
+        camera.position.z = Math.max(-300, Math.min(300, camera.position.z));
+    }
+
+    // cabs
+    for (let i = 0; i < cabState.length; i++) {
+        const s = cabState[i];
+        const len = s.lane.b - s.lane.a;
+        s.t += (s.speed * s.dir * dt) / len;
+        if (s.t > 1) s.t -= 1;
+        if (s.t < 0) s.t += 1;
+        const p = s.lane.a + s.t * len;
+        if (s.lane.axis === 'z') v3.set(s.lane.x + 0.5 + s.dir * 0.9, 1.3, p);
+        else v3.set(p, 1.3, s.lane.z + 0.5 + s.dir * 0.9);
+        m4.compose(v3, s.lane.axis === 'z' ? quatNS : quatEW, sc1);
+        cabs.setMatrixAt(i, m4);
+    }
+    cabs.instanceMatrix.needsUpdate = true;
+
+    // clouds drift
+    for (const c of clouds) {
+        c.position.x += c.userData.speed * dt;
+        if (c.position.x > 300) c.position.x = -300;
+    }
+
+    // water shimmer
+    waterTex.offset.x = t * 0.012;
+    waterTex.offset.y = Math.sin(t * 0.4) * 0.01;
+
+    renderer.render(scene, camera);
+}
+animate();
+showToast('WELCOME TO MINECRAFT NYC');
+</script>
+</body>
+</html>
