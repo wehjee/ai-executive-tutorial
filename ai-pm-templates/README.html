@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Product Manager Templates</title>
+<style>
+:root { --ink:#1a1a1a; --muted:#5c5c5c; --line:#e3e0da; --accent:#b04a2f; --bg:#faf9f6; --quote-bg:#f2efe9; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink);
+  font:17px/1.65 Georgia, 'Times New Roman', serif; }
+main { max-width:820px; margin:0 auto; padding:48px 24px 96px; }
+h1 { font-size:2rem; line-height:1.25; margin:0 0 .5em; letter-spacing:-.01em; }
+h2 { font-size:1.35rem; margin:2em 0 .6em; padding-top:.6em; border-top:1px solid var(--line); }
+h3 { font-size:1.1rem; margin:1.6em 0 .5em; }
+p { margin:.8em 0; }
+a { color:var(--accent); }
+blockquote { margin:1.2em 0; padding:14px 18px; background:var(--quote-bg);
+  border-left:4px solid var(--accent); font-style:italic; color:#3d3d3d; }
+blockquote p { margin:.4em 0; }
+table { border-collapse:collapse; width:100%; margin:1.2em 0; font-size:.92rem;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif; }
+th, td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+th { background:var(--quote-bg); font-weight:600; }
+tr:nth-child(even) td { background:#fdfcfa; }
+code { font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:.88em;
+  background:var(--quote-bg); padding:2px 5px; border-radius:4px; }
+ul, ol { padding-left:1.4em; }
+li { margin:.35em 0; }
+hr { border:none; border-top:1px solid var(--line); margin:2em 0; }
+strong { font-weight:700; }
+nav.crumb { font-family:system-ui,-apple-system,'Segoe UI',sans-serif; font-size:.85rem;
+  margin-bottom:28px; color:var(--muted); }
+nav.crumb a { text-decoration:none; }
+@media (max-width:640px){ body{font-size:16px;} main{padding:28px 16px 64px;}
+  table{display:block; overflow-x:auto;} }
+</style>
+</head>
+<body>
+<main>
+<h1>AI Product Manager Templates</h1>
+<p>A set of working templates modeled on how product managers operate at frontier AI labs —
+Anthropic, OpenAI, and Perplexity. These are not generic PM docs with &ldquo;AI&rdquo; bolted on; each one
+maps to an artifact those teams actually produce.</p>
+<h2>The templates</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Template</th>
+<th>What it&rsquo;s for</th>
+<th>Modeled on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="./01-ai-prd.html">AI PRD</a></td>
+<td>Spec a feature whose core behavior is non-deterministic</td>
+<td>Anthropic (&ldquo;crisp PRDs that account for non-deterministic behavior&rdquo;)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="./02-model-behavior-spec.html">Model Behavior Spec</a></td>
+<td>Define how the AI should behave — objectives, rules, defaults, worked examples</td>
+<td>OpenAI&rsquo;s public Model Spec</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="./03-eval-plan.html">Eval Plan</a></td>
+<td>Golden dataset, failure-mode taxonomy, graders, ship thresholds</td>
+<td>OpenAI (&ldquo;writing evals is a core PM skill&rdquo; — Kevin Weil, CPO)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="./04-capability-exposure-decision.html">Capability Exposure Decision</a></td>
+<td>Decide which model capabilities to expose, to whom, and when</td>
+<td>Anthropic PM charter</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="./05-launch-readiness-review.html">Launch Readiness Review</a></td>
+<td>Go/no-go gate: eval scores, red-team results, rollback plan, iterative-deployment stages</td>
+<td>Anthropic launch process + OpenAI iterative deployment</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="./06-safety-usage-policy-review.html">Safety &amp; Usage Policy Review</a></td>
+<td>Usage policies, rate limits, misuse scenarios, mitigations</td>
+<td>Anthropic (&ldquo;PMs set usage policies and rate limits&rdquo;)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><a href="./07-quarterly-plan.html">Quarterly Plan &amp; Weekly Goals</a></td>
+<td>Measurable (threshold/boolean) quarterly objectives + &ldquo;75% weekly goals&rdquo;</td>
+<td>Perplexity&rsquo;s planning system</td>
+</tr>
+<tr>
+<td>8</td>
+<td><a href="./08-post-launch-review.html">Post-Launch Learning Loop</a></td>
+<td>Postmortem + feedback quantification so improvements compound</td>
+<td>Anthropic post-launch loops + Perplexity postmortems</td>
+</tr>
+</tbody>
+</table>
+<h2>How to use them</h2>
+<ul>
+<li>Start with <strong>#1 (AI PRD)</strong> for any new feature; it links out to #2 and #3 rather than duplicating them.</li>
+<li><strong>#3 (Eval Plan)</strong> is the one most PMs skip and frontier labs never do — the quality of your evals caps the quality of your product.</li>
+<li><strong>#5 (Launch Readiness)</strong> is the gate. Nothing ships on vibes; it ships when the numbers in #3 clear the thresholds and #6 is signed off.</li>
+<li>Documents are meant to <em>replace meetings</em>, not summarize them. Write them so a reader can decide async.</li>
+</ul>
+<h2>Sources</h2>
+<ul>
+<li><a href="https://www.lennysnewsletter.com/p/how-anthropics-product-team-moves">How Anthropic&rsquo;s product team moves faster than anyone else — Cat Wu, Lenny&rsquo;s Podcast</a></li>
+<li><a href="https://www.lennysnewsletter.com/p/kevin-weil-open-ai">Kevin Weil (OpenAI CPO) on evals as a core PM skill — Lenny&rsquo;s Podcast</a></li>
+<li><a href="https://www.lennysnewsletter.com/p/how-perplexity-builds-product">How Perplexity builds product — Lenny&rsquo;s Newsletter</a></li>
+<li><a href="https://model-spec.openai.com/">OpenAI Model Spec</a></li>
+<li><a href="https://job-boards.greenhouse.io/anthropic">Anthropic PM role descriptions (Greenhouse job board)</a></li>
+<li><a href="https://www.braintrust.dev/blog/evals-for-pms">Evals for PMs — Braintrust</a></li>
+</ul>
+</main>
+</body>
+</html>

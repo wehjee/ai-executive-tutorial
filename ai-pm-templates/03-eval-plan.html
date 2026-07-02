@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eval Plan — [Feature name]</title>
+<style>
+:root { --ink:#1a1a1a; --muted:#5c5c5c; --line:#e3e0da; --accent:#b04a2f; --bg:#faf9f6; --quote-bg:#f2efe9; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink);
+  font:17px/1.65 Georgia, 'Times New Roman', serif; }
+main { max-width:820px; margin:0 auto; padding:48px 24px 96px; }
+h1 { font-size:2rem; line-height:1.25; margin:0 0 .5em; letter-spacing:-.01em; }
+h2 { font-size:1.35rem; margin:2em 0 .6em; padding-top:.6em; border-top:1px solid var(--line); }
+h3 { font-size:1.1rem; margin:1.6em 0 .5em; }
+p { margin:.8em 0; }
+a { color:var(--accent); }
+blockquote { margin:1.2em 0; padding:14px 18px; background:var(--quote-bg);
+  border-left:4px solid var(--accent); font-style:italic; color:#3d3d3d; }
+blockquote p { margin:.4em 0; }
+table { border-collapse:collapse; width:100%; margin:1.2em 0; font-size:.92rem;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif; }
+th, td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+th { background:var(--quote-bg); font-weight:600; }
+tr:nth-child(even) td { background:#fdfcfa; }
+code { font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:.88em;
+  background:var(--quote-bg); padding:2px 5px; border-radius:4px; }
+ul, ol { padding-left:1.4em; }
+li { margin:.35em 0; }
+hr { border:none; border-top:1px solid var(--line); margin:2em 0; }
+strong { font-weight:700; }
+nav.crumb { font-family:system-ui,-apple-system,'Segoe UI',sans-serif; font-size:.85rem;
+  margin-bottom:28px; color:var(--muted); }
+nav.crumb a { text-decoration:none; }
+@media (max-width:640px){ body{font-size:16px;} main{padding:28px 16px 64px;}
+  table{display:block; overflow-x:auto;} }
+</style>
+</head>
+<body>
+<main>
+<nav class="crumb"><a href="./README.html">&larr; All AI PM templates</a></nav><h1>Eval Plan — [Feature name]</h1>
+<blockquote>
+<p><strong>Why this template:</strong> OpenAI CPO Kevin Weil: &ldquo;Writing effective evals is becoming a core skill
+for product managers.&rdquo; Anthropic PMs literally &ldquo;write the evaluations that determine whether a
+feature is safe to ship.&rdquo; The quality of your evals caps the quality of your product — a model
+can only be optimized for what you can measure.</p>
+</blockquote>
+<p><strong>Owner:</strong> · <strong>Linked docs:</strong> <a href="./01-ai-prd.html">AI PRD</a> · <a href="./02-model-behavior-spec.html">Model Behavior Spec</a>
+<strong>Where it runs:</strong> [eval harness / CI job / dashboard link]</p>
+<hr />
+<h2>1. What we&rsquo;re measuring (and why it matters to the user)</h2>
+<p>One sentence per dimension, tied to the PRD&rsquo;s success metrics. Typical dimensions: task success,
+factual accuracy, instruction-following, safety/refusal correctness, format compliance, tone.</p>
+<h2>2. Golden dataset</h2>
+<p>Target: <strong>~100+ diverse traces</strong> representing real production scenarios, not just happy paths.</p>
+<table>
+<thead>
+<tr>
+<th>Slice</th>
+<th>Count</th>
+<th>Source</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Happy path</td>
+<td></td>
+<td>real user queries / synthetic</td>
+<td></td>
+</tr>
+<tr>
+<td>Edge cases</td>
+<td></td>
+<td>past failures, support tickets</td>
+<td></td>
+</tr>
+<tr>
+<td>Adversarial</td>
+<td></td>
+<td>red-team outputs</td>
+<td></td>
+</tr>
+<tr>
+<td>Out-of-scope</td>
+<td></td>
+<td></td>
+<td>should trigger refusal/handoff</td>
+</tr>
+</tbody>
+</table>
+<p>Rules:
+- Every example has an ideal answer or a pass/fail rubric — sourced from the Behavior Spec&rsquo;s worked examples.
+- Dataset is versioned. Production failures get added weekly (see <a href="./08-post-launch-review.html">Post-Launch Loop</a>).
+- Keep a held-out slice that prompt-tuning never sees.</p>
+<h2>3. Failure-mode taxonomy</h2>
+<p>Discovered by reading traces (error analysis), not invented in advance. Each mode is <strong>binary and
+specific</strong> — &ldquo;hallucinated a price,&rdquo; not &ldquo;bad answer.&rdquo;</p>
+<table>
+<thead>
+<tr>
+<th>Failure mode</th>
+<th>Definition (binary)</th>
+<th>Severity</th>
+<th>Current rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>e.g. Fabricated citation</td>
+<td>Cites a source that doesn&rsquo;t exist</td>
+<td>Severe</td>
+<td></td>
+</tr>
+<tr>
+<td>e.g. Format violation</td>
+<td>Output not valid per schema</td>
+<td>Moderate</td>
+<td></td>
+</tr>
+<tr>
+<td>e.g. Over-refusal</td>
+<td>Declines an in-scope request</td>
+<td>Moderate</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>4. Graders</h2>
+<p><strong>Code-based checks</strong> (deterministic, run on every change): schema validation, regex/keyword
+checks, execution tests, latency/cost assertions.</p>
+<p><strong>LLM-as-judge</strong> (for subjective dimensions). Each judge prompt must include:
+- Binary pass/fail criteria (no 1–10 scales — they don&rsquo;t reproduce)
+- 3–5 example passes and 3–5 example fails
+- Structured JSON output with an explanation field
+- Judge validated against <strong>human labels</strong> on ≥50 examples before you trust it (report agreement %)</p>
+<p><strong>Human review</strong>: sampling rate, who reviews, and the rubric they use.</p>
+<h2>5. Ship thresholds</h2>
+<p>The numbers that gate the <a href="./05-launch-readiness-review.html">Launch Readiness Review</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Ship bar</th>
+<th>Current</th>
+<th>Regression rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Golden-set pass rate</td>
+<td>≥ __%</td>
+<td></td>
+<td>no release may drop this by &gt;__pts</td>
+</tr>
+<tr>
+<td>Severe failure rate</td>
+<td>≤ __%</td>
+<td></td>
+<td>zero tolerance / block release</td>
+</tr>
+<tr>
+<td>Over-refusal rate</td>
+<td>≤ __%</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>p95 latency / cost per request</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>6. Cadence</h2>
+<ul>
+<li><strong>Every prompt or model change:</strong> full golden-set run, results posted to [channel/dashboard].</li>
+<li><strong>Weekly:</strong> review new production traces, update taxonomy and dataset.</li>
+<li><strong>Per model upgrade:</strong> full run + side-by-side comparison before switching (version comparison
+  is the point — prove the new setup beats the old one).</li>
+</ul>
+</main>
+</body>
+</html>

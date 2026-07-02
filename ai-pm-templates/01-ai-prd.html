@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI PRD — [Feature name]</title>
+<style>
+:root { --ink:#1a1a1a; --muted:#5c5c5c; --line:#e3e0da; --accent:#b04a2f; --bg:#faf9f6; --quote-bg:#f2efe9; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink);
+  font:17px/1.65 Georgia, 'Times New Roman', serif; }
+main { max-width:820px; margin:0 auto; padding:48px 24px 96px; }
+h1 { font-size:2rem; line-height:1.25; margin:0 0 .5em; letter-spacing:-.01em; }
+h2 { font-size:1.35rem; margin:2em 0 .6em; padding-top:.6em; border-top:1px solid var(--line); }
+h3 { font-size:1.1rem; margin:1.6em 0 .5em; }
+p { margin:.8em 0; }
+a { color:var(--accent); }
+blockquote { margin:1.2em 0; padding:14px 18px; background:var(--quote-bg);
+  border-left:4px solid var(--accent); font-style:italic; color:#3d3d3d; }
+blockquote p { margin:.4em 0; }
+table { border-collapse:collapse; width:100%; margin:1.2em 0; font-size:.92rem;
+  font-family:system-ui,-apple-system,'Segoe UI',sans-serif; }
+th, td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+th { background:var(--quote-bg); font-weight:600; }
+tr:nth-child(even) td { background:#fdfcfa; }
+code { font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:.88em;
+  background:var(--quote-bg); padding:2px 5px; border-radius:4px; }
+ul, ol { padding-left:1.4em; }
+li { margin:.35em 0; }
+hr { border:none; border-top:1px solid var(--line); margin:2em 0; }
+strong { font-weight:700; }
+nav.crumb { font-family:system-ui,-apple-system,'Segoe UI',sans-serif; font-size:.85rem;
+  margin-bottom:28px; color:var(--muted); }
+nav.crumb a { text-decoration:none; }
+@media (max-width:640px){ body{font-size:16px;} main{padding:28px 16px 64px;}
+  table{display:block; overflow-x:auto;} }
+</style>
+</head>
+<body>
+<main>
+<nav class="crumb"><a href="./README.html">&larr; All AI PM templates</a></nav><h1>AI PRD — [Feature name]</h1>
+<blockquote>
+<p><strong>Why this template:</strong> Anthropic PMs &ldquo;write crisp PRDs … and specs that account for
+non-deterministic behavior.&rdquo; A normal PRD assumes the feature does the same thing every time;
+an AI PRD must instead specify a <em>distribution</em> of acceptable behavior, an error budget, and
+what happens when the model is wrong.</p>
+</blockquote>
+<p><strong>Owner:</strong> · <strong>Status:</strong> Draft / In review / Approved · <strong>Last updated:</strong>
+<strong>Linked docs:</strong> <a href="./02-model-behavior-spec.html">Model Behavior Spec</a> · <a href="./03-eval-plan.html">Eval Plan</a></p>
+<hr />
+<h2>1. Problem</h2>
+<ul>
+<li>Who is the user and what job are they hiring this feature for?</li>
+<li>Why does this need a model at all? (If deterministic code solves it, use deterministic code.)</li>
+<li>Evidence: user quotes, support tickets, usage data.</li>
+</ul>
+<h2>2. Proposed solution (one paragraph)</h2>
+<p>Describe the feature as the user experiences it, not as an architecture.</p>
+<h2>3. Intended behavior</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Input example</th>
+<th>Ideal output</th>
+<th>Acceptable output</th>
+<th>Unacceptable output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Happy path</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Ambiguous input</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Adversarial / abusive input</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Out-of-scope request</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Full behavioral rules live in the <a href="./02-model-behavior-spec.html">Model Behavior Spec</a>; this table
+is the summary the eng team designs against.</p>
+<h2>4. Error budget &amp; failure handling</h2>
+<p>AI features fail. Specify how much, and what the product does when it happens.</p>
+<ul>
+<li><strong>Target quality:</strong> e.g. &ldquo;≥ 95% pass rate on the golden set; ≤ 1% severe failures.&rdquo;</li>
+<li><strong>Failure UX:</strong> what the user sees on low confidence — hedge, cite sources, refuse, or hand off to a human?</li>
+<li><strong>Reversibility:</strong> can the user undo/override every model action? If not, why is that acceptable?</li>
+</ul>
+<h2>5. Latency &amp; cost budget</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+<th>Ceiling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>p50 / p95 latency</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Cost per request (tokens)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Expected requests/day at launch, at 6 months</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Note the model tier / routing plan (e.g. small model first, escalate on complexity).</p>
+<h2>6. What we&rsquo;re NOT building</h2>
+<p>Explicit non-goals, including capabilities the model <em>could</em> do but we are choosing not to expose
+(record the reasoning in a <a href="./04-capability-exposure-decision.html">Capability Exposure Decision</a>).</p>
+<h2>7. The next-model bet</h2>
+<p>Frontier-lab practice: build products that don&rsquo;t fully work yet, so you&rsquo;re ready when the next
+model closes the gap.</p>
+<ul>
+<li>Which parts of this feature are at the edge of current model capability?</li>
+<li>If the next model generation is 2× better at [X], what does this feature become?</li>
+<li>What are we building now that&rsquo;s deliberately ahead of the model?</li>
+</ul>
+<h2>8. Success metrics</h2>
+<ul>
+<li>Primary metric (one number that says the feature works):</li>
+<li>Guardrail metrics (quality, safety, cost — the things we won&rsquo;t trade away):</li>
+<li>Eval thresholds that gate launch → see <a href="./03-eval-plan.html">Eval Plan</a> and
+  <a href="./05-launch-readiness-review.html">Launch Readiness Review</a>.</li>
+</ul>
+<h2>9. Rollout</h2>
+<p>Iterative deployment stages (internal dogfood → trusted testers → % rollout → GA), with the
+eval/metric bar for advancing each stage.</p>
+<h2>10. Open questions</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Owner</th>
+<th>Needed by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</main>
+</body>
+</html>
